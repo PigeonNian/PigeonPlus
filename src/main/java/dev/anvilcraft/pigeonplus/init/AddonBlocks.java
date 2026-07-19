@@ -5,7 +5,6 @@ import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
 import dev.anvilcraft.pigeonplus.block.BlenderBlock;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.level.block.Block;
 
 import static dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus.REGISTRUM;
 
@@ -14,14 +13,9 @@ public class AddonBlocks {
         REGISTRUM.defaultCreativeTab(AddonItemGroups.ADDON_ITEMS.getKey());
     }
 
-    public static final BlockEntry<Block> EXAMPLE_BLOCK = REGISTRUM
-        .block("example_block", Block::new)
-        .simpleItem()
-        .register();
-
     public static final BlockEntry<BlenderBlock> BLENDER = REGISTRUM
         .block("blender", BlenderBlock::new)
-        .blockstate((ctx, prov) -> prov.simpleBlock(ctx.getEntry(),
+        .blockstate((ctx, prov) -> prov.horizontalBlock(ctx.getEntry(),
             prov.models().getExistingFile(
                 ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/blender_bottom"))))
         .item((block, props) -> new BlockItem(block, props))

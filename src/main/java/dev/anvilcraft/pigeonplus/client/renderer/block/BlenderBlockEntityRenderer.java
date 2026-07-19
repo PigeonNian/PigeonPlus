@@ -14,10 +14,12 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.neoforged.neoforge.client.model.data.ModelData;
 
 public class BlenderBlockEntityRenderer implements BlockEntityRenderer<BlenderBlockEntity> {
@@ -34,19 +36,28 @@ public class BlenderBlockEntityRenderer implements BlockEntityRenderer<BlenderBl
         Level level = blockEntity.getLevel();
         if (level == null) return;
 
-        BlockState blockState = blockEntity.getBlockState();
+        BlockPos pos = blockEntity.getBlockPos();
         ModelManager modelManager = Minecraft.getInstance().getModelManager();
         BlockRenderDispatcher dispatcher = Minecraft.getInstance().getBlockRenderer();
         RandomSource random = RandomSource.create();
         ModelData modelData = ModelData.EMPTY;
 
-        // Render top (rotating)
         BakedModel topModel = modelManager.getModel(TOP_MODEL);
+
+        // Check for large cauldron core 2 blocks above
+        boolean hasCauldronAbove = isLargeCauldronCore(level, pos.above(2));
+
         poseStack.pushPose();
         float angle = (level.getGameTime() + partialTick) * 3.0f;
-        poseStack.translate(0.5, 0.0, 0.5);
+        poseStack.translate(0.5, 0.5, 0.5);
+        if (hasCauldronAbove) {
+            poseStack.scale(2.0f, 2.0f, 2.0f);
+            poseStack.translate(0.0, -0.2, 0.0);
+        }
         poseStack.mulPose(Axis.YP.rotationDegrees(angle));
-        poseStack.translate(-0.5, 0.0, -0.5);
+        poseStack.translate(-0.5, -0.5, -0.5);
+
+        BlockState blockState = blockEntity.getBlockState();
         for (RenderType renderType : topModel.getRenderTypes(blockState, random, modelData)) {
             VertexConsumer vertexConsumer = bufferSource.getBuffer(renderType);
             dispatcher.getModelRenderer().renderModel(
@@ -56,5 +67,16 @@ public class BlenderBlockEntityRenderer implements BlockEntityRenderer<BlenderBl
             );
         }
         poseStack.popPose();
+    }
+
+    private static boolean isLargeCauldronCore(Level level, BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        ResourceLocation id = state.getBlock().builtInRegistryHolder().key().location();
+        if (!id.equals(ResourceLocation.fromNamespaceAndPath("anvilcraft", "large_cauldron"))) {
+            return false;
+        }
+        Property<?> halfProp = state.getBlock().getStateDefinition().getProperty("half");
+        if (halfProp == null) return false;
+        return "mid_center".equals(state.getValue(halfProp).toString());
     }
 }

@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
+    "facing=east": {
+      "model": "anvilcraft_pigeon_plus:block/blender_bottom",
+      "y": 90
+    },
+    "facing=north": {
       "model": "anvilcraft_pigeon_plus:block/blender_bottom"
+    },
+    "facing=south": {
+      "model": "anvilcraft_pigeon_plus:block/blender_bottom",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "anvilcraft_pigeon_plus:block/blender_bottom",
+      "y": 270
     }
   }
 }
