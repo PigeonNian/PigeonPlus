@@ -24,8 +24,6 @@ public class BlenderBlockEntityRenderer implements BlockEntityRenderer<BlenderBl
         ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/blender_top"),
         "standalone");
 
-    private static final RenderType RENDER_TYPE = RenderType.solid();
-
     public BlenderBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
     }
 
