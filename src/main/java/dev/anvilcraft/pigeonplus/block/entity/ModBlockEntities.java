@@ -1,0 +1,22 @@
+package dev.anvilcraft.pigeonplus.block.entity;
+
+import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
+import dev.anvilcraft.pigeonplus.init.AddonBlocks;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
+
+public class ModBlockEntities {
+    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
+        DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, AnvilCraftPigeonPlus.MOD_ID);
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BlenderBlockEntity>> BLENDER =
+        BLOCK_ENTITIES.register("blender", () ->
+            BlockEntityType.Builder.of(BlenderBlockEntity::new, AddonBlocks.BLENDER.get()).build(null));
+
+    public static void register(IEventBus bus) {
+        BLOCK_ENTITIES.register(bus);
+    }
+}

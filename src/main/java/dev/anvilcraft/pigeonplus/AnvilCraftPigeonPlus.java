@@ -1,6 +1,7 @@
 package dev.anvilcraft.pigeonplus;
 
 import com.mojang.logging.LogUtils;
+import dev.anvilcraft.pigeonplus.block.entity.ModBlockEntities;
 import dev.anvilcraft.pigeonplus.data.AddonDatagen;
 import dev.anvilcraft.pigeonplus.init.AddonBlocks;
 import dev.anvilcraft.pigeonplus.init.AddonItemGroups;
@@ -25,6 +26,7 @@ public class AnvilCraftPigeonPlus {
         AddonBlocks.register();
         AddonItems.register();
         AddonDatagen.init();
+        ModBlockEntities.register(modEventBus);
     }
 
     public static ResourceLocation of(String path) {
