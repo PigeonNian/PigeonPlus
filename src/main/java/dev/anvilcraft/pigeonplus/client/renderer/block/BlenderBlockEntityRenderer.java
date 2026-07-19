@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
@@ -34,35 +35,26 @@ public class BlenderBlockEntityRenderer implements BlockEntityRenderer<BlenderBl
         if (level == null) return;
 
         BlockState blockState = blockEntity.getBlockState();
+        ModelManager modelManager = Minecraft.getInstance().getModelManager();
         BlockRenderDispatcher dispatcher = Minecraft.getInstance().getBlockRenderer();
-        ModelData modelData = ModelData.EMPTY;
         RandomSource random = RandomSource.create();
-
-        // Render bottom (static)
-        BakedModel bottomModel = dispatcher.getBlockModel(blockState);
-        renderModel(bottomModel, blockState, dispatcher, poseStack, bufferSource, packedLight, packedOverlay, modelData, random);
+        ModelData modelData = ModelData.EMPTY;
 
         // Render top (rotating)
-        BakedModel topModel = Minecraft.getInstance().getModelManager().getModel(TOP_MODEL);
+        BakedModel topModel = modelManager.getModel(TOP_MODEL);
         poseStack.pushPose();
         float angle = (level.getGameTime() + partialTick) * 3.0f;
         poseStack.translate(0.5, 0.0, 0.5);
         poseStack.mulPose(Axis.YP.rotationDegrees(angle));
         poseStack.translate(-0.5, 0.0, -0.5);
-        renderModel(topModel, blockState, dispatcher, poseStack, bufferSource, packedLight, packedOverlay, modelData, random);
-        poseStack.popPose();
-    }
-
-    private void renderModel(BakedModel model, BlockState state, BlockRenderDispatcher dispatcher,
-                             PoseStack poseStack, MultiBufferSource bufferSource,
-                             int packedLight, int packedOverlay, ModelData modelData, RandomSource random) {
-        for (RenderType renderType : model.getRenderTypes(state, random, modelData)) {
+        for (RenderType renderType : topModel.getRenderTypes(blockState, random, modelData)) {
             VertexConsumer vertexConsumer = bufferSource.getBuffer(renderType);
             dispatcher.getModelRenderer().renderModel(
-                poseStack.last(), vertexConsumer, state, model,
+                poseStack.last(), vertexConsumer, blockState, topModel,
                 1.0F, 1.0F, 1.0F, packedLight, packedOverlay,
                 modelData, renderType
             );
         }
+        poseStack.popPose();
     }
 }
