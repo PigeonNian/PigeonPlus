@@ -1,0 +1,14 @@
+{
+  "anvilcraft_pigeon_plus.configuration.log_dirt_block": "Log Dirt Block",
+  "anvilcraft_pigeon_plus.configuration.log_dirt_block.tooltip": "Whether to log the dirt block on common setup",
+  "anvilcraft_pigeon_plus.configuration.magic_number": "Magic Number",
+  "anvilcraft_pigeon_plus.configuration.magic_number.tooltip": "A magic number",
+  "anvilcraft_pigeon_plus.configuration.magic_number_introduction": "Magic Number Introduction",
+  "anvilcraft_pigeon_plus.configuration.magic_number_introduction.tooltip": "What you want the introduction message to be for the magic number",
+  "anvilcraft_pigeon_plus.configuration.section.anvilcraft_pigeon_plus.common.toml": "Anvilcraft Pigeon Plus Common Configuration",
+  "anvilcraft_pigeon_plus.configuration.section.anvilcraft_pigeon_plus.common.toml.title": "Anvilcraft Pigeon Plus Common Configuration",
+  "anvilcraft_pigeon_plus.configuration.title": "Anvilcraft Pigeon Plus Configuration",
+  "block.anvilcraft_pigeon_plus.example_block": "Example Block",
+  "item.anvilcraft_pigeon_plus.example_item": "Example Item",
+  "itemGroup.anvilcraft_pigeon_plus.addon_items": "AnvilCraft: Pigeon+"
+}
