@@ -23,6 +23,7 @@ public class AnvilCraftPigeonPlus {
     public static final Registrum REGISTRUM = Registrum.create(MOD_ID);
 
     public AnvilCraftPigeonPlus(IEventBus modEventBus, ModContainer modContainer) {
+        modEventBus.addListener(ModBlockEntities::registerCapabilities);
         AddonItemGroups.register(modEventBus);
         AddonFluids.register(modEventBus);
         AddonBlocks.register();

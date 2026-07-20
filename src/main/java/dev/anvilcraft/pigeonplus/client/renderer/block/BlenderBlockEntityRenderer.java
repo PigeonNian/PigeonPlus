@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
+import dev.anvilcraft.pigeonplus.block.BlenderBlock;
 import dev.anvilcraft.pigeonplus.block.entity.BlenderBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -23,6 +24,8 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.neoforged.neoforge.client.model.data.ModelData;
 
 public class BlenderBlockEntityRenderer implements BlockEntityRenderer<BlenderBlockEntity> {
+    private static final float ROTATION_DEGREES_PER_TICK = 45.0f;
+
     private static final ModelResourceLocation TOP_MODEL = new ModelResourceLocation(
         ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/blender_top"),
         "standalone");
@@ -47,8 +50,12 @@ public class BlenderBlockEntityRenderer implements BlockEntityRenderer<BlenderBl
         // Check for large cauldron core 2 blocks above
         boolean hasCauldronAbove = isLargeCauldronCore(level, pos.above(2));
 
+        BlockState blockState = blockEntity.getBlockState();
+
         poseStack.pushPose();
-        float angle = (level.getGameTime() + partialTick) * 3.0f;
+        float angle = blockState.getValue(BlenderBlock.WORKING)
+            ? (level.getGameTime() + partialTick) * ROTATION_DEGREES_PER_TICK
+            : 0.0f;
         poseStack.translate(0.5, 0.5, 0.5);
         if (hasCauldronAbove) {
             poseStack.scale(2.0f, 2.0f, 2.0f);
@@ -57,7 +64,6 @@ public class BlenderBlockEntityRenderer implements BlockEntityRenderer<BlenderBl
         poseStack.mulPose(Axis.YP.rotationDegrees(angle));
         poseStack.translate(-0.5, -0.5, -0.5);
 
-        BlockState blockState = blockEntity.getBlockState();
         for (RenderType renderType : topModel.getRenderTypes(blockState, random, modelData)) {
             VertexConsumer vertexConsumer = bufferSource.getBuffer(renderType);
             dispatcher.getModelRenderer().renderModel(

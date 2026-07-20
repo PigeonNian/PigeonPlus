@@ -136,6 +136,7 @@ public abstract class FluidPipeNetworkMixin {
         }
         FluidStack gasStack = new FluidStack(gas, 1);
         PigeonPlus_Reachability reach = directionalConstraints ? pigeonplus$computeReachable(source.fromPipePos(), gasStack) : null;
+        Map<BlockPos, List<ValveState>> pathValves = reach == null ? Map.of() : reach.pathValves();
         List<FluidEndpoint> targets = endpoints.stream()
             .filter(target -> pigeonplus$canPressureTarget(source, target, gas, gasStack, reach))
             .sorted(Comparator.comparingDouble(target -> pigeonplus$pressure(target, gas)))
@@ -149,7 +150,7 @@ public abstract class FluidPipeNetworkMixin {
             if (amount <= 0) {
                 continue;
             }
-            List<ValveState> valvePath = reach.pathValves().get(target.fromPipePos());
+            List<ValveState> valvePath = pathValves.get(target.fromPipePos());
             amount = Math.min(amount, Math.min(budget, pigeonplus$minValveRemaining(valvePath)));
             if (amount <= 0) {
                 continue;
@@ -181,7 +182,7 @@ public abstract class FluidPipeNetworkMixin {
         if (target.handler().fill(gasStack, IFluidHandler.FluidAction.SIMULATE) <= 0) {
             return false;
         }
-        return pigeonplus$isEndpointReachable(reach, target);
+        return reach == null || pigeonplus$isEndpointReachable(reach, target);
     }
 
     @Unique
@@ -238,6 +239,9 @@ public abstract class FluidPipeNetworkMixin {
         Map<BlockPos, List<ValveState>> result = new HashMap<>();
         Map<BlockPos, BlockPos> cameFrom = new HashMap<>();
         List<ValveState> startPath = pigeonplus$valvesAt(start, fluid, List.of());
+        if (startPath == null) {
+            return new PigeonPlus_Reachability(result, cameFrom);
+        }
         result.put(start, startPath);
         cameFrom.put(start, null);
         Deque<BlockPos> queue = new ArrayDeque<>();
@@ -249,10 +253,13 @@ public abstract class FluidPipeNetworkMixin {
                 if (result.containsKey(next)) {
                     continue;
                 }
-                if (pigeonplus$canLeaveDiode(cur, cameFrom.get(cur), next) || !pigeonplus$canPassFaceValve(cur, next)) {
+                if (!pigeonplus$canLeaveDiode(cur, cameFrom.get(cur), next) || !pigeonplus$canPassFaceValve(cur, next)) {
                     continue;
                 }
                 List<ValveState> nextPath = pigeonplus$valvesAt(next, fluid, curPath);
+                if (nextPath == null) {
+                    continue;
+                }
                 result.put(next, nextPath);
                 cameFrom.put(next, cur);
                 queue.add(next);
@@ -267,7 +274,7 @@ public abstract class FluidPipeNetworkMixin {
         if (!reach.pathValves().containsKey(pipe)) {
             return false;
         }
-        if (pigeonplus$canLeaveDiode(pipe, reach.cameFrom().get(pipe), target.containerPos())) {
+        if (!pigeonplus$canLeaveDiode(pipe, reach.cameFrom().get(pipe), target.containerPos())) {
             return false;
         }
         if (target.sideToPipe() != null) {
@@ -306,14 +313,14 @@ public abstract class FluidPipeNetworkMixin {
     private boolean pigeonplus$canLeaveDiode(BlockPos cur, BlockPos from, BlockPos to) {
         Direction inflowDir = diodes.get(cur);
         if (inflowDir == null) {
-            return false;
+            return true;
         }
         BlockPos highSide = cur.relative(inflowDir);
         BlockPos lowSide = cur.relative(inflowDir.getOpposite());
         if (!to.equals(lowSide)) {
-            return true;
+            return false;
         }
-        return !from.equals(highSide);
+        return from == null || from.equals(highSide);
     }
 
     @Unique
@@ -363,7 +370,7 @@ public abstract class FluidPipeNetworkMixin {
 
     @Unique
     private static int pigeonplus$minValveRemaining(List<ValveState> valvePath) {
-        if (valvePath.isEmpty()) {
+        if (valvePath == null || valvePath.isEmpty()) {
             return FluidPipeNetwork.MAX_SPEED;
         }
         int min = FluidPipeNetwork.MAX_SPEED;
@@ -375,6 +382,9 @@ public abstract class FluidPipeNetworkMixin {
 
     @Unique
     private static void pigeonplus$deductValves(List<ValveState> valvePath, int amount) {
+        if (valvePath == null) {
+            return;
+        }
         for (ValveState valve : valvePath) {
             valve.consume(amount);
         }

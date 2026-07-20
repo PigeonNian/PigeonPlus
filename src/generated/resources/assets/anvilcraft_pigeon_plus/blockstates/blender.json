@@ -1,17 +1,32 @@
 {
   "variants": {
-    "facing=east": {
+    "facing=east,working=false": {
       "model": "anvilcraft_pigeon_plus:block/blender_bottom",
       "y": 90
     },
-    "facing=north": {
+    "facing=east,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender_bottom",
+      "y": 90
+    },
+    "facing=north,working=false": {
       "model": "anvilcraft_pigeon_plus:block/blender_bottom"
     },
-    "facing=south": {
+    "facing=north,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender_bottom"
+    },
+    "facing=south,working=false": {
       "model": "anvilcraft_pigeon_plus:block/blender_bottom",
       "y": 180
     },
-    "facing=west": {
+    "facing=south,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender_bottom",
+      "y": 180
+    },
+    "facing=west,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender_bottom",
+      "y": 270
+    },
+    "facing=west,working=true": {
       "model": "anvilcraft_pigeon_plus:block/blender_bottom",
       "y": 270
     }

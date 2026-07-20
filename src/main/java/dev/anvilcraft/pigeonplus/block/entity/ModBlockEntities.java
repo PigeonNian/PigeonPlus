@@ -5,6 +5,8 @@ import dev.anvilcraft.pigeonplus.init.AddonBlocks;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -18,5 +20,13 @@ public class ModBlockEntities {
 
     public static void register(IEventBus bus) {
         BLOCK_ENTITIES.register(bus);
+    }
+
+    public static void registerCapabilities(RegisterCapabilitiesEvent event) {
+        event.registerBlockEntity(
+            Capabilities.FluidHandler.BLOCK,
+            BLENDER.get(),
+            BlenderBlockEntity::getFluidHandler
+        );
     }
 }
