@@ -24,6 +24,7 @@ public class AnvilPumpBlockEntity extends PumpBlockEntity {
     private float pistonPress;
     private float pistonPressOld;
     private boolean pistonPressing;
+    private boolean pistonHolding;
     private int pistonReleaseDelay;
     private boolean impactLocked;
     private int impactUnlockTicks;
@@ -48,9 +49,6 @@ public class AnvilPumpBlockEntity extends PumpBlockEntity {
         this.remainingPumpTicks = PUMP_DURATION_TICKS;
         this.headlift = nextHeadlift;
         this.impactLocked = true;
-        this.pistonPress = 1.0F;
-        this.pistonPressing = false;
-        this.pistonReleaseDelay = PISTON_RELEASE_DELAY_TICKS;
         this.impactUnlockTicks = IMPACT_UNLOCK_TICKS;
         this.setChanged();
         this.sendUpdate();
@@ -78,6 +76,7 @@ public class AnvilPumpBlockEntity extends PumpBlockEntity {
         this.pistonPress = 0.0F;
         this.pistonPressOld = 0.0F;
         this.pistonPressing = true;
+        this.pistonHolding = false;
         this.pistonReleaseDelay = PISTON_RELEASE_DELAY_TICKS;
     }
 
@@ -129,19 +128,29 @@ public class AnvilPumpBlockEntity extends PumpBlockEntity {
 
     private void tickPistonPressAnimation(Level level, BlockPos pos) {
         this.pistonPressOld = this.pistonPress;
-        if (hasAnvilOnTop(level, pos)) {
-            this.pistonPress = 1.0F;
-            this.pistonPressing = false;
-            this.pistonReleaseDelay = PISTON_RELEASE_DELAY_TICKS;
-            return;
-        }
+        boolean hasAnvilOnTop = hasAnvilOnTop(level, pos);
         if (!this.pistonPressing) {
+            if (hasAnvilOnTop) {
+                this.pistonHolding = true;
+                this.pistonPress = 1.0F;
+                this.pistonReleaseDelay = PISTON_RELEASE_DELAY_TICKS;
+                return;
+            }
+            if (this.pistonHolding) {
+                if (this.pistonReleaseDelay > 0) {
+                    this.pistonReleaseDelay--;
+                    return;
+                }
+                this.pistonHolding = false;
+            }
             this.tickPistonReleaseAnimation();
             return;
         }
         this.pistonPress = Math.min(1.0F, this.pistonPress + PISTON_PRESS_STEP);
         if (this.pistonPress >= 1.0F) {
+            this.pistonPress = 1.0F;
             this.pistonPressing = false;
+            this.pistonHolding = hasAnvilOnTop;
             this.pistonReleaseDelay = PISTON_RELEASE_DELAY_TICKS;
         }
     }
@@ -173,9 +182,6 @@ public class AnvilPumpBlockEntity extends PumpBlockEntity {
         super.saveAdditional(tag, registries);
         tag.putInt("RemainingPumpTicks", this.remainingPumpTicks);
         tag.putInt("Headlift", this.headlift);
-        tag.putFloat("PistonPress", this.pistonPress);
-        tag.putBoolean("PistonPressing", this.pistonPressing);
-        tag.putInt("PistonReleaseDelay", this.pistonReleaseDelay);
         tag.putBoolean("ImpactLocked", this.impactLocked);
         tag.putInt("ImpactUnlockTicks", this.impactUnlockTicks);
     }
@@ -185,10 +191,6 @@ public class AnvilPumpBlockEntity extends PumpBlockEntity {
         super.loadAdditional(tag, registries);
         this.remainingPumpTicks = tag.getInt("RemainingPumpTicks");
         this.headlift = tag.getInt("Headlift");
-        this.pistonPress = tag.getFloat("PistonPress");
-        this.pistonPressOld = this.pistonPress;
-        this.pistonPressing = tag.getBoolean("PistonPressing");
-        this.pistonReleaseDelay = tag.getInt("PistonReleaseDelay");
         this.impactLocked = tag.getBoolean("ImpactLocked");
         this.impactUnlockTicks = tag.getInt("ImpactUnlockTicks");
     }
