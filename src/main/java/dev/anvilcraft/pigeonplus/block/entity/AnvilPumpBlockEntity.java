@@ -16,6 +16,8 @@ public class AnvilPumpBlockEntity extends PumpBlockEntity {
     private static final float MAX_EFFICIENCY_FALL_DISTANCE = 20.0F;
     private static final float PISTON_PRESS_STEP = 0.25F;
     private static final int PISTON_RELEASE_DELAY_TICKS = 20;
+    private static final int PISTON_RELEASE_ANIMATION_TICKS = 4;
+    private static final int IMPACT_UNLOCK_TICKS = PISTON_RELEASE_DELAY_TICKS + PISTON_RELEASE_ANIMATION_TICKS;
 
     private int remainingPumpTicks;
     private int headlift;
@@ -24,6 +26,7 @@ public class AnvilPumpBlockEntity extends PumpBlockEntity {
     private boolean pistonPressing;
     private int pistonReleaseDelay;
     private boolean impactLocked;
+    private int impactUnlockTicks;
 
     public AnvilPumpBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.ANVIL_PUMP.get(), pos, state);
@@ -33,18 +36,22 @@ public class AnvilPumpBlockEntity extends PumpBlockEntity {
         if (this.impactLocked) {
             return false;
         }
+        if (this.getBlockState().getValue(PumpBlock.POWERED)) {
+            return false;
+        }
+        boolean wasPumping = this.canPump();
+        int oldHeadlift = this.headlift;
         int nextHeadlift = Math.max(
             1,
             Math.round(Math.min(fallDistance / MAX_EFFICIENCY_FALL_DISTANCE, 1.0F) * PumpBlockEntity.PUMP_HEADLIFT)
         );
-        boolean wasPumping = this.canPump();
-        int oldHeadlift = this.headlift;
         this.remainingPumpTicks = PUMP_DURATION_TICKS;
         this.headlift = nextHeadlift;
         this.impactLocked = true;
         this.pistonPress = 1.0F;
         this.pistonPressing = false;
         this.pistonReleaseDelay = PISTON_RELEASE_DELAY_TICKS;
+        this.impactUnlockTicks = IMPACT_UNLOCK_TICKS;
         this.setChanged();
         this.sendUpdate();
         if (this.level != null && !this.level.isClientSide()) {
@@ -68,7 +75,10 @@ public class AnvilPumpBlockEntity extends PumpBlockEntity {
         if (this.pistonPress >= 1.0F || this.pistonPressing) {
             return;
         }
+        this.pistonPress = 0.0F;
+        this.pistonPressOld = 0.0F;
         this.pistonPressing = true;
+        this.pistonReleaseDelay = PISTON_RELEASE_DELAY_TICKS;
     }
 
     @Override
@@ -82,23 +92,39 @@ public class AnvilPumpBlockEntity extends PumpBlockEntity {
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, AnvilPumpBlockEntity entity) {
-        entity.tickPistonPressAnimation(level, pos);
         if (level.isClientSide()) {
+            entity.tickPistonPressAnimation(level, pos);
             return;
         }
 
         updateRedstoneState(level, pos, state);
 
-        boolean wasPumping = entity.canPump();
         if (entity.remainingPumpTicks > 0) {
             entity.remainingPumpTicks--;
             entity.setChanged();
         }
+        entity.tickImpactLock(level, pos);
+
         boolean canPumpNow = entity.canPump();
-        if (wasPumping != canPumpNow || canPumpNow != entity.isLastCanPump()) {
+        if (canPumpNow != entity.isLastCanPump()) {
             entity.setLastCanPump(canPumpNow);
             FluidNetworkManager.INSTANCE.markDirty(level);
         }
+    }
+
+    private void tickImpactLock(Level level, BlockPos pos) {
+        if (!this.impactLocked) {
+            return;
+        }
+        if (hasAnvilOnTop(level, pos)) {
+            this.impactUnlockTicks = IMPACT_UNLOCK_TICKS;
+            return;
+        }
+        if (this.impactUnlockTicks > 0) {
+            this.impactUnlockTicks--;
+            return;
+        }
+        this.impactLocked = false;
     }
 
     private void tickPistonPressAnimation(Level level, BlockPos pos) {
@@ -107,7 +133,6 @@ public class AnvilPumpBlockEntity extends PumpBlockEntity {
             this.pistonPress = 1.0F;
             this.pistonPressing = false;
             this.pistonReleaseDelay = PISTON_RELEASE_DELAY_TICKS;
-            this.impactLocked = true;
             return;
         }
         if (!this.pistonPressing) {
@@ -130,9 +155,6 @@ public class AnvilPumpBlockEntity extends PumpBlockEntity {
             return;
         }
         this.pistonPress = Math.max(0.0F, this.pistonPress - PISTON_PRESS_STEP);
-        if (this.pistonPress <= 0.0F) {
-            this.impactLocked = false;
-        }
     }
 
     private static void updateRedstoneState(Level level, BlockPos pos, BlockState state) {
@@ -155,6 +177,7 @@ public class AnvilPumpBlockEntity extends PumpBlockEntity {
         tag.putBoolean("PistonPressing", this.pistonPressing);
         tag.putInt("PistonReleaseDelay", this.pistonReleaseDelay);
         tag.putBoolean("ImpactLocked", this.impactLocked);
+        tag.putInt("ImpactUnlockTicks", this.impactUnlockTicks);
     }
 
     @Override
@@ -167,5 +190,6 @@ public class AnvilPumpBlockEntity extends PumpBlockEntity {
         this.pistonPressing = tag.getBoolean("PistonPressing");
         this.pistonReleaseDelay = tag.getInt("PistonReleaseDelay");
         this.impactLocked = tag.getBoolean("ImpactLocked");
+        this.impactUnlockTicks = tag.getInt("ImpactUnlockTicks");
     }
 }
