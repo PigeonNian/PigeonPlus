@@ -5,4 +5,9 @@ dependencies {
     // AnvilCraft
     implementation(libs.anvilcraft) { transitive = false }
     interfaceInjectionData(libs.anvilcraft) { transitive = false }
+
+    // JEI
+    compileOnly(libs.jeiCommonApi)
+    compileOnly(libs.jeiNeoForgeApi)
+    runtimeOnly(libs.jeiNeoForge)
 }

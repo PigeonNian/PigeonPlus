@@ -2,6 +2,7 @@ package dev.anvilcraft.pigeonplus.data;
 
 import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
 import dev.anvilcraft.pigeonplus.data.lang.AddonLangHandler;
+import dev.anvilcraft.pigeonplus.data.recipe.AddonRecipeHandler;
 import dev.anvilcraft.lib.v2.registrum.providers.ProviderType;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -19,5 +20,6 @@ public class AddonDatagen {
      */
     public static void init() {
         REGISTRUM.addDataGenerator(ProviderType.LANG, AddonLangHandler::init);
+        REGISTRUM.addDataGenerator(ProviderType.RECIPE, AddonRecipeHandler::init);
     }
 }

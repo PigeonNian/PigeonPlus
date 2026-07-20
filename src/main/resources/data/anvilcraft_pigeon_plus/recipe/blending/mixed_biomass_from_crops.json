@@ -1,0 +1,13 @@
+{
+  "type": "anvilcraft_pigeon_plus:blending",
+  "fluid": "minecraft:null",
+  "ingredients": [
+    {
+      "count": 25,
+      "items": "#c:crops"
+    }
+  ],
+  "produce": 250,
+  "results": [],
+  "transform": "anvilcraft_pigeon_plus:mixed_biomass"
+}

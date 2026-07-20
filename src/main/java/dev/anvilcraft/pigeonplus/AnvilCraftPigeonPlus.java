@@ -5,6 +5,7 @@ import dev.anvilcraft.pigeonplus.block.entity.ModBlockEntities;
 import dev.anvilcraft.pigeonplus.data.AddonDatagen;
 import dev.anvilcraft.pigeonplus.init.AddonBlocks;
 import dev.anvilcraft.pigeonplus.init.AddonFluids;
+import dev.anvilcraft.pigeonplus.init.AddonInteractionMap;
 import dev.anvilcraft.pigeonplus.init.AddonItemGroups;
 import dev.anvilcraft.pigeonplus.init.AddonItems;
 import dev.anvilcraft.pigeonplus.init.AddonRecipeTypes;
@@ -14,6 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 import org.slf4j.Logger;
 
 @Mod(AnvilCraftPigeonPlus.MOD_ID)
@@ -25,6 +27,7 @@ public class AnvilCraftPigeonPlus {
 
     public AnvilCraftPigeonPlus(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(ModBlockEntities::registerCapabilities);
+        modEventBus.addListener(AnvilCraftPigeonPlus::loadComplete);
         AddonItemGroups.register(modEventBus);
         AddonFluids.register(modEventBus);
         AddonRecipeTypes.register(modEventBus);
@@ -36,5 +39,9 @@ public class AnvilCraftPigeonPlus {
 
     public static ResourceLocation of(String path) {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+    }
+
+    private static void loadComplete(FMLLoadCompleteEvent event) {
+        event.enqueueWork(AddonInteractionMap::init);
     }
 }

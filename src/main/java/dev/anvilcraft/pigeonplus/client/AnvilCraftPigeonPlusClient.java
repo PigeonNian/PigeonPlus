@@ -3,6 +3,7 @@ package dev.anvilcraft.pigeonplus.client;
 import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
 import dev.anvilcraft.pigeonplus.block.entity.ModBlockEntities;
 import dev.anvilcraft.pigeonplus.client.renderer.block.BlenderBlockEntityRenderer;
+import dev.anvilcraft.pigeonplus.init.AddonBlocks;
 import dev.anvilcraft.pigeonplus.init.AddonFluids;
 import dev.anvilcraft.pigeonplus.init.AddonItems;
 import dev.dubhe.anvilcraft.util.ModClientFluidTypeExtensionImpl;
@@ -24,6 +25,7 @@ public class AnvilCraftPigeonPlusClient {
         modBus.addListener(this::onRegisterAdditionalModels);
         modBus.addListener(this::onRegisterBER);
         modBus.addListener(this::onRegisterClientExtensions);
+        modBus.addListener(this::onRegisterBlockColors);
         modBus.addListener(this::onRegisterItemColors);
     }
 
@@ -83,6 +85,13 @@ public class AnvilCraftPigeonPlusClient {
             AddonItems.GASEOUS_BIOGAS_BUCKET.get(),
             AddonItems.COMPRESSED_AIR_BUCKET.get(),
             AddonItems.MIXED_BIOMASS_BUCKET.get()
+        );
+    }
+
+    private void onRegisterBlockColors(RegisterColorHandlersEvent.Block event) {
+        event.register(
+            (state, level, pos, tintIndex) -> tintIndex == 0 ? 0x6E5F2C : 0xFFFFFF,
+            AddonBlocks.MIXED_BIOMASS_CAULDRON.get()
         );
     }
 }
