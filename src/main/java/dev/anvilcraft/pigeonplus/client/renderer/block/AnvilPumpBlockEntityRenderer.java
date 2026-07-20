@@ -20,6 +20,7 @@ public class AnvilPumpBlockEntityRenderer implements BlockEntityRenderer<AnvilPu
     private static final ModelResourceLocation PISTON = ModelResourceLocation.standalone(
         ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/anvil_pump_pistion")
     );
+    private static final float MAX_PISTON_DROP = 8.0F / 16.0F;
 
     @SuppressWarnings("unused")
     public AnvilPumpBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
@@ -44,6 +45,7 @@ public class AnvilPumpBlockEntityRenderer implements BlockEntityRenderer<AnvilPu
         poseStack.mulPose(Axis.YP.rotationDegrees(-orientation.getYRotation()));
         poseStack.mulPose(Axis.XP.rotationDegrees(orientation.getXRotation()));
         poseStack.translate(-0.5, -0.5, -0.5);
+        poseStack.translate(0.0F, -MAX_PISTON_DROP * blockEntity.getPistonPress(partialTick), 0.0F);
 
         BakedModel piston = Minecraft.getInstance().getModelManager().getModel(PISTON);
         Minecraft.getInstance()
