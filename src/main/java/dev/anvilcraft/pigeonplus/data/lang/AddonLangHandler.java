@@ -15,5 +15,6 @@ public class AddonLangHandler {
         ConfigData.readConfigClass(provider, AddonConfig.class);
         provider.add("block.anvilcraft_pigeon_plus.gaseous_biogas", "Gaseous Biogas");
         provider.add("block.anvilcraft_pigeon_plus.compressed_air", "Compressed Air");
+        provider.add("block.anvilcraft_pigeon_plus.mixed_biomass", "Mixed Biomass");
     }
 }

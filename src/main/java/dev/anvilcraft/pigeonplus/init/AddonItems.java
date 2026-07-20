@@ -34,6 +34,16 @@ public class AddonItems {
         .model(ModelProviderUtil::bucket)
         .register();
 
+    public static final ItemEntry<BucketItem> MIXED_BIOMASS_BUCKET = REGISTRUM.item(
+            "mixed_biomass_bucket",
+            properties -> new BucketItem(AddonFluids.MIXED_BIOMASS.get(), properties)
+        )
+        .tag(Tags.Items.BUCKETS)
+        .lang("Mixed Biomass Bucket")
+        .properties(properties -> properties.stacksTo(1).craftRemainder(Items.BUCKET))
+        .model(ModelProviderUtil::bucket)
+        .register();
+
     public static void register() {
     }
 }

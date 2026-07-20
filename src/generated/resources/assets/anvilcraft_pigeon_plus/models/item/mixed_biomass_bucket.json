@@ -1,0 +1,5 @@
+{
+  "parent": "neoforge:item/bucket_drip",
+  "fluid": "anvilcraft_pigeon_plus:mixed_biomass",
+  "loader": "neoforge:fluid_container"
+}

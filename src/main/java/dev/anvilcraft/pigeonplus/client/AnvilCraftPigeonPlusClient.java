@@ -63,10 +63,26 @@ public class AnvilCraftPigeonPlusClient {
             ),
             AddonFluids.COMPRESSED_AIR_TYPE
         );
+        event.registerFluidType(
+            new ModClientFluidTypeExtensionImpl(
+                ResourceLocation.withDefaultNamespace("block/water_still"),
+                ResourceLocation.withDefaultNamespace("block/water_flow"),
+                0x6E5F2C,
+                20.0f,
+                0xFF6E5F2C,
+                false
+            ),
+            AddonFluids.MIXED_BIOMASS_TYPE
+        );
     }
 
     private void onRegisterItemColors(RegisterColorHandlersEvent.Item event) {
         DynamicFluidContainerModel.Colors colors = new DynamicFluidContainerModel.Colors();
-        event.register(colors, AddonItems.GASEOUS_BIOGAS_BUCKET.get(), AddonItems.COMPRESSED_AIR_BUCKET.get());
+        event.register(
+            colors,
+            AddonItems.GASEOUS_BIOGAS_BUCKET.get(),
+            AddonItems.COMPRESSED_AIR_BUCKET.get(),
+            AddonItems.MIXED_BIOMASS_BUCKET.get()
+        );
     }
 }

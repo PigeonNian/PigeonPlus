@@ -11,7 +11,9 @@
   "block.anvilcraft_pigeon_plus.blender": "Blender",
   "block.anvilcraft_pigeon_plus.compressed_air": "Compressed Air",
   "block.anvilcraft_pigeon_plus.gaseous_biogas": "Gaseous Biogas",
+  "block.anvilcraft_pigeon_plus.mixed_biomass": "Mixed Biomass",
   "item.anvilcraft_pigeon_plus.compressed_air_bucket": "Compressed Air Bucket",
   "item.anvilcraft_pigeon_plus.gaseous_biogas_bucket": "Gaseous Biogas Bucket",
+  "item.anvilcraft_pigeon_plus.mixed_biomass_bucket": "Mixed Biomass Bucket",
   "itemGroup.anvilcraft_pigeon_plus.addon_items": "AnvilCraft: Pigeon+"
 }
