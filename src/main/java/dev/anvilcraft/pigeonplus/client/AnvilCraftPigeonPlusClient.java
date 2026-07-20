@@ -4,6 +4,7 @@ import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
 import dev.anvilcraft.pigeonplus.block.entity.ModBlockEntities;
 import dev.anvilcraft.pigeonplus.client.renderer.block.BlenderBlockEntityRenderer;
 import dev.anvilcraft.pigeonplus.init.AddonFluids;
+import dev.anvilcraft.pigeonplus.init.AddonItems;
 import dev.dubhe.anvilcraft.util.ModClientFluidTypeExtensionImpl;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
@@ -14,6 +15,8 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+import net.neoforged.neoforge.client.model.DynamicFluidContainerModel;
 
 @Mod(value = AnvilCraftPigeonPlus.MOD_ID, dist = Dist.CLIENT)
 public class AnvilCraftPigeonPlusClient {
@@ -21,6 +24,7 @@ public class AnvilCraftPigeonPlusClient {
         modBus.addListener(this::onRegisterAdditionalModels);
         modBus.addListener(this::onRegisterBER);
         modBus.addListener(this::onRegisterClientExtensions);
+        modBus.addListener(this::onRegisterItemColors);
     }
 
     private void onRegisterAdditionalModels(ModelEvent.RegisterAdditional event) {
@@ -59,5 +63,10 @@ public class AnvilCraftPigeonPlusClient {
             ),
             AddonFluids.COMPRESSED_AIR_TYPE
         );
+    }
+
+    private void onRegisterItemColors(RegisterColorHandlersEvent.Item event) {
+        DynamicFluidContainerModel.Colors colors = new DynamicFluidContainerModel.Colors();
+        event.register(colors, AddonItems.GASEOUS_BIOGAS_BUCKET.get(), AddonItems.COMPRESSED_AIR_BUCKET.get());
     }
 }

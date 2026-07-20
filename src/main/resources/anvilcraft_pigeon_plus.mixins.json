@@ -4,8 +4,12 @@
   "package": "dev.anvilcraft.pigeonplus.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "FluidPipeNetworkMixin"
   ],
   "client": [
+    "client.FluidRenderHelperMixin",
+    "client.FluidTankRenderUtilMixin",
+    "client.LargeFluidTankBlockEntityRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
