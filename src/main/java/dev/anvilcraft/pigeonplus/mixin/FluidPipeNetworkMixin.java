@@ -34,9 +34,6 @@ import java.util.Set;
 
 @Mixin(FluidPipeNetwork.class)
 public abstract class FluidPipeNetworkMixin {
-    @Unique
-    private static final double PRESSURE_EPSILON = 0.0005;
-
     @Getter
     @Shadow
     @Final
@@ -176,9 +173,6 @@ public abstract class FluidPipeNetworkMixin {
         if (target == source || target.handler().equals(source.handler())) {
             return false;
         }
-        if (pigeonplus$pressure(source, gas) <= pigeonplus$pressure(target, gas) + PRESSURE_EPSILON) {
-            return false;
-        }
         if (target.handler().fill(gasStack, IFluidHandler.FluidAction.SIMULATE) <= 0) {
             return false;
         }
@@ -188,18 +182,30 @@ public abstract class FluidPipeNetworkMixin {
     @Unique
     private int pigeonplus$pressureTransferAmount(FluidEndpoint source, FluidEndpoint target, GasFluid gas) {
         int sourceAmount = pigeonplus$gasAmount(source, gas);
-        int targetAmount = pigeonplus$gasAmount(target, gas);
         int sourceCapacity = pigeonplus$totalCapacity(source.handler());
         int targetCapacity = pigeonplus$totalCapacity(target.handler());
         if (sourceAmount <= 0 || sourceCapacity <= 0 || targetCapacity <= 0) {
             return 0;
         }
+        int targetAmount = pigeonplus$gasAmount(target, gas);
         long numerator = (long) sourceAmount * targetCapacity - (long) targetAmount * sourceCapacity;
+        int pumpPressureDiff = pigeonplus$pumpPressureDiff(source, target);
+        if (pumpPressureDiff > 0) {
+            numerator += (long) sourceCapacity * targetCapacity * pumpPressureDiff / FluidPipeNetwork.FULL_SPEED_HEIGHT;
+        }
         if (numerator <= 0) {
             return 0;
         }
         long denominator = (long) sourceCapacity + targetCapacity;
-        return Math.max(1, (int) (numerator / denominator));
+        int equalizingAmount = (int) Math.max(1L, numerator / denominator);
+        return Math.min(equalizingAmount, FluidPipeNetwork.MAX_SPEED);
+    }
+
+    @Unique
+    private static int pigeonplus$pumpPressureDiff(FluidEndpoint source, FluidEndpoint target) {
+        int sourcePotential = source.effectiveHeight() - source.containerPos().getY();
+        int targetPotential = target.effectiveHeight() - target.containerPos().getY();
+        return Math.max(0, sourcePotential - targetPotential);
     }
 
     @Unique
@@ -371,9 +377,9 @@ public abstract class FluidPipeNetworkMixin {
     @Unique
     private static int pigeonplus$minValveRemaining(List<ValveState> valvePath) {
         if (valvePath == null || valvePath.isEmpty()) {
-            return FluidPipeNetwork.MAX_SPEED;
+            return Integer.MAX_VALUE;
         }
-        int min = FluidPipeNetwork.MAX_SPEED;
+        int min = Integer.MAX_VALUE;
         for (ValveState valve : valvePath) {
             min = Math.min(min, valve.remaining());
         }
