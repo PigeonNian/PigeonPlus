@@ -2,8 +2,11 @@ package dev.anvilcraft.pigeonplus.init;
 
 import dev.anvilcraft.lib.v2.registrum.util.entry.BlockEntry;
 import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
+import dev.anvilcraft.pigeonplus.block.AnvilPumpBlock;
 import dev.anvilcraft.pigeonplus.block.BlenderBlock;
 import dev.anvilcraft.pigeonplus.block.MixedBiomassCauldronBlock;
+import dev.dubhe.anvilcraft.block.fluid.PumpBlock;
+import dev.dubhe.anvilcraft.block.state.Orientation;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
@@ -11,6 +14,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
 import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
 
 import static dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus.REGISTRUM;
@@ -32,6 +36,28 @@ public class AddonBlocks {
             .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
                 ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/blender")))
             .build()
+        .register();
+
+    public static final BlockEntry<AnvilPumpBlock> ANVIL_PUMP = REGISTRUM
+        .block("anvil_pump", AnvilPumpBlock::new)
+        .initialProperties(() -> Blocks.IRON_BLOCK)
+        .properties(properties -> properties.noOcclusion().sound(SoundType.METAL))
+        .blockstate((ctx, provider) -> provider.getVariantBuilder(ctx.getEntry()).forAllStates(state -> {
+            Orientation orientation = state.getValue(PumpBlock.ORIENTATION);
+            return ConfiguredModel.builder()
+                .modelFile(provider.models().getExistingFile(ResourceLocation.fromNamespaceAndPath(
+                    AnvilCraftPigeonPlus.MOD_ID,
+                    "block/anvil_pump"
+                )))
+                .rotationX((int) -orientation.getXRotation())
+                .rotationY((int) orientation.getYRotation())
+                .build();
+        }))
+        .item((block, props) -> new BlockItem(block, props))
+            .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
+                ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/anvil_pump")))
+            .build()
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
         .register();
 
     public static final BlockEntry<MixedBiomassCauldronBlock> MIXED_BIOMASS_CAULDRON = REGISTRUM

@@ -2,6 +2,7 @@ package dev.anvilcraft.pigeonplus.client;
 
 import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
 import dev.anvilcraft.pigeonplus.block.entity.ModBlockEntities;
+import dev.anvilcraft.pigeonplus.client.renderer.block.AnvilPumpBlockEntityRenderer;
 import dev.anvilcraft.pigeonplus.client.renderer.block.BlenderBlockEntityRenderer;
 import dev.anvilcraft.pigeonplus.init.AddonBlocks;
 import dev.anvilcraft.pigeonplus.init.AddonFluids;
@@ -34,12 +35,16 @@ public class AnvilCraftPigeonPlusClient {
             AnvilCraftPigeonPlus.MOD_ID, "block/blender_bottom");
         ResourceLocation top = ResourceLocation.fromNamespaceAndPath(
             AnvilCraftPigeonPlus.MOD_ID, "block/blender_top");
+        ResourceLocation anvilPumpPiston = ResourceLocation.fromNamespaceAndPath(
+            AnvilCraftPigeonPlus.MOD_ID, "block/anvil_pump_pistion");
         event.register(new ModelResourceLocation(bottom, "standalone"));
         event.register(new ModelResourceLocation(top, "standalone"));
+        event.register(new ModelResourceLocation(anvilPumpPiston, "standalone"));
     }
 
     private void onRegisterBER(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(ModBlockEntities.BLENDER.get(), BlenderBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.ANVIL_PUMP.get(), AnvilPumpBlockEntityRenderer::new);
     }
 
     private void onRegisterClientExtensions(RegisterClientExtensionsEvent event) {
