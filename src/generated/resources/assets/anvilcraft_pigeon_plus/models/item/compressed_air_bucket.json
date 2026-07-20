@@ -1,0 +1,5 @@
+{
+  "parent": "neoforge:item/bucket_drip",
+  "fluid": "anvilcraft_pigeon_plus:compressed_air",
+  "loader": "neoforge:fluid_container"
+}
