@@ -14,7 +14,8 @@ import net.minecraft.world.level.block.state.BlockState;
 public class AnvilPumpBlockEntity extends PumpBlockEntity {
     private static final int PUMP_DURATION_TICKS = 20;
     private static final float MAX_EFFICIENCY_FALL_DISTANCE = 20.0F;
-    private static final float PISTON_PRESS_STEP = 0.25F;
+    private static final float PISTON_PRESS_STEP = 0.4F;
+    private static final float PISTON_RELEASE_STEP = 0.25F;
     private static final int PISTON_RELEASE_DELAY_TICKS = 20;
     private static final int PISTON_RELEASE_ANIMATION_TICKS = 4;
     private static final int IMPACT_UNLOCK_TICKS = PISTON_RELEASE_DELAY_TICKS + PISTON_RELEASE_ANIMATION_TICKS;
@@ -163,7 +164,7 @@ public class AnvilPumpBlockEntity extends PumpBlockEntity {
             this.pistonReleaseDelay--;
             return;
         }
-        this.pistonPress = Math.max(0.0F, this.pistonPress - PISTON_PRESS_STEP);
+        this.pistonPress = Math.max(0.0F, this.pistonPress - PISTON_RELEASE_STEP);
     }
 
     private static void updateRedstoneState(Level level, BlockPos pos, BlockState state) {

@@ -5,8 +5,6 @@ import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
 import dev.anvilcraft.pigeonplus.block.AnvilPumpBlock;
 import dev.anvilcraft.pigeonplus.block.BlenderBlock;
 import dev.anvilcraft.pigeonplus.block.MixedBiomassCauldronBlock;
-import dev.dubhe.anvilcraft.block.fluid.PumpBlock;
-import dev.dubhe.anvilcraft.block.state.Orientation;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
@@ -43,19 +41,17 @@ public class AddonBlocks {
         .initialProperties(() -> Blocks.IRON_BLOCK)
         .properties(properties -> properties.noOcclusion().sound(SoundType.METAL))
         .blockstate((ctx, provider) -> provider.getVariantBuilder(ctx.getEntry()).forAllStates(state -> {
-            Orientation orientation = state.getValue(PumpBlock.ORIENTATION);
             return ConfiguredModel.builder()
                 .modelFile(provider.models().getExistingFile(ResourceLocation.fromNamespaceAndPath(
                     AnvilCraftPigeonPlus.MOD_ID,
                     "block/anvil_pump"
                 )))
-                .rotationX((int) -orientation.getXRotation())
-                .rotationY((int) orientation.getYRotation())
+                .rotationY(pumpRotationY(state.getValue(AnvilPumpBlock.FACING)))
                 .build();
         }))
         .item((block, props) -> new BlockItem(block, props))
             .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
-                ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/anvil_pump")))
+                ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/anvil_pump_full")))
             .build()
         .tag(BlockTags.MINEABLE_WITH_PICKAXE)
         .register();
@@ -87,6 +83,15 @@ public class AddonBlocks {
             case EAST -> 90;
             case SOUTH -> 180;
             case WEST -> 270;
+            default -> 0;
+        };
+    }
+
+    private static int pumpRotationY(Direction direction) {
+        return switch (direction) {
+            case WEST -> 90;
+            case NORTH -> 180;
+            case EAST -> 270;
             default -> 0;
         };
     }
