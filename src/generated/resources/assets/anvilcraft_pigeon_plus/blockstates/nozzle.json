@@ -1,0 +1,85 @@
+{
+  "variants": {
+    "part=bottom_center": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    },
+    "part=bottom_e": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    },
+    "part=bottom_en": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    },
+    "part=bottom_es": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    },
+    "part=bottom_n": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    },
+    "part=bottom_s": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    },
+    "part=bottom_w": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    },
+    "part=bottom_wn": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    },
+    "part=bottom_ws": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    },
+    "part=mid_center": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle"
+    },
+    "part=mid_e": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    },
+    "part=mid_en": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    },
+    "part=mid_es": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    },
+    "part=mid_n": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    },
+    "part=mid_s": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    },
+    "part=mid_w": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    },
+    "part=mid_wn": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    },
+    "part=mid_ws": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    },
+    "part=top_center": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    },
+    "part=top_e": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    },
+    "part=top_en": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    },
+    "part=top_es": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    },
+    "part=top_n": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    },
+    "part=top_s": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    },
+    "part=top_w": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    },
+    "part=top_wn": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    },
+    "part=top_ws": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    }
+  }
+}

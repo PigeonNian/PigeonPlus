@@ -5,6 +5,10 @@ import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
 import dev.anvilcraft.pigeonplus.block.AnvilPumpBlock;
 import dev.anvilcraft.pigeonplus.block.BlenderBlock;
 import dev.anvilcraft.pigeonplus.block.MixedBiomassCauldronBlock;
+import dev.anvilcraft.pigeonplus.block.NozzleBlock;
+import dev.dubhe.anvilcraft.block.item.SimpleMultiPartBlockItem;
+import dev.dubhe.anvilcraft.block.multipart.SimpleMultiPartBlock;
+import dev.dubhe.anvilcraft.block.state.Cube3x3PartHalf;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
@@ -33,7 +37,28 @@ public class AddonBlocks {
         .item((block, props) -> new BlockItem(block, props))
             .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
                 ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/blender")))
+        .build()
+        .register();
+
+    public static final BlockEntry<NozzleBlock> NOZZLE = REGISTRUM
+        .block("nozzle", NozzleBlock::new)
+        .initialProperties(() -> Blocks.IRON_BLOCK)
+        .properties(properties -> properties.noOcclusion().sound(SoundType.METAL))
+        .blockstate((ctx, provider) -> provider.getVariantBuilder(ctx.getEntry()).forAllStates(state ->
+            ConfiguredModel.builder()
+                .modelFile(provider.models().getExistingFile(ResourceLocation.fromNamespaceAndPath(
+                    AnvilCraftPigeonPlus.MOD_ID,
+                    state.getValue(NozzleBlock.PART) == Cube3x3PartHalf.MID_CENTER
+                        ? "block/nozzle"
+                        : "block/nozzle_part"
+                )))
+                .build()))
+        .loot((tables, block) -> SimpleMultiPartBlock.loot(tables, block))
+        .item(SimpleMultiPartBlockItem<Cube3x3PartHalf>::new)
+            .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
+                ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/nozzle")))
             .build()
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
         .register();
 
     public static final BlockEntry<AnvilPumpBlock> ANVIL_PUMP = REGISTRUM
