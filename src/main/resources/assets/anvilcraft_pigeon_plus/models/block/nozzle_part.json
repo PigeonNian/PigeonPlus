@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/block",
   "textures": {
-    "particle": "anvilcraft_pigeon_plus:block/nozzle_side"
+    "particle": "anvilcraft:block/giant_anvil_side"
   }
 }
