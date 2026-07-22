@@ -1,7 +1,10 @@
 package dev.anvilcraft.pigeonplus.mixin;
 
+import com.mojang.datafixers.util.Pair;
 import dev.anvilcraft.pigeonplus.util.NozzlePlasmaJetUtil;
+import dev.dubhe.anvilcraft.api.chargecollector.ChargeCollectorManager;
 import dev.dubhe.anvilcraft.api.heat.HeaterManager;
+import dev.dubhe.anvilcraft.block.entity.ChargeCollectorBlockEntity;
 import dev.dubhe.anvilcraft.block.entity.LargeCauldronBlockEntity;
 import dev.dubhe.anvilcraft.block.entity.PlasmaJetsBlockEntity;
 import dev.dubhe.anvilcraft.init.ModHeaterInfos;
@@ -22,6 +25,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Collection;
 import java.util.Set;
@@ -52,12 +56,8 @@ public abstract class PlasmaJetsBlockEntityMixin {
             return;
         }
 
-        this.duration--;
-        if (this.duration + NozzlePlasmaJetUtil.PLASMA_HALF_DURATION < NozzlePlasmaJetUtil.PLASMA_MAX_DURATION
-            && NozzlePlasmaJetUtil.consumeTopOilOnce(cauldron)) {
-            this.duration += NozzlePlasmaJetUtil.PLASMA_HALF_DURATION;
-        }
-        if (this.duration < 0) {
+        if (level.getGameTime() % NozzlePlasmaJetUtil.PLASMA_CONSUME_INTERVAL == 0
+            && !NozzlePlasmaJetUtil.consumeTopOilOnce(cauldron)) {
             this.pigeonplus$removeJet(level);
             return;
         }
@@ -79,6 +79,48 @@ public abstract class PlasmaJetsBlockEntityMixin {
         this.cauldronPos = cauldron.getBlockPos();
         NozzlePlasmaJetUtil.seedTubeWalls(this.tubeWalls, this.pigeonplus$blockPos());
         this.pigeonplus$spawnNozzleJetParticles(level);
+    }
+
+    @Inject(method = "getHeatingPoses()Lcom/mojang/datafixers/util/Pair;", at = @At("HEAD"), cancellable = true)
+    private void pigeonplus$getHeatingPoses(CallbackInfoReturnable<Pair<Set<BlockPos>, Set<BlockPos>>> cir) {
+        Level level = ((PlasmaJetsBlockEntity) (Object) this).getLevel();
+        if (level == null) {
+            return;
+        }
+        if (NozzlePlasmaJetUtil.getStructuralCauldron(level, this.pigeonplus$blockPos()) == null) {
+            return;
+        }
+        cir.setReturnValue(NozzlePlasmaJetUtil.collectRingTargets(level, this.pigeonplus$blockPos()).toHeatingPoses());
+    }
+
+    @Inject(
+        method = "getHeatingPoses(Lnet/minecraft/world/level/Level;)Lcom/mojang/datafixers/util/Pair;",
+        at = @At("HEAD"),
+        cancellable = true
+    )
+    private void pigeonplus$getHeatingPoses(
+        Level level,
+        CallbackInfoReturnable<Pair<Set<BlockPos>, Set<BlockPos>>> cir
+    ) {
+        if (NozzlePlasmaJetUtil.getStructuralCauldron(level, this.pigeonplus$blockPos()) == null) {
+            return;
+        }
+        cir.setReturnValue(NozzlePlasmaJetUtil.collectRingTargets(level, this.pigeonplus$blockPos()).toHeatingPoses());
+    }
+
+    @Inject(method = "provideCharge", at = @At("HEAD"), cancellable = true)
+    private void pigeonplus$provideCharge(Level level, CallbackInfo ci) {
+        if (NozzlePlasmaJetUtil.getStructuralCauldron(level, this.pigeonplus$blockPos()) == null) {
+            return;
+        }
+        ci.cancel();
+        if (level.getGameTime() % (ChargeCollectorBlockEntity.INPUT_COOLDOWN * 20) != 0) {
+            return;
+        }
+        ChargeCollectorManager instance = ChargeCollectorManager.getInstance(level);
+        for (BlockPos magnetPos : NozzlePlasmaJetUtil.collectRingTargets(level, this.pigeonplus$blockPos()).magnetPoses()) {
+            instance.charge(256, magnetPos);
+        }
     }
 
     private BlockPos pigeonplus$blockPos() {
