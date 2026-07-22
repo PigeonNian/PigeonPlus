@@ -6,9 +6,9 @@ import dev.anvilcraft.pigeonplus.block.AnvilPumpBlock;
 import dev.anvilcraft.pigeonplus.block.BlenderBlock;
 import dev.anvilcraft.pigeonplus.block.MixedBiomassCauldronBlock;
 import dev.anvilcraft.pigeonplus.block.NozzleBlock;
-import dev.dubhe.anvilcraft.block.item.SimpleMultiPartBlockItem;
-import dev.dubhe.anvilcraft.block.multipart.SimpleMultiPartBlock;
-import dev.dubhe.anvilcraft.block.state.Cube3x3PartHalf;
+import dev.dubhe.anvilcraft.block.item.FlexibleMultiPartBlockItem;
+import dev.dubhe.anvilcraft.block.multipart.FlexibleMultiPartBlock;
+import dev.dubhe.anvilcraft.block.state.DirectionCube3x3PartHalf;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
@@ -17,6 +17,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
 
 import static dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus.REGISTRUM;
@@ -48,13 +49,15 @@ public class AddonBlocks {
             ConfiguredModel.builder()
                 .modelFile(provider.models().getExistingFile(ResourceLocation.fromNamespaceAndPath(
                     AnvilCraftPigeonPlus.MOD_ID,
-                    state.getValue(NozzleBlock.PART) == Cube3x3PartHalf.MID_CENTER
+                    state.getValue(NozzleBlock.PART) == DirectionCube3x3PartHalf.MID_CENTER
                         ? "block/nozzle"
                         : "block/nozzle_part"
                 )))
+                .rotationX(nozzleRotationX(state.getValue(NozzleBlock.FACING)))
+                .rotationY(nozzleRotationY(state.getValue(NozzleBlock.FACING)))
                 .build()))
-        .loot((tables, block) -> SimpleMultiPartBlock.loot(tables, block))
-        .item(SimpleMultiPartBlockItem<Cube3x3PartHalf>::new)
+        .loot((tables, block) -> FlexibleMultiPartBlock.loot(tables, block))
+        .item(FlexibleMultiPartBlockItem<DirectionCube3x3PartHalf, DirectionProperty, Direction>::new)
             .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
                 ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/nozzle")))
             .build()
@@ -118,6 +121,23 @@ public class AddonBlocks {
             case NORTH -> 180;
             case EAST -> 270;
             default -> 0;
+        };
+    }
+
+    private static int nozzleRotationX(Direction direction) {
+        return switch (direction) {
+            case DOWN -> 180;
+            case UP -> 0;
+            default -> 90;
+        };
+    }
+
+    private static int nozzleRotationY(Direction direction) {
+        return switch (direction) {
+            case UP, DOWN, NORTH -> 0;
+            case EAST -> 90;
+            case SOUTH -> 180;
+            default -> 270;
         };
     }
 }

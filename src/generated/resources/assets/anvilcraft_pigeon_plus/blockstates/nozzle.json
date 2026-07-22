@@ -1,85 +1,706 @@
 {
   "variants": {
-    "part=bottom_center": {
+    "facing=down,part=bottom_center": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 180
+    },
+    "facing=down,part=bottom_e": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 180
+    },
+    "facing=down,part=bottom_en": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 180
+    },
+    "facing=down,part=bottom_es": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 180
+    },
+    "facing=down,part=bottom_n": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 180
+    },
+    "facing=down,part=bottom_s": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 180
+    },
+    "facing=down,part=bottom_w": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 180
+    },
+    "facing=down,part=bottom_wn": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 180
+    },
+    "facing=down,part=bottom_ws": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 180
+    },
+    "facing=down,part=mid_center": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle",
+      "x": 180
+    },
+    "facing=down,part=mid_e": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 180
+    },
+    "facing=down,part=mid_en": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 180
+    },
+    "facing=down,part=mid_es": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 180
+    },
+    "facing=down,part=mid_n": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 180
+    },
+    "facing=down,part=mid_s": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 180
+    },
+    "facing=down,part=mid_w": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 180
+    },
+    "facing=down,part=mid_wn": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 180
+    },
+    "facing=down,part=mid_ws": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 180
+    },
+    "facing=down,part=top_center": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 180
+    },
+    "facing=down,part=top_e": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 180
+    },
+    "facing=down,part=top_en": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 180
+    },
+    "facing=down,part=top_es": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 180
+    },
+    "facing=down,part=top_n": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 180
+    },
+    "facing=down,part=top_s": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 180
+    },
+    "facing=down,part=top_w": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 180
+    },
+    "facing=down,part=top_wn": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 180
+    },
+    "facing=down,part=top_ws": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 180
+    },
+    "facing=east,part=bottom_center": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,part=bottom_e": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,part=bottom_en": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,part=bottom_es": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,part=bottom_n": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,part=bottom_s": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,part=bottom_w": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,part=bottom_wn": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,part=bottom_ws": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,part=mid_center": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,part=mid_e": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,part=mid_en": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,part=mid_es": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,part=mid_n": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,part=mid_s": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,part=mid_w": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,part=mid_wn": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,part=mid_ws": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,part=top_center": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,part=top_e": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,part=top_en": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,part=top_es": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,part=top_n": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,part=top_s": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,part=top_w": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,part=top_wn": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,part=top_ws": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north,part=bottom_center": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90
+    },
+    "facing=north,part=bottom_e": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90
+    },
+    "facing=north,part=bottom_en": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90
+    },
+    "facing=north,part=bottom_es": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90
+    },
+    "facing=north,part=bottom_n": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90
+    },
+    "facing=north,part=bottom_s": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90
+    },
+    "facing=north,part=bottom_w": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90
+    },
+    "facing=north,part=bottom_wn": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90
+    },
+    "facing=north,part=bottom_ws": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90
+    },
+    "facing=north,part=mid_center": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle",
+      "x": 90
+    },
+    "facing=north,part=mid_e": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90
+    },
+    "facing=north,part=mid_en": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90
+    },
+    "facing=north,part=mid_es": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90
+    },
+    "facing=north,part=mid_n": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90
+    },
+    "facing=north,part=mid_s": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90
+    },
+    "facing=north,part=mid_w": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90
+    },
+    "facing=north,part=mid_wn": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90
+    },
+    "facing=north,part=mid_ws": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90
+    },
+    "facing=north,part=top_center": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90
+    },
+    "facing=north,part=top_e": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90
+    },
+    "facing=north,part=top_en": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90
+    },
+    "facing=north,part=top_es": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90
+    },
+    "facing=north,part=top_n": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90
+    },
+    "facing=north,part=top_s": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90
+    },
+    "facing=north,part=top_w": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90
+    },
+    "facing=north,part=top_wn": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90
+    },
+    "facing=north,part=top_ws": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90
+    },
+    "facing=south,part=bottom_center": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,part=bottom_e": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,part=bottom_en": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,part=bottom_es": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,part=bottom_n": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,part=bottom_s": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,part=bottom_w": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,part=bottom_wn": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,part=bottom_ws": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,part=mid_center": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,part=mid_e": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,part=mid_en": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,part=mid_es": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,part=mid_n": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,part=mid_s": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,part=mid_w": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,part=mid_wn": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,part=mid_ws": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,part=top_center": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,part=top_e": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,part=top_en": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,part=top_es": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,part=top_n": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,part=top_s": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,part=top_w": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,part=top_wn": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,part=top_ws": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 180
+    },
+    "facing=up,part=bottom_center": {
       "model": "anvilcraft_pigeon_plus:block/nozzle_part"
     },
-    "part=bottom_e": {
+    "facing=up,part=bottom_e": {
       "model": "anvilcraft_pigeon_plus:block/nozzle_part"
     },
-    "part=bottom_en": {
+    "facing=up,part=bottom_en": {
       "model": "anvilcraft_pigeon_plus:block/nozzle_part"
     },
-    "part=bottom_es": {
+    "facing=up,part=bottom_es": {
       "model": "anvilcraft_pigeon_plus:block/nozzle_part"
     },
-    "part=bottom_n": {
+    "facing=up,part=bottom_n": {
       "model": "anvilcraft_pigeon_plus:block/nozzle_part"
     },
-    "part=bottom_s": {
+    "facing=up,part=bottom_s": {
       "model": "anvilcraft_pigeon_plus:block/nozzle_part"
     },
-    "part=bottom_w": {
+    "facing=up,part=bottom_w": {
       "model": "anvilcraft_pigeon_plus:block/nozzle_part"
     },
-    "part=bottom_wn": {
+    "facing=up,part=bottom_wn": {
       "model": "anvilcraft_pigeon_plus:block/nozzle_part"
     },
-    "part=bottom_ws": {
+    "facing=up,part=bottom_ws": {
       "model": "anvilcraft_pigeon_plus:block/nozzle_part"
     },
-    "part=mid_center": {
+    "facing=up,part=mid_center": {
       "model": "anvilcraft_pigeon_plus:block/nozzle"
     },
-    "part=mid_e": {
+    "facing=up,part=mid_e": {
       "model": "anvilcraft_pigeon_plus:block/nozzle_part"
     },
-    "part=mid_en": {
+    "facing=up,part=mid_en": {
       "model": "anvilcraft_pigeon_plus:block/nozzle_part"
     },
-    "part=mid_es": {
+    "facing=up,part=mid_es": {
       "model": "anvilcraft_pigeon_plus:block/nozzle_part"
     },
-    "part=mid_n": {
+    "facing=up,part=mid_n": {
       "model": "anvilcraft_pigeon_plus:block/nozzle_part"
     },
-    "part=mid_s": {
+    "facing=up,part=mid_s": {
       "model": "anvilcraft_pigeon_plus:block/nozzle_part"
     },
-    "part=mid_w": {
+    "facing=up,part=mid_w": {
       "model": "anvilcraft_pigeon_plus:block/nozzle_part"
     },
-    "part=mid_wn": {
+    "facing=up,part=mid_wn": {
       "model": "anvilcraft_pigeon_plus:block/nozzle_part"
     },
-    "part=mid_ws": {
+    "facing=up,part=mid_ws": {
       "model": "anvilcraft_pigeon_plus:block/nozzle_part"
     },
-    "part=top_center": {
+    "facing=up,part=top_center": {
       "model": "anvilcraft_pigeon_plus:block/nozzle_part"
     },
-    "part=top_e": {
+    "facing=up,part=top_e": {
       "model": "anvilcraft_pigeon_plus:block/nozzle_part"
     },
-    "part=top_en": {
+    "facing=up,part=top_en": {
       "model": "anvilcraft_pigeon_plus:block/nozzle_part"
     },
-    "part=top_es": {
+    "facing=up,part=top_es": {
       "model": "anvilcraft_pigeon_plus:block/nozzle_part"
     },
-    "part=top_n": {
+    "facing=up,part=top_n": {
       "model": "anvilcraft_pigeon_plus:block/nozzle_part"
     },
-    "part=top_s": {
+    "facing=up,part=top_s": {
       "model": "anvilcraft_pigeon_plus:block/nozzle_part"
     },
-    "part=top_w": {
+    "facing=up,part=top_w": {
       "model": "anvilcraft_pigeon_plus:block/nozzle_part"
     },
-    "part=top_wn": {
+    "facing=up,part=top_wn": {
       "model": "anvilcraft_pigeon_plus:block/nozzle_part"
     },
-    "part=top_ws": {
+    "facing=up,part=top_ws": {
       "model": "anvilcraft_pigeon_plus:block/nozzle_part"
+    },
+    "facing=west,part=bottom_center": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,part=bottom_e": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,part=bottom_en": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,part=bottom_es": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,part=bottom_n": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,part=bottom_s": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,part=bottom_w": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,part=bottom_wn": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,part=bottom_ws": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,part=mid_center": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,part=mid_e": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,part=mid_en": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,part=mid_es": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,part=mid_n": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,part=mid_s": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,part=mid_w": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,part=mid_wn": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,part=mid_ws": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,part=top_center": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,part=top_e": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,part=top_en": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,part=top_es": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,part=top_n": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,part=top_s": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,part=top_w": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,part=top_wn": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,part=top_ws": {
+      "model": "anvilcraft_pigeon_plus:block/nozzle_part",
+      "x": 90,
+      "y": 270
     }
   }
 }
