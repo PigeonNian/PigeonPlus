@@ -1,0 +1,18 @@
+{
+  "engine_on": {
+    "sounds": [
+      {
+        "name": "anvilcraft_pigeon_plus:engine_on",
+        "stream": false
+      }
+    ]
+  },
+  "engine_fire": {
+    "sounds": [
+      {
+        "name": "anvilcraft_pigeon_plus:engine_fire",
+        "stream": false
+      }
+    ]
+  }
+}

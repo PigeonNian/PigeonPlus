@@ -2,11 +2,13 @@ package dev.anvilcraft.pigeonplus.client;
 
 import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
 import dev.anvilcraft.pigeonplus.block.entity.ModBlockEntities;
+import dev.anvilcraft.pigeonplus.client.particle.RollingPlasmaParticle;
 import dev.anvilcraft.pigeonplus.client.renderer.block.AnvilPumpBlockEntityRenderer;
 import dev.anvilcraft.pigeonplus.client.renderer.block.BlenderBlockEntityRenderer;
 import dev.anvilcraft.pigeonplus.init.AddonBlocks;
 import dev.anvilcraft.pigeonplus.init.AddonFluids;
 import dev.anvilcraft.pigeonplus.init.AddonItems;
+import dev.anvilcraft.pigeonplus.init.AddonParticles;
 import dev.dubhe.anvilcraft.util.ModClientFluidTypeExtensionImpl;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
@@ -17,6 +19,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.model.DynamicFluidContainerModel;
 
@@ -28,6 +31,7 @@ public class AnvilCraftPigeonPlusClient {
         modBus.addListener(this::onRegisterClientExtensions);
         modBus.addListener(this::onRegisterBlockColors);
         modBus.addListener(this::onRegisterItemColors);
+        modBus.addListener(this::onRegisterParticleProviders);
     }
 
     private void onRegisterAdditionalModels(ModelEvent.RegisterAdditional event) {
@@ -98,5 +102,9 @@ public class AnvilCraftPigeonPlusClient {
             (state, level, pos, tintIndex) -> tintIndex == 0 ? 0x6E5F2C : 0xFFFFFF,
             AddonBlocks.MIXED_BIOMASS_CAULDRON.get()
         );
+    }
+
+    private void onRegisterParticleProviders(RegisterParticleProvidersEvent event) {
+        event.registerSpriteSet(AddonParticles.ROLLING_PLASMA.get(), RollingPlasmaParticle.Provider::new);
     }
 }

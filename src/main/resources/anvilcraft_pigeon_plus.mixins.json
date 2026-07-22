@@ -6,6 +6,7 @@
   "mixins": [
     "FallingBlockEntityMixin",
     "FishTankBlockEntityMixin",
+    "LargeCauldronBlockMixin",
     "FluidNetworkScannerMixin",
     "FluidPipeNetworkMixin",
     "LargeCauldronBlockEntityMixin",
@@ -17,6 +18,7 @@
     "client.FluidTankRenderUtilMixin",
     "client.LargeCauldronBlockEntityRendererMixin",
     "client.LargeFluidTankBlockEntityRendererMixin",
+    "client.PlasmaJetsBlockEntityClientMixin",
     "client.PlasmaJetsRendererMixin"
   ],
   "injectors": {

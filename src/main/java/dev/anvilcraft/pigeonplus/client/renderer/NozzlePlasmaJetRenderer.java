@@ -2,9 +2,11 @@ package dev.anvilcraft.pigeonplus.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import dev.anvilcraft.pigeonplus.client.sound.NozzleJetSoundController;
 import dev.anvilcraft.pigeonplus.util.NozzlePlasmaJetUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 
 public final class NozzlePlasmaJetRenderer {
@@ -14,7 +16,7 @@ public final class NozzlePlasmaJetRenderer {
     private static final float CENTER_X = 0.5F;
     private static final float CENTER_Z = 0.5F;
     private static final float BASE_Y_OFFSET = -1.0F;
-    private static final float TOTAL_HEIGHT = NozzlePlasmaJetUtil.JET_RANGE_HEIGHT;
+    private static final float TOTAL_HEIGHT = NozzlePlasmaJetUtil.JET_VISUAL_HEIGHT;
     private static final float TWO_PI = (float) (Math.PI * 2.0);
     private static final float PLUME_WAVE_TIME_SCALE = 0.180F;
     private static final float PLUME_FLICKER_TIME_SCALE = 0.720F;
@@ -22,15 +24,26 @@ public final class NozzlePlasmaJetRenderer {
     private NozzlePlasmaJetRenderer() {
     }
 
-    public static void render(PoseStack poseStack, MultiBufferSource buffers, float time, Propellant propellant) {
+    public static void render(PoseStack poseStack, MultiBufferSource buffers, float time, BlockPos pos, Propellant propellant) {
+        float startupProgress = NozzleJetSoundController.getFlameStartupProgress(pos);
+        if (startupProgress <= 0.0F) {
+            return;
+        }
+
         VertexConsumer buffer = buffers.getBuffer(RenderType.beaconBeam(BEAM_TEXTURE, true));
         PoseStack.Pose pose = poseStack.last();
         RenderProfile profile = profile(propellant);
+        float heightScale = startupProgress * startupProgress * (3.0F - 2.0F * startupProgress);
+        float radiusScale = 0.30F + startupProgress * 0.70F;
+        float alphaScale = 0.20F + startupProgress * 0.80F;
 
         renderLayer(
             pose,
             buffer,
             time,
+            heightScale,
+            radiusScale,
+            alphaScale,
             profile.outerSegments,
             profile.outerPlanes,
             profile.outerStartRadius,
@@ -46,6 +59,9 @@ public final class NozzlePlasmaJetRenderer {
             pose,
             buffer,
             time + profile.corePhaseOffset,
+            heightScale,
+            radiusScale,
+            alphaScale,
             profile.coreSegments,
             profile.corePlanes,
             profile.coreStartRadius,
@@ -57,13 +73,18 @@ public final class NozzlePlasmaJetRenderer {
             profile.coreStartR, profile.coreStartG, profile.coreStartB,
             profile.coreEndR, profile.coreEndG, profile.coreEndB
         );
-        renderMachDiamonds(pose, buffer, time, profile);
+        if (startupProgress >= 0.35F) {
+            renderMachDiamonds(pose, buffer, time, heightScale, radiusScale, alphaScale, profile);
+        }
     }
 
     private static void renderLayer(
         PoseStack.Pose pose,
         VertexConsumer buffer,
         float time,
+        float heightScale,
+        float radiusScale,
+        float alphaScale,
         int segments,
         int planes,
         float startRadius,
@@ -86,12 +107,12 @@ public final class NozzlePlasmaJetRenderer {
             for (int segment = 0; segment < segments; segment++) {
                 float t0 = segment / (float) segments;
                 float t1 = (segment + 1) / (float) segments;
-                float y0 = TOTAL_HEIGHT * t0;
-                float y1 = TOTAL_HEIGHT * t1;
-                float radius0 = plumeRadius(t0, time, startRadius, endRadius, waveAmplitude, waveFrequency);
-                float radius1 = plumeRadius(t1, time, startRadius, endRadius, waveAmplitude, waveFrequency);
-                float alpha0 = plumeAlpha(t0, time, baseAlpha, flickerAmplitude);
-                float alpha1 = plumeAlpha(t1, time, baseAlpha, flickerAmplitude);
+                float y0 = TOTAL_HEIGHT * heightScale * t0;
+                float y1 = TOTAL_HEIGHT * heightScale * t1;
+                float radius0 = plumeRadius(t0, time, startRadius, endRadius, waveAmplitude, waveFrequency) * radiusScale;
+                float radius1 = plumeRadius(t1, time, startRadius, endRadius, waveAmplitude, waveFrequency) * radiusScale;
+                float alpha0 = plumeAlpha(t0, time, baseAlpha, flickerAmplitude) * alphaScale;
+                float alpha1 = plumeAlpha(t1, time, baseAlpha, flickerAmplitude) * alphaScale;
                 float r0 = lerp(startR, endR, t0);
                 float g0 = lerp(startG, endG, t0);
                 float b0 = lerp(startB, endB, t0);
@@ -121,12 +142,22 @@ public final class NozzlePlasmaJetRenderer {
         }
     }
 
-    private static void renderMachDiamonds(PoseStack.Pose pose, VertexConsumer buffer, float time, RenderProfile profile) {
+    private static void renderMachDiamonds(
+        PoseStack.Pose pose,
+        VertexConsumer buffer,
+        float time,
+        float heightScale,
+        float radiusScale,
+        float alphaScale,
+        RenderProfile profile
+    ) {
         for (int i = 0; i < profile.diamondCount; i++) {
             float center = (i + profile.diamondCenterOffset) / (profile.diamondCount + profile.diamondCountOffset);
             float bandHeight = profile.diamondBandHeightBase + i * profile.diamondBandHeightStep;
-            float y0 = Math.max(0.0F, center * TOTAL_HEIGHT - bandHeight * 0.5F);
-            float y1 = Math.min(TOTAL_HEIGHT, center * TOTAL_HEIGHT + bandHeight * 0.5F);
+            float scaledCenterY = center * TOTAL_HEIGHT * heightScale;
+            float scaledBandHeight = bandHeight * heightScale;
+            float y0 = Math.max(0.0F, scaledCenterY - scaledBandHeight * 0.5F);
+            float y1 = Math.min(TOTAL_HEIGHT * heightScale, scaledCenterY + scaledBandHeight * 0.5F);
             float pulse = profile.diamondPulseBase
                 + profile.diamondPulseAmplitude * (float) Math.sin(time * profile.diamondPulseFrequency + i * profile.diamondPulsePhaseStep);
             float coreRadius = plumeRadius(
@@ -136,10 +167,10 @@ public final class NozzlePlasmaJetRenderer {
                 profile.coreEndRadius,
                 profile.coreWaveAmplitude,
                 profile.coreWaveFrequency
-            );
+            ) * radiusScale;
             float outer = Math.max(0.08F, coreRadius * profile.diamondOuterScale + profile.diamondOuterBias);
             float inner = outer * profile.diamondInnerRatio;
-            float alpha = profile.diamondAlpha * (1.0F - center * profile.diamondAlphaTaper) * pulse;
+            float alpha = profile.diamondAlpha * alphaScale * (1.0F - center * profile.diamondAlphaTaper) * pulse;
 
             for (int plane = 0; plane < 4; plane++) {
                 float angle = (float) (Math.PI * 0.25 * plane);
@@ -151,7 +182,7 @@ public final class NozzlePlasmaJetRenderer {
                     dx,
                     dz,
                     y0,
-                    center * TOTAL_HEIGHT,
+                    scaledCenterY,
                     outer,
                     inner,
                     profile.diamondStartR, profile.diamondStartG, profile.diamondStartB, alpha * profile.diamondStartAlphaScale,
@@ -162,7 +193,7 @@ public final class NozzlePlasmaJetRenderer {
                     buffer,
                     dx,
                     dz,
-                    center * TOTAL_HEIGHT,
+                    scaledCenterY,
                     y1,
                     inner,
                     outer,

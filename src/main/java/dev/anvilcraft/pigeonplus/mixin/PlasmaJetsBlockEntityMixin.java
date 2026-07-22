@@ -1,6 +1,7 @@
 package dev.anvilcraft.pigeonplus.mixin;
 
 import com.mojang.datafixers.util.Pair;
+import dev.anvilcraft.pigeonplus.init.AddonParticles;
 import dev.anvilcraft.pigeonplus.util.NozzlePlasmaJetUtil;
 import dev.dubhe.anvilcraft.api.chargecollector.ChargeCollectorManager;
 import dev.dubhe.anvilcraft.api.heat.HeaterManager;
@@ -38,8 +39,6 @@ public abstract class PlasmaJetsBlockEntityMixin {
 
     @Shadow protected abstract void hurtEntities(Level level);
 
-    @Shadow protected abstract void playJetSound(ServerLevel level);
-
     @Shadow protected abstract void provideCharge(Level level);
 
     @Inject(method = "serverTick", at = @At("HEAD"), cancellable = true)
@@ -66,7 +65,7 @@ public abstract class PlasmaJetsBlockEntityMixin {
         HeaterManager.addProducer(this.pigeonplus$blockPos(), level, ModHeaterInfos.MAGNET_PLASMA_JETS);
         this.pigeonplus$hurtNozzleJetEntities(level);
         this.provideCharge(level);
-        this.playJetSound(level);
+        this.duration++;
     }
 
     @Inject(method = "clientTick", at = @At("HEAD"), cancellable = true)
@@ -128,6 +127,7 @@ public abstract class PlasmaJetsBlockEntityMixin {
     }
 
     private void pigeonplus$removeJet(Level level) {
+        this.duration = 0;
         level.removeBlock(this.pigeonplus$blockPos(), false);
     }
 
@@ -143,7 +143,7 @@ public abstract class PlasmaJetsBlockEntityMixin {
                 startPos.getY(),
                 startPos.getZ() - NozzlePlasmaJetUtil.JET_RANGE_RADIUS,
                 startPos.getX() + NozzlePlasmaJetUtil.JET_RANGE_RADIUS + 2,
-                startPos.getY() + NozzlePlasmaJetUtil.JET_RANGE_HEIGHT,
+                startPos.getY() + NozzlePlasmaJetUtil.JET_DAMAGE_HEIGHT,
                 startPos.getZ() + NozzlePlasmaJetUtil.JET_RANGE_RADIUS + 2
             ),
             entity -> !entity.fireImmune()
@@ -160,6 +160,7 @@ public abstract class PlasmaJetsBlockEntityMixin {
         RandomSource random = level.getRandom();
         BlockPos jetPos = this.pigeonplus$blockPos();
         double baseY = jetPos.getY() - 0.92;
+        double visualHeight = NozzlePlasmaJetUtil.JET_VISUAL_HEIGHT;
 
         for (int i = 0; i < 6; i++) {
             double x = jetPos.getX() - 0.55 + random.nextDouble() * 2.1;
@@ -192,7 +193,37 @@ public abstract class PlasmaJetsBlockEntityMixin {
             );
         }
 
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 4; i++) {
+            double t = 0.12 + random.nextDouble() * 0.78;
+            double radius = 0.20 + (1.0 - t) * 0.32 + random.nextDouble() * 0.10;
+            double angle = random.nextDouble() * Math.PI * 2.0;
+            double plumeX = jetPos.getX() + 0.5 + Math.cos(angle) * radius;
+            double plumeZ = jetPos.getZ() + 0.5 + Math.sin(angle) * radius;
+            double plumeY = baseY + t * visualHeight;
+            level.addParticle(
+                ParticleTypes.FLAME,
+                plumeX,
+                plumeY,
+                plumeZ,
+                (random.nextDouble() - 0.5) * 0.02,
+                0.04 + random.nextDouble() * 0.08,
+                (random.nextDouble() - 0.5) * 0.02
+            );
+            if (random.nextFloat() < 0.65F) {
+                level.addParticle(
+                    ModParticles.PLASMA_JETS.get(),
+                    true,
+                    plumeX,
+                    plumeY,
+                    plumeZ,
+                    (random.nextDouble() - 0.5) * 0.03,
+                    0.08 + random.nextDouble() * 0.10,
+                    (random.nextDouble() - 0.5) * 0.03
+                );
+            }
+        }
+
+        for (int i = 0; i < 10; i++) {
             double angle = random.nextDouble() * Math.PI * 2.0;
             double radius = 2.0 + random.nextDouble() * 0.4;
             double dirX = Math.cos(angle);
@@ -201,38 +232,39 @@ public abstract class PlasmaJetsBlockEntityMixin {
             double centerZ = jetPos.getZ() + 0.5;
             double rimX = centerX + dirX * radius;
             double rimZ = centerZ + dirZ * radius;
-            double rimY = baseY + 1.0 + random.nextDouble() * 0.22;
-            double targetScale = 1.5 / Math.max(Math.abs(dirX), Math.abs(dirZ));
+            double rimY = baseY + 0.5 + random.nextDouble() * 0.22;
+            double targetScale = 0.5 / Math.max(Math.abs(dirX), Math.abs(dirZ));
             double targetX = centerX + dirX * targetScale;
+            double targetY = rimY + 2.0;
             double targetZ = centerZ + dirZ * targetScale;
-            double speed = 0.08 + random.nextDouble() * 0.08;
+            double speed = 0.11 + random.nextDouble() * 0.09;
             double inwardX = targetX - rimX;
+            double inwardY = targetY - rimY;
             double inwardZ = targetZ - rimZ;
-            double inwardLength = Math.sqrt(inwardX * inwardX + inwardZ * inwardZ);
+            double inwardLength = Math.sqrt(inwardX * inwardX + inwardY * inwardY + inwardZ * inwardZ);
             if (inwardLength > 1.0E-6) {
                 inwardX = inwardX / inwardLength * speed;
+                inwardY = inwardY / inwardLength * speed;
                 inwardZ = inwardZ / inwardLength * speed;
             }
             level.addParticle(
-                ParticleTypes.CLOUD,
+                AddonParticles.ROLLING_PLASMA.get(),
                 rimX,
                 rimY,
                 rimZ,
-                inwardX + (random.nextDouble() - 0.5) * 0.02,
-                0.03 + random.nextDouble() * 0.05,
-                inwardZ + (random.nextDouble() - 0.5) * 0.02
+                inwardX * 0.72 + (random.nextDouble() - 0.5) * 0.012,
+                inwardY * 0.72 + (random.nextDouble() - 0.5) * 0.012,
+                inwardZ * 0.72 + (random.nextDouble() - 0.5) * 0.012
             );
-            if (random.nextFloat() < 0.5F) {
-                level.addParticle(
-                    ParticleTypes.SMOKE,
-                    rimX,
-                    rimY,
-                    rimZ,
-                    inwardX * 0.7 + (random.nextDouble() - 0.5) * 0.02,
-                    0.02 + random.nextDouble() * 0.04,
-                    inwardZ * 0.7 + (random.nextDouble() - 0.5) * 0.02
-                );
-            }
+            level.addParticle(
+                AddonParticles.ROLLING_PLASMA.get(),
+                rimX,
+                rimY,
+                rimZ,
+                inwardX * 0.56 + (random.nextDouble() - 0.5) * 0.010,
+                inwardY * 0.56 + (random.nextDouble() - 0.5) * 0.010,
+                inwardZ * 0.56 + (random.nextDouble() - 0.5) * 0.010
+            );
         }
 
         if (random.nextFloat() < 0.45F) {
@@ -246,6 +278,22 @@ public abstract class PlasmaJetsBlockEntityMixin {
                 smokeZ,
                 (random.nextDouble() - 0.5) * 0.02,
                 0.05 + random.nextDouble() * 0.08,
+                (random.nextDouble() - 0.5) * 0.02
+            );
+        }
+
+        if (random.nextFloat() < 0.35F) {
+            double t = 0.35 + random.nextDouble() * 0.55;
+            double smokeX = jetPos.getX() + 0.1 + random.nextDouble() * 0.8;
+            double smokeZ = jetPos.getZ() + 0.1 + random.nextDouble() * 0.8;
+            double smokeY = baseY + t * visualHeight;
+            level.addParticle(
+                ParticleTypes.SMOKE,
+                smokeX,
+                smokeY,
+                smokeZ,
+                (random.nextDouble() - 0.5) * 0.02,
+                0.03 + random.nextDouble() * 0.04,
                 (random.nextDouble() - 0.5) * 0.02
             );
         }

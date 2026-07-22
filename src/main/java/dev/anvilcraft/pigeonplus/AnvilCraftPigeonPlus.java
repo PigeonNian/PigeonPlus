@@ -8,7 +8,9 @@ import dev.anvilcraft.pigeonplus.init.AddonFluids;
 import dev.anvilcraft.pigeonplus.init.AddonInteractionMap;
 import dev.anvilcraft.pigeonplus.init.AddonItemGroups;
 import dev.anvilcraft.pigeonplus.init.AddonItems;
+import dev.anvilcraft.pigeonplus.init.AddonParticles;
 import dev.anvilcraft.pigeonplus.init.AddonRecipeTypes;
+import dev.anvilcraft.pigeonplus.init.AddonSounds;
 import dev.anvilcraft.lib.v2.config.ConfigManager;
 import dev.anvilcraft.lib.v2.registrum.Registrum;
 import net.minecraft.resources.ResourceLocation;
@@ -30,6 +32,8 @@ public class AnvilCraftPigeonPlus {
         modEventBus.addListener(AnvilCraftPigeonPlus::loadComplete);
         AddonItemGroups.register(modEventBus);
         AddonFluids.register(modEventBus);
+        AddonParticles.register(modEventBus);
+        AddonSounds.register(modEventBus);
         AddonRecipeTypes.register(modEventBus);
         AddonBlocks.register();
         AddonItems.register();

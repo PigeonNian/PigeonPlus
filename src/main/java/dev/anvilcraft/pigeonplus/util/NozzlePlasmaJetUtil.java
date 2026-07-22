@@ -22,6 +22,8 @@ public final class NozzlePlasmaJetUtil {
     public static final int JET_TUBE_HEIGHT = 4;
     public static final int JET_RANGE_RADIUS = 1;
     public static final int JET_RANGE_HEIGHT = 9;
+    public static final int JET_VISUAL_HEIGHT = 16;
+    public static final int JET_DAMAGE_HEIGHT = 16;
     public static final int JET_OUTLET_OFFSET_Y = 5;
     public static final int NOZZLE_MAIN_OFFSET_Y = 3;
     public static final int PLASMA_CONSUME_AMOUNT = FluidType.BUCKET_VOLUME;
@@ -64,6 +66,11 @@ public final class NozzlePlasmaJetUtil {
         return hasUpwardNozzle(level, cauldronMainPos) && getJetOutletPos(cauldronMainPos).equals(jetPos)
             ? cauldron
             : null;
+    }
+
+    public static boolean isNozzleJetActive(Level level, BlockPos jetPos) {
+        LargeCauldronBlockEntity cauldron = getStructuralCauldron(level, jetPos);
+        return cauldron != null && canSustainJet(level, cauldron);
     }
 
     public static void seedTubeWalls(Set<PlasmaJetsBlockEntity.TubeWallLayer> tubeWalls, BlockPos jetPos) {

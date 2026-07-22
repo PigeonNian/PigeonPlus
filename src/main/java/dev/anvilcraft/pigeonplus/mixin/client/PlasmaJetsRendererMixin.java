@@ -36,6 +36,7 @@ public class PlasmaJetsRendererMixin {
             poseStack,
             bufferSource,
             entity.getLevel().getGameTime() + partialTick,
+            entity.getBlockPos(),
             NozzlePlasmaJetRenderer.Propellant.KEROSENE
         );
     }
