@@ -1,6 +1,7 @@
 package dev.anvilcraft.pigeonplus.mixin;
 
 import dev.anvilcraft.pigeonplus.util.GasEscapeUtil;
+import dev.anvilcraft.pigeonplus.util.NozzlePlasmaJetUtil;
 import dev.dubhe.anvilcraft.block.entity.LargeCauldronBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -22,6 +23,7 @@ public class LargeCauldronBlockEntityMixin {
     ) {
         if (entity.isMainPart()) {
             GasEscapeUtil.escapeLargeCauldronGas(level, pos, entity.getFluids());
+            NozzlePlasmaJetUtil.trySpawn(level, entity);
         }
     }
 }
