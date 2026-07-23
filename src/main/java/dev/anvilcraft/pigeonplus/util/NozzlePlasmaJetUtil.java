@@ -13,8 +13,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,15 +36,16 @@ public final class NozzlePlasmaJetUtil {
     private NozzlePlasmaJetUtil() {
     }
 
-    public static BlockPos getJetOutletPos(BlockPos cauldronMainPos) {
-        return cauldronMainPos.above(JET_OUTLET_OFFSET_Y);
+    public static BlockPos getJetOutletPos(BlockPos cauldronMainPos, Direction facing) {
+        return cauldronMainPos.relative(facing, JET_OUTLET_OFFSET_Y);
     }
 
     public static boolean trySpawn(Level level, LargeCauldronBlockEntity cauldron) {
-        if (!canSustainJet(level, cauldron)) {
+        Direction facing = getNozzleFacing(level, cauldron.getBlockPos());
+        if (facing == null || !canSustainJet(level, cauldron)) {
             return false;
         }
-        BlockPos outletPos = getJetOutletPos(cauldron.getBlockPos());
+        BlockPos outletPos = getJetOutletPos(cauldron.getBlockPos(), facing);
         BlockState outletState = level.getBlockState(outletPos);
         if (outletState.is(ModBlocks.PLASMA_JETS)) {
             return true;
@@ -52,86 +57,133 @@ public final class NozzlePlasmaJetUtil {
     }
 
     public static boolean canSustainJet(Level level, LargeCauldronBlockEntity cauldron) {
-        return hasUpwardNozzle(level, cauldron.getBlockPos())
+        return getNozzleFacing(level, cauldron.getBlockPos()) != null
             && cauldron.isIgnited()
             && AddonVaporizationSources.wasCrudeOilVaporizedRecently(level, cauldron.getBlockPos());
     }
 
     public static LargeCauldronBlockEntity getStructuralCauldron(Level level, BlockPos jetPos) {
-        BlockPos cauldronMainPos = jetPos.below(JET_OUTLET_OFFSET_Y);
-        if (!(level.getBlockEntity(cauldronMainPos) instanceof LargeCauldronBlockEntity cauldron) || !cauldron.isMainPart()) {
-            return null;
-        }
-        return hasUpwardNozzle(level, cauldronMainPos) && getJetOutletPos(cauldronMainPos).equals(jetPos)
-            ? cauldron
-            : null;
+        StructuralJet jet = findStructuralJet(level, jetPos);
+        return jet != null ? jet.cauldron() : null;
+    }
+
+    public static @Nullable Direction getStructuralFacing(Level level, BlockPos jetPos) {
+        StructuralJet jet = findStructuralJet(level, jetPos);
+        return jet != null ? jet.facing() : null;
     }
 
     public static boolean isNozzleJetActive(Level level, BlockPos jetPos) {
-        LargeCauldronBlockEntity cauldron = getStructuralCauldron(level, jetPos);
-        return cauldron != null && canSustainJet(level, cauldron);
+        StructuralJet jet = findStructuralJet(level, jetPos);
+        return jet != null && canSustainJet(level, jet.cauldron());
     }
 
-    public static void seedTubeWalls(Set<PlasmaJetsBlockEntity.TubeWallLayer> tubeWalls, BlockPos jetPos) {
+    public static void seedTubeWalls(Set<PlasmaJetsBlockEntity.TubeWallLayer> tubeWalls, BlockPos jetPos, Direction facing) {
         if (!tubeWalls.isEmpty()) {
             return;
         }
         for (int i = 1; i <= JET_TUBE_HEIGHT; i++) {
-            tubeWalls.add(PlasmaJetsBlockEntity.TubeWallLayer.of(jetPos.below(i)));
+            tubeWalls.add(PlasmaJetsBlockEntity.TubeWallLayer.of(jetPos.relative(facing.getOpposite(), i)));
         }
     }
 
     public static NozzleRingTargets collectRingTargets(Level level, BlockPos jetPos) {
+        Direction facing = getStructuralFacing(level, jetPos);
+        if (facing == null) {
+            return new NozzleRingTargets(Set.of(), Set.of(), Set.of());
+        }
         Set<BlockPos> noMagnetHeatablePoses = new HashSet<>();
         Set<BlockPos> magnetHeatablePoses = new HashSet<>();
         Set<BlockPos> magnetPoses = new HashSet<>();
+        Direction[] plane = getPlaneDirections(facing);
+        Direction firstAxis = plane[0];
+        Direction secondAxis = plane[1];
         for (int i = 0; i < JET_RANGE_HEIGHT; i++) {
-            BlockPos layerCenter = jetPos.above(i);
-            BlockPos[] northFace = new BlockPos[] {
-                layerCenter.north(2).west(),
-                layerCenter.north(2),
-                layerCenter.north(2).east()
-            };
-            BlockPos[] southFace = new BlockPos[] {
-                layerCenter.south(2).west(),
-                layerCenter.south(2),
-                layerCenter.south(2).east()
-            };
-            BlockPos[] eastFace = new BlockPos[] {
-                layerCenter.east(2).north(),
-                layerCenter.east(2),
-                layerCenter.east(2).south()
-            };
-            BlockPos[] westFace = new BlockPos[] {
-                layerCenter.west(2).north(),
-                layerCenter.west(2),
-                layerCenter.west(2).south()
-            };
+            BlockPos layerCenter = jetPos.relative(facing, i);
+            BlockPos[] firstFace = createFace(layerCenter, firstAxis, secondAxis);
+            BlockPos[] oppositeFirstFace = createFace(layerCenter, firstAxis.getOpposite(), secondAxis);
+            BlockPos[] secondFace = createFace(layerCenter, secondAxis, firstAxis);
+            BlockPos[] oppositeSecondFace = createFace(layerCenter, secondAxis.getOpposite(), firstAxis);
 
-            if (matchesHeatablePair(level, northFace, southFace) && matchesMagnetPair(level, eastFace, westFace)) {
-                addFace(magnetHeatablePoses, northFace);
-                addFace(magnetHeatablePoses, southFace);
-                addFace(magnetPoses, eastFace);
-                addFace(magnetPoses, westFace);
+            if (matchesHeatablePair(level, firstFace, oppositeFirstFace)
+                && matchesMagnetPair(level, secondFace, oppositeSecondFace)) {
+                addFace(magnetHeatablePoses, firstFace);
+                addFace(magnetHeatablePoses, oppositeFirstFace);
+                addFace(magnetPoses, secondFace);
+                addFace(magnetPoses, oppositeSecondFace);
                 continue;
             }
 
-            if (matchesHeatablePair(level, eastFace, westFace) && matchesMagnetPair(level, northFace, southFace)) {
-                addFace(magnetHeatablePoses, eastFace);
-                addFace(magnetHeatablePoses, westFace);
-                addFace(magnetPoses, northFace);
-                addFace(magnetPoses, southFace);
+            if (matchesHeatablePair(level, secondFace, oppositeSecondFace)
+                && matchesMagnetPair(level, firstFace, oppositeFirstFace)) {
+                addFace(magnetHeatablePoses, secondFace);
+                addFace(magnetHeatablePoses, oppositeSecondFace);
+                addFace(magnetPoses, firstFace);
+                addFace(magnetPoses, oppositeFirstFace);
                 continue;
             }
 
-            if (matchesHeatablePair(level, northFace, southFace) && matchesHeatablePair(level, eastFace, westFace)) {
-                addFace(noMagnetHeatablePoses, northFace);
-                addFace(noMagnetHeatablePoses, southFace);
-                addFace(noMagnetHeatablePoses, eastFace);
-                addFace(noMagnetHeatablePoses, westFace);
+            if (matchesHeatablePair(level, firstFace, oppositeFirstFace)
+                && matchesHeatablePair(level, secondFace, oppositeSecondFace)) {
+                addFace(noMagnetHeatablePoses, firstFace);
+                addFace(noMagnetHeatablePoses, oppositeFirstFace);
+                addFace(noMagnetHeatablePoses, secondFace);
+                addFace(noMagnetHeatablePoses, oppositeSecondFace);
             }
         }
         return new NozzleRingTargets(noMagnetHeatablePoses, magnetHeatablePoses, magnetPoses);
+    }
+
+    public static AABB getJetEffectBounds(BlockPos jetPos, Direction facing, int length) {
+        return switch (facing) {
+            case UP -> new AABB(
+                jetPos.getX() - JET_RANGE_RADIUS,
+                jetPos.getY(),
+                jetPos.getZ() - JET_RANGE_RADIUS,
+                jetPos.getX() + JET_RANGE_RADIUS + 2,
+                jetPos.getY() + length,
+                jetPos.getZ() + JET_RANGE_RADIUS + 2
+            );
+            case DOWN -> new AABB(
+                jetPos.getX() - JET_RANGE_RADIUS,
+                jetPos.getY() - length + 1,
+                jetPos.getZ() - JET_RANGE_RADIUS,
+                jetPos.getX() + JET_RANGE_RADIUS + 2,
+                jetPos.getY() + 1,
+                jetPos.getZ() + JET_RANGE_RADIUS + 2
+            );
+            case SOUTH -> new AABB(
+                jetPos.getX() - JET_RANGE_RADIUS,
+                jetPos.getY() - JET_RANGE_RADIUS,
+                jetPos.getZ(),
+                jetPos.getX() + JET_RANGE_RADIUS + 2,
+                jetPos.getY() + JET_RANGE_RADIUS + 2,
+                jetPos.getZ() + length
+            );
+            case NORTH -> new AABB(
+                jetPos.getX() - JET_RANGE_RADIUS,
+                jetPos.getY() - JET_RANGE_RADIUS,
+                jetPos.getZ() - length + 1,
+                jetPos.getX() + JET_RANGE_RADIUS + 2,
+                jetPos.getY() + JET_RANGE_RADIUS + 2,
+                jetPos.getZ() + 1
+            );
+            case EAST -> new AABB(
+                jetPos.getX(),
+                jetPos.getY() - JET_RANGE_RADIUS,
+                jetPos.getZ() - JET_RANGE_RADIUS,
+                jetPos.getX() + length,
+                jetPos.getY() + JET_RANGE_RADIUS + 2,
+                jetPos.getZ() + JET_RANGE_RADIUS + 2
+            );
+            case WEST -> new AABB(
+                jetPos.getX() - length + 1,
+                jetPos.getY() - JET_RANGE_RADIUS,
+                jetPos.getZ() - JET_RANGE_RADIUS,
+                jetPos.getX() + 1,
+                jetPos.getY() + JET_RANGE_RADIUS + 2,
+                jetPos.getZ() + JET_RANGE_RADIUS + 2
+            );
+        };
     }
 
     private static boolean matchesHeatablePair(Level level, BlockPos[] firstFace, BlockPos[] secondFace) {
@@ -190,12 +242,47 @@ public final class NozzlePlasmaJetUtil {
         return false;
     }
 
-    private static boolean hasUpwardNozzle(Level level, BlockPos cauldronMainPos) {
-        BlockPos nozzleMainPos = cauldronMainPos.above(NOZZLE_MAIN_OFFSET_Y);
-        BlockState state = level.getBlockState(nozzleMainPos);
-        return state.getBlock() instanceof NozzleBlock nozzle
-            && nozzle.isMainPart(state)
-            && state.getValue(NozzleBlock.FACING) == Direction.UP;
+    public static @Nullable Direction getNozzleFacing(Level level, BlockPos cauldronMainPos) {
+        for (Direction facing : Direction.values()) {
+            BlockPos nozzleMainPos = cauldronMainPos.relative(facing, NOZZLE_MAIN_OFFSET_Y);
+            BlockState state = level.getBlockState(nozzleMainPos);
+            if (state.getBlock() instanceof NozzleBlock nozzle
+                && nozzle.isMainPart(state)
+                && state.getValue(NozzleBlock.FACING) == facing) {
+                return facing;
+            }
+        }
+        return null;
+    }
+
+    private static @Nullable StructuralJet findStructuralJet(Level level, BlockPos jetPos) {
+        for (Direction facing : Direction.values()) {
+            BlockPos cauldronMainPos = jetPos.relative(facing.getOpposite(), JET_OUTLET_OFFSET_Y);
+            if (!(level.getBlockEntity(cauldronMainPos) instanceof LargeCauldronBlockEntity cauldron) || !cauldron.isMainPart()) {
+                continue;
+            }
+            Direction nozzleFacing = getNozzleFacing(level, cauldronMainPos);
+            if (nozzleFacing == facing && getJetOutletPos(cauldronMainPos, facing).equals(jetPos)) {
+                return new StructuralJet(cauldron, facing);
+            }
+        }
+        return null;
+    }
+
+    private static Direction[] getPlaneDirections(Direction facing) {
+        return switch (facing.getAxis()) {
+            case Y -> new Direction[] {Direction.NORTH, Direction.EAST};
+            case X -> new Direction[] {Direction.UP, Direction.NORTH};
+            case Z -> new Direction[] {Direction.UP, Direction.EAST};
+        };
+    }
+
+    private static BlockPos[] createFace(BlockPos center, Direction faceDirection, Direction spanDirection) {
+        return new BlockPos[] {
+            center.relative(faceDirection, 2).relative(spanDirection.getOpposite()),
+            center.relative(faceDirection, 2),
+            center.relative(faceDirection, 2).relative(spanDirection)
+        };
     }
 
     public record NozzleRingTargets(
@@ -206,5 +293,8 @@ public final class NozzlePlasmaJetUtil {
         public Pair<Set<BlockPos>, Set<BlockPos>> toHeatingPoses() {
             return Pair.of(this.noMagnetHeatablePoses, this.magnetHeatablePoses);
         }
+    }
+
+    private record StructuralJet(LargeCauldronBlockEntity cauldron, Direction facing) {
     }
 }

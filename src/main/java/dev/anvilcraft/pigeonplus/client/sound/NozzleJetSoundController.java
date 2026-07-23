@@ -6,6 +6,7 @@ import dev.dubhe.anvilcraft.block.entity.PlasmaJetsBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,12 +33,16 @@ public final class NozzleJetSoundController {
         if (minecraft.isPaused() || minecraft.level == null) {
             return;
         }
+        Direction facing = NozzlePlasmaJetUtil.getStructuralFacing(minecraft.level, pos);
+        if (facing == null) {
+            return;
+        }
 
         SoundState state = SOUND_STATES.get(pos);
         if (state == null) {
             NozzleJetSoundInstance created = new NozzleJetSoundInstance(pos, true);
             minecraft.getSoundManager().play(created);
-            NozzleStartupParticleUtil.spawnStartupRing((ClientLevel) minecraft.level, pos, 0);
+            NozzleStartupParticleUtil.spawnStartupRing((ClientLevel) minecraft.level, pos, facing, 0);
             List<NozzleJetSoundInstance> sounds = new ArrayList<>();
             sounds.add(created);
             SOUND_STATES.put(pos, new SoundState(sounds, 1));
@@ -47,7 +52,7 @@ public final class NozzleJetSoundController {
         state.playingSounds().removeIf(NozzleJetSoundInstance::isStopped);
 
         if (state.age() < NozzleStartupParticleUtil.STARTUP_RING_TICKS) {
-            NozzleStartupParticleUtil.spawnStartupRing((ClientLevel) minecraft.level, pos, state.age());
+            NozzleStartupParticleUtil.spawnStartupRing((ClientLevel) minecraft.level, pos, facing, state.age());
         }
 
         int firstFireTick = NozzleJetSoundInstance.ENGINE_ON_TICKS - NozzleJetSoundInstance.ENGINE_ON_TO_FIRE_LEAD_TICKS;

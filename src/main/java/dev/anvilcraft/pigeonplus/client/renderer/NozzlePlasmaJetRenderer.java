@@ -7,6 +7,7 @@ import dev.anvilcraft.pigeonplus.util.NozzlePlasmaJetUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 
 public final class NozzlePlasmaJetRenderer {
@@ -24,7 +25,14 @@ public final class NozzlePlasmaJetRenderer {
     private NozzlePlasmaJetRenderer() {
     }
 
-    public static void render(PoseStack poseStack, MultiBufferSource buffers, float time, BlockPos pos, Propellant propellant) {
+    public static void render(
+        PoseStack poseStack,
+        MultiBufferSource buffers,
+        float time,
+        BlockPos pos,
+        Direction facing,
+        Propellant propellant
+    ) {
         float startupProgress = NozzleJetSoundController.getFlameStartupProgress(pos);
         if (startupProgress <= 0.0F) {
             return;
@@ -44,6 +52,7 @@ public final class NozzlePlasmaJetRenderer {
             heightScale,
             radiusScale,
             alphaScale,
+            facing,
             profile.outerSegments,
             profile.outerPlanes,
             profile.outerStartRadius,
@@ -62,6 +71,7 @@ public final class NozzlePlasmaJetRenderer {
             heightScale,
             radiusScale,
             alphaScale,
+            facing,
             profile.coreSegments,
             profile.corePlanes,
             profile.coreStartRadius,
@@ -74,7 +84,7 @@ public final class NozzlePlasmaJetRenderer {
             profile.coreEndR, profile.coreEndG, profile.coreEndB
         );
         if (startupProgress >= 0.35F) {
-            renderMachDiamonds(pose, buffer, time, heightScale, radiusScale, alphaScale, profile);
+            renderMachDiamonds(pose, buffer, time, heightScale, radiusScale, alphaScale, facing, profile);
         }
     }
 
@@ -85,6 +95,7 @@ public final class NozzlePlasmaJetRenderer {
         float heightScale,
         float radiusScale,
         float alphaScale,
+        Direction facing,
         int segments,
         int planes,
         float startRadius,
@@ -136,7 +147,8 @@ public final class NozzlePlasmaJetRenderer {
                     r1,
                     g1,
                     b1,
-                    alpha1
+                    alpha1,
+                    facing
                 );
             }
         }
@@ -149,6 +161,7 @@ public final class NozzlePlasmaJetRenderer {
         float heightScale,
         float radiusScale,
         float alphaScale,
+        Direction facing,
         RenderProfile profile
     ) {
         for (int i = 0; i < profile.diamondCount; i++) {
@@ -186,7 +199,8 @@ public final class NozzlePlasmaJetRenderer {
                     outer,
                     inner,
                     profile.diamondStartR, profile.diamondStartG, profile.diamondStartB, alpha * profile.diamondStartAlphaScale,
-                    profile.diamondMidR, profile.diamondMidG, profile.diamondMidB, alpha
+                    profile.diamondMidR, profile.diamondMidG, profile.diamondMidB, alpha,
+                    facing
                 );
                 addVerticalQuad(
                     pose,
@@ -198,7 +212,8 @@ public final class NozzlePlasmaJetRenderer {
                     inner,
                     outer,
                     profile.diamondMidR, profile.diamondMidG, profile.diamondMidB, alpha,
-                    profile.diamondEndR, profile.diamondEndG, profile.diamondEndB, alpha * profile.diamondEndAlphaScale
+                    profile.diamondEndR, profile.diamondEndG, profile.diamondEndB, alpha * profile.diamondEndAlphaScale,
+                    facing
                 );
             }
         }
@@ -249,36 +264,95 @@ public final class NozzlePlasmaJetRenderer {
         float r1,
         float g1,
         float b1,
-        float a1
+        float a1,
+        Direction facing
     ) {
         float yy0 = y0 + BASE_Y_OFFSET;
         float yy1 = y1 + BASE_Y_OFFSET;
         float v0 = yy0 * 0.18F;
         float v1 = yy1 * 0.18F;
-        buffer.addVertex(pose, CENTER_X - dx * radius0, yy0, CENTER_Z - dz * radius0)
-            .setColor(r0, g0, b0, a0)
-            .setUv(0.0F, v0)
+        addVertex(pose, buffer, facing, CENTER_X - dx * radius0, yy0, CENTER_Z - dz * radius0, r0, g0, b0, a0, 0.0F, v0);
+        addVertex(pose, buffer, facing, CENTER_X - dx * radius1, yy1, CENTER_Z - dz * radius1, r1, g1, b1, a1, 0.0F, v1);
+        addVertex(pose, buffer, facing, CENTER_X + dx * radius1, yy1, CENTER_Z + dz * radius1, r1, g1, b1, a1, 1.0F, v1);
+        addVertex(pose, buffer, facing, CENTER_X + dx * radius0, yy0, CENTER_Z + dz * radius0, r0, g0, b0, a0, 1.0F, v0);
+    }
+
+    private static void addVertex(
+        PoseStack.Pose pose,
+        VertexConsumer buffer,
+        Direction facing,
+        float sideX,
+        float axis,
+        float sideZ,
+        float r,
+        float g,
+        float b,
+        float a,
+        float u,
+        float v
+    ) {
+        float x;
+        float y;
+        float z;
+        float nx;
+        float ny;
+        float nz;
+        switch (facing) {
+            case DOWN -> {
+                x = sideX;
+                y = 1.0F - axis;
+                z = sideZ;
+                nx = 0.0F;
+                ny = -1.0F;
+                nz = 0.0F;
+            }
+            case EAST -> {
+                x = axis;
+                y = sideX;
+                z = sideZ;
+                nx = 1.0F;
+                ny = 0.0F;
+                nz = 0.0F;
+            }
+            case WEST -> {
+                x = 1.0F - axis;
+                y = sideX;
+                z = sideZ;
+                nx = -1.0F;
+                ny = 0.0F;
+                nz = 0.0F;
+            }
+            case SOUTH -> {
+                x = sideX;
+                y = sideZ;
+                z = axis;
+                nx = 0.0F;
+                ny = 0.0F;
+                nz = 1.0F;
+            }
+            case NORTH -> {
+                x = sideX;
+                y = sideZ;
+                z = 1.0F - axis;
+                nx = 0.0F;
+                ny = 0.0F;
+                nz = -1.0F;
+            }
+            default -> {
+                x = sideX;
+                y = axis;
+                z = sideZ;
+                nx = 0.0F;
+                ny = 1.0F;
+                nz = 0.0F;
+            }
+        }
+        buffer.addVertex(pose, x, y, z)
+            .setColor(r, g, b, a)
+            .setUv(u, v)
             .setOverlay(0)
             .setLight(FULL_BRIGHT)
-            .setNormal(pose, 0.0F, 1.0F, 0.0F);
-        buffer.addVertex(pose, CENTER_X - dx * radius1, yy1, CENTER_Z - dz * radius1)
-            .setColor(r1, g1, b1, a1)
-            .setUv(0.0F, v1)
-            .setOverlay(0)
-            .setLight(FULL_BRIGHT)
-            .setNormal(pose, 0.0F, 1.0F, 0.0F);
-        buffer.addVertex(pose, CENTER_X + dx * radius1, yy1, CENTER_Z + dz * radius1)
-            .setColor(r1, g1, b1, a1)
-            .setUv(1.0F, v1)
-            .setOverlay(0)
-            .setLight(FULL_BRIGHT)
-            .setNormal(pose, 0.0F, 1.0F, 0.0F);
-        buffer.addVertex(pose, CENTER_X + dx * radius0, yy0, CENTER_Z + dz * radius0)
-            .setColor(r0, g0, b0, a0)
-            .setUv(1.0F, v0)
-            .setOverlay(0)
-            .setLight(FULL_BRIGHT)
-            .setNormal(pose, 0.0F, 1.0F, 0.0F);
+            .setNormal(pose, nx, ny, nz);
     }
 
     private static RenderProfile profile(Propellant propellant) {

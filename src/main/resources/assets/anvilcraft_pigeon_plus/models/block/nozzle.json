@@ -8,22 +8,23 @@
 		"0": "anvilcraft_pigeon_plus:block/nozzle_bottom",
 		"5": "anvilcraft:block/giant_anvil_side",
 		"6": "anvilcraft:block/giant_anvil_top",
-		"7": "anvilcraft:block/frost_metal_block_outline",
+		"8": "anvilcraft:block/ember_metal_block_outline",
 		"particle": "anvilcraft:block/giant_anvil_side",
 		"side": "anvilcraft:block/large_cauldron_side",
 		"bottom": "anvilcraft:block/large_cauldron_bottom"
 	},
 	"elements": [
 		{
-			"from": [-9, -11, -9],
+			"from": [-9, -10, -9],
 			"to": [25, -6, 25],
 			"rotation": {"angle": 0, "axis": "y", "origin": [-1, -11, 0]},
 			"faces": {
-				"north": {"uv": [0, 8.5, 8.5, 9.75], "texture": "#0"},
-				"east": {"uv": [0, 8.5, 8.5, 9.75], "texture": "#0"},
-				"south": {"uv": [0, 8.5, 8.5, 9.75], "texture": "#0"},
-				"west": {"uv": [0, 8.5, 8.5, 9.75], "texture": "#0"},
-				"up": {"uv": [0, 0, 8.5, 8.5], "texture": "#0"}
+				"north": {"uv": [0, 8.5, 8.5, 9.5], "texture": "#0"},
+				"east": {"uv": [0, 8.5, 8.5, 9.5], "texture": "#0"},
+				"south": {"uv": [0, 8.5, 8.5, 9.5], "texture": "#0"},
+				"west": {"uv": [0, 8.5, 8.5, 9.5], "texture": "#0"},
+				"up": {"uv": [0, 0, 8.5, 8.5], "texture": "#0"},
+				"down": {"uv": [0, 0, 8.5, 8.5], "texture": "#0"}
 			}
 		},
 		{
@@ -40,14 +41,14 @@
 			}
 		},
 		{
-			"from": [-5, -6, -5],
+			"from": [-5, -11, -5],
 			"to": [21, 2, 21],
 			"rotation": {"angle": 0, "axis": "y", "origin": [2, -6, 3]},
 			"faces": {
-				"north": {"uv": [2.75, 8.25, 9.25, 10.25], "texture": "#5"},
-				"east": {"uv": [2.75, 8.25, 9.25, 10.25], "texture": "#5"},
-				"south": {"uv": [2.75, 8.25, 9.25, 10.25], "texture": "#5"},
-				"west": {"uv": [2.75, 8.25, 9.25, 10.25], "texture": "#5"}
+				"north": {"uv": [2.75, 8.25, 9.25, 11.5], "texture": "#5"},
+				"east": {"uv": [2.75, 8.25, 9.25, 11.5], "texture": "#5"},
+				"south": {"uv": [2.75, 8.25, 9.25, 11.5], "texture": "#5"},
+				"west": {"uv": [2.75, 8.25, 9.25, 11.5], "texture": "#5"}
 			}
 		},
 		{
@@ -315,12 +316,12 @@
 			"light_emission": 15,
 			"rotation": {"angle": 0, "axis": "y", "origin": [26, -5, 26]},
 			"faces": {
-				"north": {"uv": [0, 0, 16, 16], "texture": "#7"},
-				"east": {"uv": [0, 0, 16, 16], "texture": "#7"},
-				"south": {"uv": [0, 0, 16, 16], "texture": "#7"},
-				"west": {"uv": [0, 0, 16, 16], "texture": "#7"},
-				"up": {"uv": [0, 0, 16, 16], "texture": "#7"},
-				"down": {"uv": [0, 0, 16, 16], "texture": "#7"}
+				"north": {"uv": [0, 0, 16, 16], "texture": "#8"},
+				"east": {"uv": [0, 0, 16, 16], "texture": "#8"},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#8"},
+				"west": {"uv": [0, 0, 16, 16], "texture": "#8"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#8"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#8"}
 			}
 		}
 	],

@@ -1,0 +1,19 @@
+{
+  "type": "anvilcraft:item_inject",
+  "block_ingredient": {
+    "blocks": "anvilcraft:giant_anvil"
+  },
+  "ingredients": [
+    {
+      "items": "anvilcraft:ember_metal_block"
+    }
+  ],
+  "results": [
+    {
+      "id": "anvilcraft_pigeon_plus:nozzle"
+    },
+    {
+      "id": "anvilcraft:heavy_iron_block"
+    }
+  ]
+}

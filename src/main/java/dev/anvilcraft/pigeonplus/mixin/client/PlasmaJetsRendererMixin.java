@@ -7,6 +7,7 @@ import dev.dubhe.anvilcraft.block.entity.PlasmaJetsBlockEntity;
 import dev.dubhe.anvilcraft.client.renderer.blockentity.PlasmaJetsRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.core.Direction;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,12 +32,17 @@ public class PlasmaJetsRendererMixin {
         if (entity.getLevel() == null || NozzlePlasmaJetUtil.getStructuralCauldron(entity.getLevel(), entity.getBlockPos()) == null) {
             return;
         }
+        Direction facing = NozzlePlasmaJetUtil.getStructuralFacing(entity.getLevel(), entity.getBlockPos());
+        if (facing == null) {
+            return;
+        }
         ci.cancel();
         NozzlePlasmaJetRenderer.render(
             poseStack,
             bufferSource,
             entity.getLevel().getGameTime() + partialTick,
             entity.getBlockPos(),
+            facing,
             NozzlePlasmaJetRenderer.Propellant.KEROSENE
         );
     }
@@ -57,6 +63,13 @@ public class PlasmaJetsRendererMixin {
 
     public AABB getRenderBoundingBox(PlasmaJetsBlockEntity blockEntity) {
         var pos = blockEntity.getBlockPos();
-        return new AABB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1.0, PIGEONPLUS_MAX_RENDER_Y, pos.getZ() + 1.0);
+        if (blockEntity.getLevel() == null) {
+            return new AABB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1.0, PIGEONPLUS_MAX_RENDER_Y, pos.getZ() + 1.0);
+        }
+        Direction facing = NozzlePlasmaJetUtil.getStructuralFacing(blockEntity.getLevel(), pos);
+        if (facing == null) {
+            return new AABB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1.0, PIGEONPLUS_MAX_RENDER_Y, pos.getZ() + 1.0);
+        }
+        return NozzlePlasmaJetUtil.getJetEffectBounds(pos, facing, NozzlePlasmaJetUtil.JET_VISUAL_HEIGHT).inflate(2.0);
     }
 }
