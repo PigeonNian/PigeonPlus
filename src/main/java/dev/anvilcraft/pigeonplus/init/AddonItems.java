@@ -24,6 +24,16 @@ public class AddonItems {
         .model(ModelProviderUtil::bucket)
         .register();
 
+    public static final ItemEntry<BucketItem> LIQUEFIED_BIOGAS_BUCKET = REGISTRUM.item(
+            "liquefied_biogas_bucket",
+            properties -> new BucketItem(AddonFluids.LIQUEFIED_BIOGAS.get(), properties)
+        )
+        .tag(Tags.Items.BUCKETS)
+        .lang("Liquefied Biogas Bucket")
+        .properties(properties -> properties.stacksTo(1).craftRemainder(Items.BUCKET))
+        .model(ModelProviderUtil::bucket)
+        .register();
+
     public static final ItemEntry<BucketItem> COMPRESSED_AIR_BUCKET = REGISTRUM.item(
             "compressed_air_bucket",
             properties -> new BucketItem(AddonFluids.COMPRESSED_AIR.get(), properties)

@@ -1,13 +1,18 @@
 package dev.anvilcraft.pigeonplus.mixin;
 
 import dev.anvilcraft.pigeonplus.fluid.GasFluid;
+import dev.anvilcraft.pigeonplus.init.AddonFluids;
+import dev.anvilcraft.pigeonplus.util.GasLiquefactionTracker;
 import dev.dubhe.anvilcraft.api.fluid.network.FluidEndpoint;
 import dev.dubhe.anvilcraft.api.fluid.network.FluidPipeNetwork;
 import dev.dubhe.anvilcraft.api.fluid.network.ValveState;
+import dev.dubhe.anvilcraft.block.entity.LargeFluidTankBlockEntity;
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.Nullable;
@@ -173,7 +178,8 @@ public abstract class FluidPipeNetworkMixin {
         if (target == source || target.handler().equals(source.handler())) {
             return false;
         }
-        if (target.handler().fill(gasStack, IFluidHandler.FluidAction.SIMULATE) <= 0) {
+        if (target.handler().fill(gasStack, IFluidHandler.FluidAction.SIMULATE) <= 0
+            && !pigeonplus$canLiquefyGas(source, target, gas)) {
             return false;
         }
         return reach == null || pigeonplus$isEndpointReachable(reach, target);
@@ -213,7 +219,7 @@ public abstract class FluidPipeNetworkMixin {
         FluidStack wanted = new FluidStack(gas, amount);
         int fillable = target.handler().fill(wanted, IFluidHandler.FluidAction.SIMULATE);
         if (fillable <= 0) {
-            return 0;
+            return pigeonplus$liquefyGas(source, target, gas, amount);
         }
         FluidStack drained = source.handler().drain(new FluidStack(gas, fillable), IFluidHandler.FluidAction.EXECUTE);
         if (drained.isEmpty()) {
@@ -224,6 +230,109 @@ public abstract class FluidPipeNetworkMixin {
             source.handler().fill(drained.copyWithAmount(drained.getAmount() - filled), IFluidHandler.FluidAction.EXECUTE);
         }
         return filled;
+    }
+
+    @Unique
+    private boolean pigeonplus$canLiquefyGas(FluidEndpoint source, FluidEndpoint target, GasFluid gas) {
+        Fluid liquefied = pigeonplus$liquefiedFluid(gas);
+        if (liquefied == null || pigeonplus$pumpPressureDiff(source, target) <= 0) {
+            GasLiquefactionTracker.clear(level, target.containerPos(), gas);
+            return false;
+        }
+        if (!pigeonplus$isLargeTank(target)) {
+            GasLiquefactionTracker.clear(level, target.containerPos(), gas);
+            return false;
+        }
+        IFluidHandler handler = target.handler();
+        int capacity = pigeonplus$totalCapacity(handler);
+        int totalAmount = pigeonplus$totalAmount(handler);
+        int gasAmount = pigeonplus$gasAmount(target, gas);
+        if (capacity <= 0 || totalAmount < capacity || gasAmount <= 0) {
+            GasLiquefactionTracker.clear(level, target.containerPos(), gas);
+            return false;
+        }
+        return true;
+    }
+
+    @Unique
+    private int pigeonplus$liquefyGas(FluidEndpoint source, FluidEndpoint target, GasFluid gas, int amount) {
+        if (!pigeonplus$canLiquefyGas(source, target, gas) || amount <= 0) {
+            return 0;
+        }
+        int sourceGas = pigeonplus$gasAmount(source, gas);
+        int targetGas = pigeonplus$gasAmount(target, gas);
+        int inputAmount = Math.min(amount, Math.min(sourceGas, targetGas));
+        if (inputAmount <= 0) {
+            return 0;
+        }
+        FluidStack drained = source.handler().drain(new FluidStack(gas, inputAmount), IFluidHandler.FluidAction.EXECUTE);
+        if (drained.isEmpty()) {
+            return 0;
+        }
+
+        int liquidAmount = GasLiquefactionTracker.addGasInput(
+            level,
+            target.containerPos(),
+            gas,
+            drained.getAmount(),
+            pigeonplus$liquefactionRatio(gas)
+        );
+        if (liquidAmount > 0) {
+            pigeonplus$replaceTargetGasWithLiquid(target, gas, liquidAmount);
+        }
+        return drained.getAmount();
+    }
+
+    @Unique
+    private int pigeonplus$replaceTargetGasWithLiquid(FluidEndpoint target, GasFluid gas, int liquidAmount) {
+        Fluid liquefied = pigeonplus$liquefiedFluid(gas);
+        if (liquefied == null || liquidAmount <= 0) {
+            return 0;
+        }
+        IFluidHandler handler = target.handler();
+        FluidStack targetGas = new FluidStack(gas, liquidAmount);
+        FluidStack drainedTargetGas = handler.drain(targetGas, IFluidHandler.FluidAction.EXECUTE);
+        int actualLiquidAmount = drainedTargetGas.getAmount();
+        if (actualLiquidAmount <= 0) {
+            return 0;
+        }
+        FluidStack liquefiedStack = new FluidStack(liquefied, actualLiquidAmount);
+        int filled = handler.fill(liquefiedStack, IFluidHandler.FluidAction.EXECUTE);
+        if (filled < actualLiquidAmount) {
+            handler.fill(drainedTargetGas.copyWithAmount(actualLiquidAmount - filled), IFluidHandler.FluidAction.EXECUTE);
+        }
+        return filled;
+    }
+
+    @Unique
+    private Fluid pigeonplus$liquefiedFluid(GasFluid gas) {
+        if (gas.isSame(AddonFluids.GASEOUS_BIOGAS.get())) {
+            return AddonFluids.LIQUEFIED_BIOGAS.get();
+        }
+        if (gas.isSame(AddonFluids.COMPRESSED_AIR.get())) {
+            return AddonFluids.LIQUID_OXYGEN.get();
+        }
+        return null;
+    }
+
+    @Unique
+    private int pigeonplus$liquefactionRatio(GasFluid gas) {
+        if (gas.isSame(AddonFluids.GASEOUS_BIOGAS.get())) {
+            return GasLiquefactionTracker.BIOGAS_TO_LIQUEFIED_BIOGAS_RATIO;
+        }
+        if (gas.isSame(AddonFluids.COMPRESSED_AIR.get())) {
+            return GasLiquefactionTracker.COMPRESSED_AIR_TO_LIQUID_OXYGEN_RATIO;
+        }
+        return 0;
+    }
+
+    @Unique
+    private boolean pigeonplus$isLargeTank(FluidEndpoint endpoint) {
+        if (!level.isLoaded(endpoint.containerPos())) {
+            return false;
+        }
+        BlockEntity blockEntity = level.getBlockEntity(endpoint.containerPos());
+        return blockEntity instanceof LargeFluidTankBlockEntity;
     }
 
     @Unique
@@ -370,6 +479,15 @@ public abstract class FluidPipeNetworkMixin {
         int total = 0;
         for (int i = 0; i < handler.getTanks(); i++) {
             total += handler.getTankCapacity(i);
+        }
+        return total;
+    }
+
+    @Unique
+    private static int pigeonplus$totalAmount(IFluidHandler handler) {
+        int total = 0;
+        for (int i = 0; i < handler.getTanks(); i++) {
+            total += handler.getFluidInTank(i).getAmount();
         }
         return total;
     }

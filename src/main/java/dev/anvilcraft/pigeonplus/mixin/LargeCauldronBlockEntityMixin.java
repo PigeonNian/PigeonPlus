@@ -32,7 +32,7 @@ public class LargeCauldronBlockEntityMixin {
     @Inject(method = "canIgniteTopFluid", at = @At("RETURN"), cancellable = true)
     private void pigeonplus$allowMixedPropellantIgnition(CallbackInfoReturnable<Boolean> cir) {
         if (!cir.getReturnValueZ()
-            && AddonVaporizationSources.hasMixedPropellant((LargeCauldronBlockEntity) (Object) this)) {
+            && AddonVaporizationSources.hasAnyPropellant((LargeCauldronBlockEntity) (Object) this)) {
             cir.setReturnValue(true);
         }
     }

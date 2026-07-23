@@ -1,6 +1,6 @@
 package dev.anvilcraft.pigeonplus.client.particle;
 
-import dev.dubhe.anvilcraft.init.ModParticles;
+import dev.anvilcraft.pigeonplus.init.AddonParticles;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -40,7 +40,7 @@ public final class NozzleStartupParticleUtil {
                     outwardZ + (random.nextDouble() - 0.5) * 0.01
                 );
                 level.addParticle(
-                    ModParticles.PLASMA_JETS.get(),
+                    AddonParticles.ROLLING_PLASMA.get(),
                     true,
                     pos.x,
                     pos.y,

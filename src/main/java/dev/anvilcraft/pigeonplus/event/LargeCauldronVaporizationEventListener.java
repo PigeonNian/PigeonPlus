@@ -16,6 +16,9 @@ public final class LargeCauldronVaporizationEventListener {
         if (event.phase() != LargeCauldronProcessEvent.Phase.BEFORE_VAPORIZATION) {
             return;
         }
+        if (AddonVaporizationSources.tryProcessMethaneVaporization(event.context())) {
+            return;
+        }
         AddonVaporizationSources.tryProcessMixedVaporization(event.context());
     }
 }

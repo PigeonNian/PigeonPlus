@@ -15,16 +15,24 @@ public class NozzleJetSoundInstance extends AbstractTickableSoundInstance {
     public static final int ENGINE_ON_TO_FIRE_LEAD_TICKS = 8;
     public static final int ENGINE_FIRE_TO_FIRE_LEAD_TICKS = 10;
     public static final int ENGINE_FIRE_TICKS = 96;
+    public static final long TICK_MILLIS = 50L;
+    public static final long ENGINE_ON_MILLIS = ENGINE_ON_TICKS * TICK_MILLIS;
+    public static final long ENGINE_ON_TO_FIRE_LEAD_MILLIS = ENGINE_ON_TO_FIRE_LEAD_TICKS * TICK_MILLIS;
+    public static final long ENGINE_FIRE_TO_FIRE_LEAD_MILLIS = ENGINE_FIRE_TO_FIRE_LEAD_TICKS * TICK_MILLIS;
+    public static final long ENGINE_FIRE_MILLIS = ENGINE_FIRE_TICKS * TICK_MILLIS;
     private static final float VOLUME = 5.0F;
 
     private final BlockPos pos;
     private final boolean startup;
-    private int age;
+    private final long startNanos;
+    private final long durationNanos;
 
     public NozzleJetSoundInstance(BlockPos pos, boolean startup) {
         super(startup ? AddonSounds.ENGINE_ON.get() : AddonSounds.ENGINE_FIRE.get(), SoundSource.BLOCKS, RandomSource.create());
         this.pos = pos.immutable();
         this.startup = startup;
+        this.startNanos = System.nanoTime();
+        this.durationNanos = millisToNanos(startup ? ENGINE_ON_MILLIS : ENGINE_FIRE_MILLIS);
         this.looping = false;
         this.delay = 0;
         this.volume = VOLUME;
@@ -50,12 +58,7 @@ public class NozzleJetSoundInstance extends AbstractTickableSoundInstance {
         this.y = this.pos.getY() + 0.5D;
         this.z = this.pos.getZ() + 0.5D;
 
-        this.age++;
-        if (this.startup) {
-            if (this.age >= ENGINE_ON_TICKS) {
-                this.stop();
-            }
-        } else if (this.age >= ENGINE_FIRE_TICKS) {
+        if (System.nanoTime() - this.startNanos >= this.durationNanos) {
             this.stop();
         }
     }
@@ -69,14 +72,18 @@ public class NozzleJetSoundInstance extends AbstractTickableSoundInstance {
     }
 
     public boolean shouldStartLoop() {
-        return this.startup && this.age >= ENGINE_ON_TICKS - ENGINE_ON_TO_FIRE_LEAD_TICKS;
+        return this.startup && System.nanoTime() - this.startNanos >= millisToNanos(ENGINE_ON_MILLIS - ENGINE_ON_TO_FIRE_LEAD_MILLIS);
     }
 
     public boolean shouldChainFire() {
-        return !this.startup && this.age >= ENGINE_FIRE_TICKS - ENGINE_FIRE_TO_FIRE_LEAD_TICKS;
+        return !this.startup && System.nanoTime() - this.startNanos >= millisToNanos(ENGINE_FIRE_MILLIS - ENGINE_FIRE_TO_FIRE_LEAD_MILLIS);
     }
 
     public void forceStop() {
         this.stop();
+    }
+
+    private static long millisToNanos(long millis) {
+        return millis * 1_000_000L;
     }
 }

@@ -3,6 +3,7 @@ package dev.anvilcraft.pigeonplus.mixin;
 import com.mojang.datafixers.util.Pair;
 import dev.anvilcraft.pigeonplus.init.AddonHeaterInfos;
 import dev.anvilcraft.pigeonplus.init.AddonParticles;
+import dev.anvilcraft.pigeonplus.init.AddonVaporizationSources;
 import dev.anvilcraft.pigeonplus.util.NozzlePlasmaJetUtil;
 import dev.dubhe.anvilcraft.api.chargecollector.ChargeCollectorManager;
 import dev.dubhe.anvilcraft.api.heat.HeaterManager;
@@ -12,7 +13,6 @@ import dev.dubhe.anvilcraft.block.entity.PlasmaJetsBlockEntity;
 import dev.dubhe.anvilcraft.init.ModParticles;
 import dev.dubhe.anvilcraft.init.entity.ModDamageTypes;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -57,13 +57,14 @@ public abstract class PlasmaJetsBlockEntityMixin {
             return;
         }
         NozzlePlasmaJetUtil.seedTubeWalls(this.tubeWalls, this.pigeonplus$blockPos(), facing);
-        if (!NozzlePlasmaJetUtil.canSustainJet(level, cauldron)) {
+        AddonVaporizationSources.JetPropellant propellant = NozzlePlasmaJetUtil.getJetPropellant(level, cauldron);
+        if (propellant == null || !NozzlePlasmaJetUtil.canSustainJet(level, cauldron)) {
             this.pigeonplus$removeJet(level);
             return;
         }
 
         if (level.getGameTime() % NozzlePlasmaJetUtil.PLASMA_CONSUME_INTERVAL == 0
-            && !NozzlePlasmaJetUtil.consumeTopOilOnce(cauldron)) {
+            && !NozzlePlasmaJetUtil.consumeTopFuelOnce(cauldron, propellant)) {
             this.pigeonplus$removeJet(level);
             return;
         }
@@ -171,8 +172,13 @@ public abstract class PlasmaJetsBlockEntityMixin {
         if (facing == null) {
             return;
         }
+        LargeCauldronBlockEntity cauldron = NozzlePlasmaJetUtil.getStructuralCauldron(level, jetPos);
+        AddonVaporizationSources.JetPropellant propellant = cauldron == null
+            ? AddonVaporizationSources.JetPropellant.KEROSENE
+            : NozzlePlasmaJetUtil.getJetPropellant(level, cauldron);
+        boolean methane = propellant == AddonVaporizationSources.JetPropellant.METHANE;
+        var rollingParticle = methane ? AddonParticles.ROLLING_METHANE_PLASMA.get() : AddonParticles.ROLLING_PLASMA.get();
         double baseAxis = -0.92;
-        double visualHeight = NozzlePlasmaJetUtil.JET_VISUAL_HEIGHT;
 
         for (int i = 0; i < 6; i++) {
             Vec3 pos = pigeonplus$point(
@@ -198,77 +204,6 @@ public abstract class PlasmaJetsBlockEntityMixin {
                 velocity.y,
                 velocity.z
             );
-        }
-
-        for (int i = 0; i < 2; i++) {
-            Vec3 pos = pigeonplus$point(
-                jetPos,
-                facing,
-                -0.45 + random.nextDouble() * 1.9,
-                baseAxis + random.nextDouble() * 0.18,
-                -0.45 + random.nextDouble() * 1.9
-            );
-            Vec3 velocity = pigeonplus$vector(
-                facing,
-                (random.nextDouble() - 0.5) * 0.03,
-                0.08 + random.nextDouble() * 0.16,
-                (random.nextDouble() - 0.5) * 0.03
-            );
-            level.addParticle(
-                ParticleTypes.FLAME,
-                pos.x,
-                pos.y,
-                pos.z,
-                velocity.x,
-                velocity.y,
-                velocity.z
-            );
-        }
-
-        for (int i = 0; i < 4; i++) {
-            double t = 0.12 + random.nextDouble() * 0.78;
-            double radius = 0.20 + (1.0 - t) * 0.32 + random.nextDouble() * 0.10;
-            double angle = random.nextDouble() * Math.PI * 2.0;
-            Vec3 pos = pigeonplus$point(
-                jetPos,
-                facing,
-                0.5 + Math.cos(angle) * radius,
-                baseAxis + t * visualHeight,
-                0.5 + Math.sin(angle) * radius
-            );
-            Vec3 velocity = pigeonplus$vector(
-                facing,
-                (random.nextDouble() - 0.5) * 0.02,
-                0.04 + random.nextDouble() * 0.08,
-                (random.nextDouble() - 0.5) * 0.02
-            );
-            level.addParticle(
-                ParticleTypes.FLAME,
-                pos.x,
-                pos.y,
-                pos.z,
-                velocity.x,
-                velocity.y,
-                velocity.z
-            );
-            if (random.nextFloat() < 0.65F) {
-                Vec3 plasmaVelocity = pigeonplus$vector(
-                    facing,
-                    (random.nextDouble() - 0.5) * 0.03,
-                    0.08 + random.nextDouble() * 0.10,
-                    (random.nextDouble() - 0.5) * 0.03
-                );
-                level.addParticle(
-                    ModParticles.PLASMA_JETS.get(),
-                    true,
-                    pos.x,
-                    pos.y,
-                    pos.z,
-                    plasmaVelocity.x,
-                    plasmaVelocity.y,
-                    plasmaVelocity.z
-                );
-            }
         }
 
         for (int i = 0; i < 10; i++) {
@@ -307,7 +242,7 @@ public abstract class PlasmaJetsBlockEntityMixin {
                 inwardZ * 0.56 + (random.nextDouble() - 0.5) * 0.010
             );
             level.addParticle(
-                AddonParticles.ROLLING_PLASMA.get(),
+                rollingParticle,
                 pos.x,
                 pos.y,
                 pos.z,
@@ -316,89 +251,13 @@ public abstract class PlasmaJetsBlockEntityMixin {
                 fastVelocity.z
             );
             level.addParticle(
-                AddonParticles.ROLLING_PLASMA.get(),
+                rollingParticle,
                 pos.x,
                 pos.y,
                 pos.z,
                 slowVelocity.x,
                 slowVelocity.y,
                 slowVelocity.z
-            );
-        }
-
-        if (random.nextFloat() < 0.45F) {
-            Vec3 pos = pigeonplus$point(
-                jetPos,
-                facing,
-                -0.45 + random.nextDouble() * 1.9,
-                baseAxis + random.nextDouble() * 0.12,
-                -0.45 + random.nextDouble() * 1.9
-            );
-            Vec3 velocity = pigeonplus$vector(
-                facing,
-                (random.nextDouble() - 0.5) * 0.02,
-                0.05 + random.nextDouble() * 0.08,
-                (random.nextDouble() - 0.5) * 0.02
-            );
-            level.addParticle(
-                ParticleTypes.SMOKE,
-                pos.x,
-                pos.y,
-                pos.z,
-                velocity.x,
-                velocity.y,
-                velocity.z
-            );
-        }
-
-        if (random.nextFloat() < 0.35F) {
-            double t = 0.35 + random.nextDouble() * 0.55;
-            Vec3 pos = pigeonplus$point(
-                jetPos,
-                facing,
-                0.1 + random.nextDouble() * 0.8,
-                baseAxis + t * visualHeight,
-                0.1 + random.nextDouble() * 0.8
-            );
-            Vec3 velocity = pigeonplus$vector(
-                facing,
-                (random.nextDouble() - 0.5) * 0.02,
-                0.03 + random.nextDouble() * 0.04,
-                (random.nextDouble() - 0.5) * 0.02
-            );
-            level.addParticle(
-                ParticleTypes.SMOKE,
-                pos.x,
-                pos.y,
-                pos.z,
-                velocity.x,
-                velocity.y,
-                velocity.z
-            );
-        }
-
-        if (random.nextFloat() < 0.28F) {
-            Vec3 pos = pigeonplus$point(
-                jetPos,
-                facing,
-                -0.35 + random.nextDouble() * 1.7,
-                baseAxis + random.nextDouble() * 0.10,
-                -0.35 + random.nextDouble() * 1.7
-            );
-            Vec3 velocity = pigeonplus$vector(
-                facing,
-                (random.nextDouble() - 0.5) * 0.05,
-                0.10 + random.nextDouble() * 0.12,
-                (random.nextDouble() - 0.5) * 0.05
-            );
-            level.addParticle(
-                ParticleTypes.LAVA,
-                pos.x,
-                pos.y,
-                pos.z,
-                velocity.x,
-                velocity.y,
-                velocity.z
             );
         }
     }

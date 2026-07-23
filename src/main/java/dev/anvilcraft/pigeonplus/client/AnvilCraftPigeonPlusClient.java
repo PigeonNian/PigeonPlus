@@ -57,6 +57,8 @@ public class AnvilCraftPigeonPlusClient {
 
     private void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
+            ItemBlockRenderTypes.setRenderLayer(AddonFluids.LIQUEFIED_BIOGAS.get(), RenderType.translucent());
+            ItemBlockRenderTypes.setRenderLayer(AddonFluids.LIQUEFIED_BIOGAS_FLOWING.get(), RenderType.translucent());
             ItemBlockRenderTypes.setRenderLayer(AddonFluids.LIQUID_OXYGEN.get(), RenderType.translucent());
             ItemBlockRenderTypes.setRenderLayer(AddonFluids.LIQUID_OXYGEN_FLOWING.get(), RenderType.translucent());
         });
@@ -100,9 +102,20 @@ public class AnvilCraftPigeonPlusClient {
             new ModClientFluidTypeExtensionImpl(
                 ResourceLocation.withDefaultNamespace("block/water_still"),
                 ResourceLocation.withDefaultNamespace("block/water_flow"),
+                0x8FD2B3,
+                28.0f,
+                0xD08FD2B3,
+                false
+            ),
+            AddonFluids.LIQUEFIED_BIOGAS_TYPE
+        );
+        event.registerFluidType(
+            new ModClientFluidTypeExtensionImpl(
+                ResourceLocation.withDefaultNamespace("block/water_still"),
+                ResourceLocation.withDefaultNamespace("block/water_flow"),
                 0x87CEEB,
                 8.0f,
-                0x4087CEEB,
+                0x7087CEEB,
                 false
             ),
             AddonFluids.LIQUID_OXYGEN_TYPE
@@ -122,6 +135,7 @@ public class AnvilCraftPigeonPlusClient {
                 int color = colors.getColor(stack, tintIndex);
                 return (color & 0x00FFFFFF) | 0xFF000000;
             },
+            AddonItems.LIQUEFIED_BIOGAS_BUCKET.get(),
             AddonItems.LIQUID_OXYGEN_BUCKET.get()
         );
     }
@@ -135,5 +149,6 @@ public class AnvilCraftPigeonPlusClient {
 
     private void onRegisterParticleProviders(RegisterParticleProvidersEvent event) {
         event.registerSpriteSet(AddonParticles.ROLLING_PLASMA.get(), RollingPlasmaParticle.Provider::new);
+        event.registerSpriteSet(AddonParticles.ROLLING_METHANE_PLASMA.get(), RollingPlasmaParticle.MethaneProvider::new);
     }
 }

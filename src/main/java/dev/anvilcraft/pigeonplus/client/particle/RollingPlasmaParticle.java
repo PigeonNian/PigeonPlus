@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class RollingPlasmaParticle extends TextureSheetParticle {
     private final SpriteSet sprites;
+    private final ColorProfile colorProfile;
 
     protected RollingPlasmaParticle(
         ClientLevel level,
@@ -22,13 +23,15 @@ public class RollingPlasmaParticle extends TextureSheetParticle {
         double xSpeed,
         double ySpeed,
         double zSpeed,
-        SpriteSet sprites
+        SpriteSet sprites,
+        ColorProfile colorProfile
     ) {
         super(level, x, y, z);
         this.xd = xSpeed + (Math.random() * 2.0 - 1.0) * 0.008F;
         this.yd = ySpeed + (Math.random() * 2.0 - 1.0) * 0.004F;
         this.zd = zSpeed + (Math.random() * 2.0 - 1.0) * 0.008F;
         this.sprites = sprites;
+        this.colorProfile = colorProfile;
         this.friction = 0.92F;
         this.gravity = -0.01F;
         this.speedUpWhenYMotionIsBlocked = false;
@@ -59,12 +62,25 @@ public class RollingPlasmaParticle extends TextureSheetParticle {
 
     private void pigeonplus$setColorFromAge(int age, int maxAge) {
         float progress = maxAge <= 0 ? 1.0F : Math.min(1.0F, age / (float) maxAge);
-        float whiteBlend = Math.max(0.0F, 1.0F - progress * 1.35F);
-        float orangeBlend = Math.max(0.0F, (progress - 0.32F) / 0.68F);
-        float r = 1.0F;
-        float g = 0.56F + whiteBlend * 0.44F - orangeBlend * 0.08F;
-        float b = 0.12F + whiteBlend * 0.88F - orangeBlend * 0.10F;
-        this.setColor(r, Math.max(0.20F, g), Math.max(0.0F, b));
+        float r;
+        float g;
+        float b;
+        if (progress < 0.42F) {
+            float t = progress / 0.42F;
+            r = lerp(this.colorProfile.startR, this.colorProfile.midR, t);
+            g = lerp(this.colorProfile.startG, this.colorProfile.midG, t);
+            b = lerp(this.colorProfile.startB, this.colorProfile.midB, t);
+        } else {
+            float t = (progress - 0.42F) / 0.58F;
+            r = lerp(this.colorProfile.midR, this.colorProfile.endR, t);
+            g = lerp(this.colorProfile.midG, this.colorProfile.endG, t);
+            b = lerp(this.colorProfile.midB, this.colorProfile.endB, t);
+        }
+        this.setColor(r, g, b);
+    }
+
+    private static float lerp(float start, float end, float delta) {
+        return start + (end - start) * delta;
     }
 
     @Override
@@ -91,7 +107,48 @@ public class RollingPlasmaParticle extends TextureSheetParticle {
             double ySpeed,
             double zSpeed
         ) {
-            return new RollingPlasmaParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, this.sprites);
+            return new RollingPlasmaParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, this.sprites, ColorProfile.AIR);
         }
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static class MethaneProvider implements ParticleProvider<SimpleParticleType> {
+        private final SpriteSet sprites;
+
+        public MethaneProvider(SpriteSet sprites) {
+            this.sprites = sprites;
+        }
+
+        @Override
+        public @Nullable Particle createParticle(
+            SimpleParticleType type,
+            ClientLevel level,
+            double x,
+            double y,
+            double z,
+            double xSpeed,
+            double ySpeed,
+            double zSpeed
+        ) {
+            return new RollingPlasmaParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, this.sprites, ColorProfile.AIR);
+        }
+    }
+
+    private record ColorProfile(
+        float startR,
+        float startG,
+        float startB,
+        float midR,
+        float midG,
+        float midB,
+        float endR,
+        float endG,
+        float endB
+    ) {
+        private static final ColorProfile AIR = new ColorProfile(
+            1.00F, 1.00F, 1.00F,
+            0.92F, 0.96F, 1.00F,
+            0.78F, 0.82F, 0.86F
+        );
     }
 }

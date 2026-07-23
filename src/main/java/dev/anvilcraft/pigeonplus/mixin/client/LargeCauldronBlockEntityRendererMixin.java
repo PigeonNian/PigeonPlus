@@ -93,7 +93,7 @@ import java.util.List;
         int light,
         int renderOverlay
     ) {
-        if (AddonVaporizationSources.hasMixedPropellant(cauldron)) {
+        if (AddonVaporizationSources.hasAnyPropellant(cauldron)) {
             return;
         }
         this.drawFire(pose, buffers, overlay, surfaceY);

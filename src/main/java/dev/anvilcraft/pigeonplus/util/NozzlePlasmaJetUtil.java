@@ -3,6 +3,7 @@ package dev.anvilcraft.pigeonplus.util;
 import com.mojang.datafixers.util.Pair;
 import dev.anvilcraft.pigeonplus.init.AddonVaporizationSources;
 import dev.anvilcraft.pigeonplus.block.NozzleBlock;
+import dev.anvilcraft.pigeonplus.init.AddonFluids;
 import dev.dubhe.anvilcraft.api.fluid.LargeCauldronFluidHandler;
 import dev.dubhe.anvilcraft.block.entity.LargeCauldronBlockEntity;
 import dev.dubhe.anvilcraft.block.entity.PlasmaJetsBlockEntity;
@@ -59,7 +60,21 @@ public final class NozzlePlasmaJetUtil {
     public static boolean canSustainJet(Level level, LargeCauldronBlockEntity cauldron) {
         return getNozzleFacing(level, cauldron.getBlockPos()) != null
             && cauldron.isIgnited()
-            && AddonVaporizationSources.wasCrudeOilVaporizedRecently(level, cauldron.getBlockPos());
+            && getJetPropellant(level, cauldron) != null;
+    }
+
+    public static @Nullable AddonVaporizationSources.JetPropellant getJetPropellant(
+        Level level,
+        LargeCauldronBlockEntity cauldron
+    ) {
+        AddonVaporizationSources.JetPropellant recent = AddonVaporizationSources.getRecentJetPropellant(
+            level,
+            cauldron.getBlockPos()
+        );
+        if (recent != null) {
+            return recent;
+        }
+        return AddonVaporizationSources.getAvailableJetPropellant(cauldron);
     }
 
     public static LargeCauldronBlockEntity getStructuralCauldron(Level level, BlockPos jetPos) {
@@ -219,7 +234,10 @@ public final class NozzlePlasmaJetUtil {
         }
     }
 
-    public static boolean consumeTopOilOnce(LargeCauldronBlockEntity cauldron) {
+    public static boolean consumeTopFuelOnce(
+        LargeCauldronBlockEntity cauldron,
+        AddonVaporizationSources.JetPropellant propellant
+    ) {
         LargeCauldronFluidHandler handler = cauldron.getFluids();
         java.util.List<FluidStack> fluids = handler.copyFluids();
         for (int i = fluids.size() - 1; i >= 0; i--) {
@@ -227,19 +245,36 @@ public final class NozzlePlasmaJetUtil {
             if (stack.isEmpty()) {
                 continue;
             }
-            if (!stack.is(ModFluidTags.OIL)) {
+            if (!matchesFuel(stack, propellant)) {
                 continue;
             }
             int consumeAmount = Math.min(stack.getAmount(), PLASMA_CONSUME_AMOUNT);
             int remaining = stack.getAmount() - consumeAmount;
             fluids.set(i, remaining > 0 ? stack.copyWithAmount(remaining) : FluidStack.EMPTY);
             handler.setFluids(fluids);
-            if (!AddonVaporizationSources.hasMixedPropellant(cauldron)) {
+            if (!hasPropellant(cauldron, propellant)) {
                 cauldron.setIgnited(false);
             }
             return true;
         }
         return false;
+    }
+
+    private static boolean matchesFuel(FluidStack stack, AddonVaporizationSources.JetPropellant propellant) {
+        return switch (propellant) {
+            case KEROSENE -> stack.is(ModFluidTags.OIL);
+            case METHANE -> stack.getFluid().isSame(AddonFluids.LIQUEFIED_BIOGAS.get());
+        };
+    }
+
+    private static boolean hasPropellant(
+        LargeCauldronBlockEntity cauldron,
+        AddonVaporizationSources.JetPropellant propellant
+    ) {
+        return switch (propellant) {
+            case KEROSENE -> AddonVaporizationSources.hasMixedPropellant(cauldron);
+            case METHANE -> AddonVaporizationSources.hasMethanePropellant(cauldron);
+        };
     }
 
     public static @Nullable Direction getNozzleFacing(Level level, BlockPos cauldronMainPos) {

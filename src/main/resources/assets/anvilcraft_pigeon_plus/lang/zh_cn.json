@@ -1,10 +1,12 @@
 {
   "block.anvilcraft_pigeon_plus.mixed_biomass": "\u6df7\u5408\u751f\u7269\u8d28",
   "block.anvilcraft_pigeon_plus.liquid_oxygen": "\u6db2\u6c27",
+  "block.anvilcraft_pigeon_plus.liquefied_biogas": "\u6db2\u5316\u6cbc\u6c14",
   "block.anvilcraft_pigeon_plus.anvil_pump": "\u94c1\u7827\u6cf5",
   "block.anvilcraft_pigeon_plus.nozzle": "\u55b7\u5634",
   "block.anvilcraft_pigeon_plus.mixed_biomass_cauldron": "\u6df7\u5408\u751f\u7269\u8d28\u9505",
   "gui.anvilcraft_pigeon_plus.category.blending": "\u6405\u62cc",
   "item.anvilcraft_pigeon_plus.mixed_biomass_bucket": "\u6df7\u5408\u751f\u7269\u8d28\u6876",
-  "item.anvilcraft_pigeon_plus.liquid_oxygen_bucket": "\u6db2\u6c27\u6876"
+  "item.anvilcraft_pigeon_plus.liquid_oxygen_bucket": "\u6db2\u6c27\u6876",
+  "item.anvilcraft_pigeon_plus.liquefied_biogas_bucket": "\u6db2\u5316\u6cbc\u6c14\u6876"
 }

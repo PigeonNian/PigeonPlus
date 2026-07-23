@@ -50,6 +50,38 @@ public class AddonFluids {
         () -> new GasFluid(GASEOUS_BIOGAS_TYPE, AddonItems.GASEOUS_BIOGAS_BUCKET)
     );
 
+    public static final DeferredHolder<FluidType, FluidType> LIQUEFIED_BIOGAS_TYPE = FLUID_TYPES.register(
+        "liquefied_biogas",
+        () -> new FluidType(FluidType.Properties.create()
+            .descriptionId("block.%s.liquefied_biogas".formatted(AnvilCraftPigeonPlus.MOD_ID))
+            .density(450)
+            .viscosity(700)
+            .temperature(112)
+            .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL)
+            .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY))
+    );
+
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> LIQUEFIED_BIOGAS = FLUIDS.register(
+        "liquefied_biogas",
+        () -> new BaseFlowingFluid.Source(liquefiedBiogasProperties())
+    );
+
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> LIQUEFIED_BIOGAS_FLOWING = FLUIDS.register(
+        "flowing_liquefied_biogas",
+        () -> new BaseFlowingFluid.Flowing(liquefiedBiogasProperties())
+    );
+
+    public static final DeferredHolder<Block, LiquidBlock> LIQUEFIED_BIOGAS_BLOCK = BLOCKS.register(
+        "liquefied_biogas",
+        () -> new LiquidBlock(LIQUEFIED_BIOGAS.get(), BlockBehaviour.Properties.of()
+            .replaceable()
+            .noCollission()
+            .strength(100.0f)
+            .pushReaction(PushReaction.DESTROY)
+            .noLootTable()
+            .liquid())
+    );
+
     public static final DeferredHolder<FluidType, FluidType> COMPRESSED_AIR_TYPE = FLUID_TYPES.register(
         "compressed_air",
         () -> new FluidType(FluidType.Properties.create()
@@ -139,6 +171,16 @@ public class AddonFluids {
             .slopeFindDistance(3)
             .levelDecreasePerBlock(2)
             .tickRate(10)
+            .explosionResistance(100.0f);
+    }
+
+    private static BaseFlowingFluid.Properties liquefiedBiogasProperties() {
+        return new BaseFlowingFluid.Properties(LIQUEFIED_BIOGAS_TYPE, LIQUEFIED_BIOGAS, LIQUEFIED_BIOGAS_FLOWING)
+            .bucket(AddonItems.LIQUEFIED_BIOGAS_BUCKET)
+            .block(LIQUEFIED_BIOGAS_BLOCK)
+            .slopeFindDistance(4)
+            .levelDecreasePerBlock(1)
+            .tickRate(5)
             .explosionResistance(100.0f);
     }
 

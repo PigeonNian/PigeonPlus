@@ -33,6 +33,7 @@ public final class NozzlePlasmaJetRenderer {
         Direction facing,
         Propellant propellant
     ) {
+        NozzleJetSoundController.tick(pos);
         float startupProgress = NozzleJetSoundController.getFlameStartupProgress(pos);
         if (startupProgress <= 0.0F) {
             return;
@@ -358,21 +359,22 @@ public final class NozzlePlasmaJetRenderer {
     private static RenderProfile profile(Propellant propellant) {
         return switch (propellant) {
             case METHANE -> new RenderProfile(
-                22, 7, 1.36F, 0.28F, 0.30F, 7.4F, 0.20F, 0.08F,
-                0.62F, 0.86F, 1.00F, 0.50F, 0.28F, 1.00F,
-                20, 9, 7.0F, 0.58F, 0.12F, 0.18F, 8.1F, 0.56F, 0.14F,
-                0.96F, 1.00F, 1.00F, 0.76F, 0.93F, 1.00F,
-                7, 0.52F, 0.30F, 0.44F, 0.05F, 0.24F, 0.80F, 0.15F, 0.42F, 0.08F, 0.84F, 0.14F,
-                0.12F, 0.98F, 0.70F, 0.90F, 1.00F, 0.92F, 0.98F, 1.00F, 0.52F, 0.28F, 0.95F,
+                24, 6, 1.06F, 0.26F, 0.40F, 6.8F, 0.46F, 0.16F,
+                0.56F, 0.78F, 1.00F, 0.88F, 0.58F, 0.96F,
+                18, 8, 9.0F, 0.76F, 0.14F, 0.18F, 7.2F, 0.62F, 0.16F,
+                0.94F, 0.98F, 1.00F, 0.98F, 0.72F, 1.00F,
+                3, 0.55F, 0.20F, 0.70F, 0.10F, 0.48F, 0.88F, 0.14F, 0.40F, 0.10F, 0.96F, 0.10F,
+                0.11F, 0.94F,
+                0.72F, 0.90F, 1.00F, 0.98F, 0.96F, 1.00F, 0.90F, 0.62F, 1.00F,
                 0.82F, 0.78F
             );
             case KEROSENE -> new RenderProfile(
-                24, 6, 1.06F, 0.42F, 0.40F, 6.8F, 0.46F, 0.16F,
-                0.92F, 0.44F, 0.14F, 1.00F, 0.96F, 0.82F,
-                18, 8, 9.0F, 0.76F, 0.24F, 0.18F, 7.2F, 0.62F, 0.16F,
-                1.00F, 0.82F, 0.30F, 1.00F, 0.99F, 0.86F,
+                24, 6, 1.06F, 0.26F, 0.40F, 6.8F, 0.46F, 0.16F,
+                1.00F, 0.68F, 0.28F, 0.90F, 0.82F, 0.66F,
+                18, 8, 9.0F, 0.76F, 0.14F, 0.18F, 7.2F, 0.62F, 0.16F,
+                1.00F, 0.90F, 0.62F, 1.00F, 0.98F, 0.88F,
                 3, 0.55F, 0.20F, 0.70F, 0.10F, 0.48F, 0.88F, 0.14F, 0.40F, 0.10F, 0.96F, 0.10F,
-                0.11F, 0.94F, 0.92F, 0.58F, 0.22F, 1.00F, 0.88F, 0.50F, 1.00F, 0.94F, 0.78F,
+                0.11F, 0.94F, 1.00F, 0.76F, 0.36F, 1.00F, 0.98F, 0.88F, 0.84F, 0.76F, 0.60F,
                 0.92F, 0.84F
             );
         };

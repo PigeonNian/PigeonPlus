@@ -2,7 +2,9 @@ package dev.anvilcraft.pigeonplus.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.anvilcraft.pigeonplus.client.renderer.NozzlePlasmaJetRenderer;
+import dev.anvilcraft.pigeonplus.init.AddonVaporizationSources;
 import dev.anvilcraft.pigeonplus.util.NozzlePlasmaJetUtil;
+import dev.dubhe.anvilcraft.block.entity.LargeCauldronBlockEntity;
 import dev.dubhe.anvilcraft.block.entity.PlasmaJetsBlockEntity;
 import dev.dubhe.anvilcraft.client.renderer.blockentity.PlasmaJetsRenderer;
 import net.minecraft.client.Minecraft;
@@ -29,7 +31,11 @@ public class PlasmaJetsRendererMixin {
         int packedOverlay,
         CallbackInfo ci
     ) {
-        if (entity.getLevel() == null || NozzlePlasmaJetUtil.getStructuralCauldron(entity.getLevel(), entity.getBlockPos()) == null) {
+        if (entity.getLevel() == null) {
+            return;
+        }
+        LargeCauldronBlockEntity cauldron = NozzlePlasmaJetUtil.getStructuralCauldron(entity.getLevel(), entity.getBlockPos());
+        if (cauldron == null) {
             return;
         }
         Direction facing = NozzlePlasmaJetUtil.getStructuralFacing(entity.getLevel(), entity.getBlockPos());
@@ -37,13 +43,16 @@ public class PlasmaJetsRendererMixin {
             return;
         }
         ci.cancel();
+        AddonVaporizationSources.JetPropellant propellant = NozzlePlasmaJetUtil.getJetPropellant(entity.getLevel(), cauldron);
         NozzlePlasmaJetRenderer.render(
             poseStack,
             bufferSource,
             entity.getLevel().getGameTime() + partialTick,
             entity.getBlockPos(),
             facing,
-            NozzlePlasmaJetRenderer.Propellant.KEROSENE
+            propellant == AddonVaporizationSources.JetPropellant.METHANE
+                ? NozzlePlasmaJetRenderer.Propellant.METHANE
+                : NozzlePlasmaJetRenderer.Propellant.KEROSENE
         );
     }
 
