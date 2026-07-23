@@ -20,7 +20,7 @@ public class AddonItemGroups {
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> ADDON_ITEMS = DEFERRED_REGISTER.register(
         "addon_items",
         () -> CreativeModeTab.builder()
-            .icon(() -> AddonBlocks.BLENDER.asStack())
+            .icon(() -> AddonBlocks.NOZZLE.asStack())
             .displayItems((ctx, entries) -> {
             })
             .title(

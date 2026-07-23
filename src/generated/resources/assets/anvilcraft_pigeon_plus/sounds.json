@@ -1,0 +1,20 @@
+{
+  "engine_fire": {
+    "sounds": [
+      {
+        "attenuation_distance": 64,
+        "name": "anvilcraft_pigeon_plus:engine_fire"
+      }
+    ],
+    "subtitle": "subtitles.anvilcraft_pigeon_plus.engine_fire"
+  },
+  "engine_on": {
+    "sounds": [
+      {
+        "attenuation_distance": 48,
+        "name": "anvilcraft_pigeon_plus:engine_on"
+      }
+    ],
+    "subtitle": "subtitles.anvilcraft_pigeon_plus.engine_on"
+  }
+}

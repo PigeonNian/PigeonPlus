@@ -1,12 +1,14 @@
 package dev.anvilcraft.pigeonplus.client.sound;
 
 import dev.anvilcraft.pigeonplus.client.particle.NozzleStartupParticleUtil;
+import dev.anvilcraft.pigeonplus.client.support.NozzleScreenShakeManager;
 import dev.anvilcraft.pigeonplus.util.NozzlePlasmaJetUtil;
 import dev.dubhe.anvilcraft.block.entity.PlasmaJetsBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,8 +19,13 @@ import java.util.Map;
 public final class NozzleJetSoundController {
     private static final Map<BlockPos, SoundState> SOUND_STATES = new HashMap<>();
     private static final long NANOS_PER_MILLI = 1_000_000L;
+    private static final long LEVEL_STARTUP_WARM_START_NANOS = 5_000_000_000L;
+    private static final float STARTUP_SHAKE_RADIUS = 24.0F;
+    private static final float CONTINUOUS_SHAKE_RADIUS = 12.0F;
     public static final int FLAME_DELAY_TICKS = 6;
     public static final int FLAME_GROWTH_TICKS = 12;
+    private static ClientLevel observedLevel;
+    private static long levelWarmStartUntilNanos;
 
     private record SoundState(
         List<NozzleJetSoundInstance> playingSounds,
@@ -43,16 +50,23 @@ public final class NozzleJetSoundController {
         if (minecraft.isPaused() || minecraft.level == null) {
             return;
         }
+        long now = System.nanoTime();
+        refreshObservedLevel((ClientLevel) minecraft.level, now);
         Direction facing = NozzlePlasmaJetUtil.getStructuralFacing(minecraft.level, pos);
         if (facing == null) {
             return;
         }
+        NozzleScreenShakeManager.getInstance().sustain(Vec3.atCenterOf(pos), CONTINUOUS_SHAKE_RADIUS);
 
-        long now = System.nanoTime();
         SoundState state = SOUND_STATES.get(pos);
         if (state == null) {
+            if (now <= levelWarmStartUntilNanos) {
+                SOUND_STATES.put(pos, createWarmState(minecraft, pos, now));
+                return;
+            }
             NozzleJetSoundInstance created = new NozzleJetSoundInstance(pos, true);
             minecraft.getSoundManager().play(created);
+            NozzleScreenShakeManager.getInstance().trigger(Vec3.atCenterOf(pos), STARTUP_SHAKE_RADIUS);
             NozzleStartupParticleUtil.spawnStartupRing((ClientLevel) minecraft.level, pos, facing, 0);
             List<NozzleJetSoundInstance> sounds = new ArrayList<>();
             sounds.add(created);
@@ -92,6 +106,31 @@ public final class NozzleJetSoundController {
         SOUND_STATES.put(pos, state);
     }
 
+    private static SoundState createWarmState(Minecraft minecraft, BlockPos pos, long now) {
+        NozzleJetSoundInstance fireSound = new NozzleJetSoundInstance(pos, false);
+        minecraft.getSoundManager().play(fireSound);
+        List<NozzleJetSoundInstance> sounds = new ArrayList<>();
+        sounds.add(fireSound);
+        long fireIntervalNanos = millisToNanos(
+            NozzleJetSoundInstance.ENGINE_FIRE_MILLIS - NozzleJetSoundInstance.ENGINE_FIRE_TO_FIRE_LEAD_MILLIS
+        );
+        return new SoundState(
+            sounds,
+            now - millisToNanos((FLAME_DELAY_TICKS + FLAME_GROWTH_TICKS) * NozzleJetSoundInstance.TICK_MILLIS),
+            now + fireIntervalNanos,
+            NozzleStartupParticleUtil.STARTUP_RING_TICKS - 1
+        );
+    }
+
+    private static void refreshObservedLevel(ClientLevel level, long now) {
+        if (observedLevel == level) {
+            return;
+        }
+        observedLevel = level;
+        levelWarmStartUntilNanos = now + LEVEL_STARTUP_WARM_START_NANOS;
+        SOUND_STATES.clear();
+    }
+
     public static void cleanup() {
         Minecraft minecraft = Minecraft.getInstance();
         ClientLevel level = minecraft.level;
@@ -104,6 +143,8 @@ public final class NozzleJetSoundController {
                 }
             }
             SOUND_STATES.clear();
+            observedLevel = null;
+            levelWarmStartUntilNanos = 0L;
             return;
         }
 

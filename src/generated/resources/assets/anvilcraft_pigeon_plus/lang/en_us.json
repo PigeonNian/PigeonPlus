@@ -22,5 +22,7 @@
   "item.anvilcraft_pigeon_plus.liquefied_biogas_bucket": "Liquefied Biogas Bucket",
   "item.anvilcraft_pigeon_plus.liquid_oxygen_bucket": "Liquid Oxygen Bucket",
   "item.anvilcraft_pigeon_plus.mixed_biomass_bucket": "Mixed Biomass Bucket",
-  "itemGroup.anvilcraft_pigeon_plus.addon_items": "AnvilCraft: Pigeon+"
+  "itemGroup.anvilcraft_pigeon_plus.addon_items": "AnvilCraft: Pigeon+",
+  "subtitles.anvilcraft_pigeon_plus.engine_fire": "Nozzle engine roars",
+  "subtitles.anvilcraft_pigeon_plus.engine_on": "Nozzle engine starts"
 }
