@@ -1,6 +1,7 @@
 package dev.anvilcraft.pigeonplus.mixin;
 
 import com.mojang.datafixers.util.Pair;
+import dev.anvilcraft.pigeonplus.init.AddonHeaterInfos;
 import dev.anvilcraft.pigeonplus.init.AddonParticles;
 import dev.anvilcraft.pigeonplus.util.NozzlePlasmaJetUtil;
 import dev.dubhe.anvilcraft.api.chargecollector.ChargeCollectorManager;
@@ -8,7 +9,6 @@ import dev.dubhe.anvilcraft.api.heat.HeaterManager;
 import dev.dubhe.anvilcraft.block.entity.ChargeCollectorBlockEntity;
 import dev.dubhe.anvilcraft.block.entity.LargeCauldronBlockEntity;
 import dev.dubhe.anvilcraft.block.entity.PlasmaJetsBlockEntity;
-import dev.dubhe.anvilcraft.init.ModHeaterInfos;
 import dev.dubhe.anvilcraft.init.ModParticles;
 import dev.dubhe.anvilcraft.init.entity.ModDamageTypes;
 import net.minecraft.core.BlockPos;
@@ -61,8 +61,8 @@ public abstract class PlasmaJetsBlockEntityMixin {
             return;
         }
 
-        HeaterManager.addProducer(this.pigeonplus$blockPos(), level, ModHeaterInfos.NO_MAGNET_PLASMA_JETS);
-        HeaterManager.addProducer(this.pigeonplus$blockPos(), level, ModHeaterInfos.MAGNET_PLASMA_JETS);
+        HeaterManager.addProducer(this.pigeonplus$blockPos(), level, AddonHeaterInfos.NO_MAGNET_NOZZLE_PLASMA_JETS);
+        HeaterManager.addProducer(this.pigeonplus$blockPos(), level, AddonHeaterInfos.MAGNET_NOZZLE_PLASMA_JETS);
         this.pigeonplus$hurtNozzleJetEntities(level);
         this.provideCharge(level);
         this.duration++;
@@ -118,7 +118,7 @@ public abstract class PlasmaJetsBlockEntityMixin {
         }
         ChargeCollectorManager instance = ChargeCollectorManager.getInstance(level);
         for (BlockPos magnetPos : NozzlePlasmaJetUtil.collectRingTargets(level, this.pigeonplus$blockPos()).magnetPoses()) {
-            instance.charge(256, magnetPos);
+            instance.charge(512, magnetPos);
         }
     }
 

@@ -1,22 +1,26 @@
 package dev.anvilcraft.pigeonplus.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import dev.anvilcraft.pigeonplus.init.AddonVaporizationSources;
 import dev.anvilcraft.pigeonplus.client.renderer.GasContainerRenderUtil;
 import dev.dubhe.anvilcraft.api.fluid.LargeCauldronFluidHandler;
+import dev.dubhe.anvilcraft.block.entity.LargeCauldronBlockEntity;
 import dev.dubhe.anvilcraft.client.renderer.blockentity.LargeCauldronBlockEntityRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Mixin(LargeCauldronBlockEntityRenderer.class)
-public class LargeCauldronBlockEntityRendererMixin {
+    public class LargeCauldronBlockEntityRendererMixin {
     @Unique
     private static final float PIGEONPLUS_WALL = 0.25F + 0.001F;
     @Unique
@@ -63,5 +67,35 @@ public class LargeCauldronBlockEntityRendererMixin {
             source.endBatch();
         }
         ci.cancel();
+    }
+
+    @Shadow
+    private void drawFire(PoseStack pose, MultiBufferSource buffers, int overlay, float surfaceY) {
+    }
+
+    @Redirect(
+        method = "render",
+        at = @At(
+            value = "INVOKE",
+            target = "Ldev/dubhe/anvilcraft/client/renderer/blockentity/LargeCauldronBlockEntityRenderer;drawFire(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;IF)V"
+        )
+    )
+    private void pigeonplus$hideIgnitedFireTexture(
+        LargeCauldronBlockEntityRenderer instance,
+        PoseStack pose,
+        MultiBufferSource buffers,
+        int overlay,
+        float surfaceY,
+        LargeCauldronBlockEntity cauldron,
+        float partialTick,
+        PoseStack renderPose,
+        MultiBufferSource renderBuffers,
+        int light,
+        int renderOverlay
+    ) {
+        if (AddonVaporizationSources.hasMixedPropellant(cauldron)) {
+            return;
+        }
+        this.drawFire(pose, buffers, overlay, surfaceY);
     }
 }

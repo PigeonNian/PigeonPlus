@@ -9,6 +9,7 @@ import dev.anvilcraft.pigeonplus.init.AddonInteractionMap;
 import dev.anvilcraft.pigeonplus.init.AddonItemGroups;
 import dev.anvilcraft.pigeonplus.init.AddonItems;
 import dev.anvilcraft.pigeonplus.init.AddonParticles;
+import dev.anvilcraft.pigeonplus.init.AddonVaporizationSources;
 import dev.anvilcraft.pigeonplus.init.AddonRecipeTypes;
 import dev.anvilcraft.pigeonplus.init.AddonSounds;
 import dev.anvilcraft.lib.v2.config.ConfigManager;
@@ -35,6 +36,7 @@ public class AnvilCraftPigeonPlus {
         AddonParticles.register(modEventBus);
         AddonSounds.register(modEventBus);
         AddonRecipeTypes.register(modEventBus);
+        AddonVaporizationSources.register();
         AddonBlocks.register();
         AddonItems.register();
         AddonDatagen.init();

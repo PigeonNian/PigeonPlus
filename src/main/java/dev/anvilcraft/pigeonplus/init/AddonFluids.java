@@ -6,6 +6,7 @@ import dev.anvilcraft.pigeonplus.fluid.GasFluid;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.PushReaction;
@@ -99,6 +100,38 @@ public class AddonFluids {
             .liquid())
     );
 
+    public static final DeferredHolder<FluidType, FluidType> LIQUID_OXYGEN_TYPE = FLUID_TYPES.register(
+        "liquid_oxygen",
+        () -> new FluidType(FluidType.Properties.create()
+            .descriptionId("block.%s.liquid_oxygen".formatted(AnvilCraftPigeonPlus.MOD_ID))
+            .density(1140)
+            .viscosity(900)
+            .temperature(90)
+            .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL)
+            .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY))
+    );
+
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> LIQUID_OXYGEN = FLUIDS.register(
+        "liquid_oxygen",
+        () -> new BaseFlowingFluid.Source(liquidOxygenProperties())
+    );
+
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> LIQUID_OXYGEN_FLOWING = FLUIDS.register(
+        "flowing_liquid_oxygen",
+        () -> new BaseFlowingFluid.Flowing(liquidOxygenProperties())
+    );
+
+    public static final DeferredHolder<Block, LiquidBlock> LIQUID_OXYGEN_BLOCK = BLOCKS.register(
+        "liquid_oxygen",
+        () -> new LiquidBlock(LIQUID_OXYGEN.get(), BlockBehaviour.Properties.of()
+            .replaceable()
+            .noCollission()
+            .strength(100.0f)
+            .pushReaction(PushReaction.DESTROY)
+            .noLootTable()
+            .liquid())
+    );
+
     private static BaseFlowingFluid.Properties mixedBiomassProperties() {
         return new BaseFlowingFluid.Properties(MIXED_BIOMASS_TYPE, MIXED_BIOMASS, MIXED_BIOMASS_FLOWING)
             .bucket(AddonItems.MIXED_BIOMASS_BUCKET)
@@ -106,6 +139,16 @@ public class AddonFluids {
             .slopeFindDistance(3)
             .levelDecreasePerBlock(2)
             .tickRate(10)
+            .explosionResistance(100.0f);
+    }
+
+    private static BaseFlowingFluid.Properties liquidOxygenProperties() {
+        return new BaseFlowingFluid.Properties(LIQUID_OXYGEN_TYPE, LIQUID_OXYGEN, LIQUID_OXYGEN_FLOWING)
+            .bucket(AddonItems.LIQUID_OXYGEN_BUCKET)
+            .block(LIQUID_OXYGEN_BLOCK)
+            .slopeFindDistance(4)
+            .levelDecreasePerBlock(1)
+            .tickRate(5)
             .explosionResistance(100.0f);
     }
 

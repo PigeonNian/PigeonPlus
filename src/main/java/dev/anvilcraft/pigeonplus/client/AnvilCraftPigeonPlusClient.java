@@ -10,12 +10,15 @@ import dev.anvilcraft.pigeonplus.init.AddonFluids;
 import dev.anvilcraft.pigeonplus.init.AddonItems;
 import dev.anvilcraft.pigeonplus.init.AddonParticles;
 import dev.dubhe.anvilcraft.util.ModClientFluidTypeExtensionImpl;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
@@ -28,6 +31,7 @@ public class AnvilCraftPigeonPlusClient {
     public AnvilCraftPigeonPlusClient(IEventBus modBus, ModContainer container) {
         modBus.addListener(this::onRegisterAdditionalModels);
         modBus.addListener(this::onRegisterBER);
+        modBus.addListener(this::onClientSetup);
         modBus.addListener(this::onRegisterClientExtensions);
         modBus.addListener(this::onRegisterBlockColors);
         modBus.addListener(this::onRegisterItemColors);
@@ -49,6 +53,13 @@ public class AnvilCraftPigeonPlusClient {
     private void onRegisterBER(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(ModBlockEntities.BLENDER.get(), BlenderBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.ANVIL_PUMP.get(), AnvilPumpBlockEntityRenderer::new);
+    }
+
+    private void onClientSetup(FMLClientSetupEvent event) {
+        event.enqueueWork(() -> {
+            ItemBlockRenderTypes.setRenderLayer(AddonFluids.LIQUID_OXYGEN.get(), RenderType.translucent());
+            ItemBlockRenderTypes.setRenderLayer(AddonFluids.LIQUID_OXYGEN_FLOWING.get(), RenderType.translucent());
+        });
     }
 
     private void onRegisterClientExtensions(RegisterClientExtensionsEvent event) {
@@ -85,6 +96,17 @@ public class AnvilCraftPigeonPlusClient {
             ),
             AddonFluids.MIXED_BIOMASS_TYPE
         );
+        event.registerFluidType(
+            new ModClientFluidTypeExtensionImpl(
+                ResourceLocation.withDefaultNamespace("block/water_still"),
+                ResourceLocation.withDefaultNamespace("block/water_flow"),
+                0x87CEEB,
+                8.0f,
+                0x4087CEEB,
+                false
+            ),
+            AddonFluids.LIQUID_OXYGEN_TYPE
+        );
     }
 
     private void onRegisterItemColors(RegisterColorHandlersEvent.Item event) {
@@ -94,6 +116,13 @@ public class AnvilCraftPigeonPlusClient {
             AddonItems.GASEOUS_BIOGAS_BUCKET.get(),
             AddonItems.COMPRESSED_AIR_BUCKET.get(),
             AddonItems.MIXED_BIOMASS_BUCKET.get()
+        );
+        event.register(
+            (stack, tintIndex) -> {
+                int color = colors.getColor(stack, tintIndex);
+                return (color & 0x00FFFFFF) | 0xFF000000;
+            },
+            AddonItems.LIQUID_OXYGEN_BUCKET.get()
         );
     }
 

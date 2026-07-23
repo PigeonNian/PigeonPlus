@@ -44,6 +44,16 @@ public class AddonItems {
         .model(ModelProviderUtil::bucket)
         .register();
 
+    public static final ItemEntry<BucketItem> LIQUID_OXYGEN_BUCKET = REGISTRUM.item(
+            "liquid_oxygen_bucket",
+            properties -> new BucketItem(AddonFluids.LIQUID_OXYGEN.get(), properties)
+        )
+        .tag(Tags.Items.BUCKETS)
+        .lang("Liquid Oxygen Bucket")
+        .properties(properties -> properties.stacksTo(1).craftRemainder(Items.BUCKET))
+        .model(ModelProviderUtil::bucket)
+        .register();
+
     public static void register() {
     }
 }

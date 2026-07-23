@@ -1,9 +1,9 @@
 package dev.anvilcraft.pigeonplus.util;
 
 import com.mojang.datafixers.util.Pair;
+import dev.anvilcraft.pigeonplus.init.AddonVaporizationSources;
 import dev.anvilcraft.pigeonplus.block.NozzleBlock;
 import dev.dubhe.anvilcraft.api.fluid.LargeCauldronFluidHandler;
-import dev.dubhe.anvilcraft.block.HeaterBlock;
 import dev.dubhe.anvilcraft.block.entity.LargeCauldronBlockEntity;
 import dev.dubhe.anvilcraft.block.entity.PlasmaJetsBlockEntity;
 import dev.dubhe.anvilcraft.init.block.ModBlocks;
@@ -21,7 +21,7 @@ import java.util.Set;
 public final class NozzlePlasmaJetUtil {
     public static final int JET_TUBE_HEIGHT = 4;
     public static final int JET_RANGE_RADIUS = 1;
-    public static final int JET_RANGE_HEIGHT = 9;
+    public static final int JET_RANGE_HEIGHT = 12;
     public static final int JET_VISUAL_HEIGHT = 16;
     public static final int JET_DAMAGE_HEIGHT = 16;
     public static final int JET_OUTLET_OFFSET_Y = 5;
@@ -54,8 +54,7 @@ public final class NozzlePlasmaJetUtil {
     public static boolean canSustainJet(Level level, LargeCauldronBlockEntity cauldron) {
         return hasUpwardNozzle(level, cauldron.getBlockPos())
             && cauldron.isIgnited()
-            && isTopFluidOil(cauldron)
-            && hasActiveHeaterBelow(level, cauldron.getBlockPos());
+            && AddonVaporizationSources.wasCrudeOilVaporizedRecently(level, cauldron.getBlockPos());
     }
 
     public static LargeCauldronBlockEntity getStructuralCauldron(Level level, BlockPos jetPos) {
@@ -177,13 +176,13 @@ public final class NozzlePlasmaJetUtil {
                 continue;
             }
             if (!stack.is(ModFluidTags.OIL)) {
-                return false;
+                continue;
             }
             int consumeAmount = Math.min(stack.getAmount(), PLASMA_CONSUME_AMOUNT);
             int remaining = stack.getAmount() - consumeAmount;
             fluids.set(i, remaining > 0 ? stack.copyWithAmount(remaining) : FluidStack.EMPTY);
             handler.setFluids(fluids);
-            if (!isTopFluidOil(cauldron)) {
+            if (!AddonVaporizationSources.hasMixedPropellant(cauldron)) {
                 cauldron.setIgnited(false);
             }
             return true;
@@ -197,21 +196,6 @@ public final class NozzlePlasmaJetUtil {
         return state.getBlock() instanceof NozzleBlock nozzle
             && nozzle.isMainPart(state)
             && state.getValue(NozzleBlock.FACING) == Direction.UP;
-    }
-
-    private static boolean isTopFluidOil(LargeCauldronBlockEntity cauldron) {
-        return cauldron.getTopFluid().is(ModFluidTags.OIL);
-    }
-
-    private static boolean hasActiveHeaterBelow(Level level, BlockPos cauldronMainPos) {
-        BlockPos center = cauldronMainPos.below(2);
-        for (BlockPos pos : BlockPos.betweenClosed(center.offset(-1, 0, -1), center.offset(1, 0, 1))) {
-            BlockState state = level.getBlockState(pos);
-            if (state.is(ModBlocks.HEATER) && state.getBlock() instanceof HeaterBlock heater && heater.isActive(state)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public record NozzleRingTargets(
