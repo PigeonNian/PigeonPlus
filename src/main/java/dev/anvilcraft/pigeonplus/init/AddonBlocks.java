@@ -15,6 +15,7 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
@@ -60,6 +61,24 @@ public class AddonBlocks {
         .item(FlexibleMultiPartBlockItem<DirectionCube3x3PartHalf, DirectionProperty, Direction>::new)
             .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
                 ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/nozzle")))
+            .build()
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+        .register();
+
+    public static final BlockEntry<Block> STASIS_BEACON = REGISTRUM
+        .block("stasis_beacon", Block::new)
+        .initialProperties(() -> Blocks.BEACON)
+        .properties(properties -> properties.isValidSpawn(Blocks::never))
+        .blockstate((ctx, provider) -> provider.simpleBlock(
+            ctx.getEntry(),
+            provider.models().getExistingFile(ResourceLocation.fromNamespaceAndPath(
+                AnvilCraftPigeonPlus.MOD_ID,
+                "block/stasis_beacon"
+            ))
+        ))
+        .item((block, props) -> new BlockItem(block, props))
+            .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
+                ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/stasis_beacon")))
             .build()
         .tag(BlockTags.MINEABLE_WITH_PICKAXE)
         .register();
