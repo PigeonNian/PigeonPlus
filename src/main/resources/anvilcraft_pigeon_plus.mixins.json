@@ -14,11 +14,13 @@
     "PlasmaJetsBlockEntityMixin"
   ],
   "client": [
+    "client.EntityClientMixin",
     "client.FishTankBlockEntityRendererMixin",
     "client.FluidRenderHelperMixin",
     "client.FluidTankRenderUtilMixin",
     "client.LargeCauldronBlockEntityRendererMixin",
     "client.LargeFluidTankBlockEntityRendererMixin",
+    "client.MinecraftClientMixin",
     "client.PlasmaJetsBlockEntityClientMixin",
     "client.PlasmaJetsRendererMixin"
   ],

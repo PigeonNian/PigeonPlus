@@ -15,6 +15,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.entity.Entity;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.Nullable;
@@ -198,6 +200,19 @@ public final class NozzlePlasmaJetUtil {
                 jetPos.getY() + JET_RANGE_RADIUS + 2,
                 jetPos.getZ() + JET_RANGE_RADIUS + 2
             );
+        };
+    }
+
+    public static boolean isInJetCenterLine(Entity entity, BlockPos jetPos, Direction facing) {
+        Vec3 center = entity.getBoundingBox().getCenter();
+        double x = jetPos.getX() + 0.5;
+        double y = jetPos.getY() + 0.5;
+        double z = jetPos.getZ() + 0.5;
+        double tolerance = 0.5 + Math.max(entity.getBbWidth(), 0.1) * 0.5;
+        return switch (facing.getAxis()) {
+            case X -> Math.abs(center.y - y) <= tolerance && Math.abs(center.z - z) <= tolerance;
+            case Y -> Math.abs(center.x - x) <= tolerance && Math.abs(center.z - z) <= tolerance;
+            case Z -> Math.abs(center.x - x) <= tolerance && Math.abs(center.y - y) <= tolerance;
         };
     }
 

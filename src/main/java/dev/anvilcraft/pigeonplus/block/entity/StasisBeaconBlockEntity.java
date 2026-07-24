@@ -36,6 +36,9 @@ public class StasisBeaconBlockEntity extends BlockEntity {
     private UUID frozenEntityId;
     private int frozenEntityClientId = -1;
     private UUID forceReleasedEntityId;
+    private float frozenAccumulatedDamage;
+    private double frozenAccumulatedSpeed;
+    private int frozenTicks;
 
     public StasisBeaconBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.STASIS_BEACON.get(), pos, state);
@@ -161,6 +164,7 @@ public class StasisBeaconBlockEntity extends BlockEntity {
                 this.releaseFrozenEntity(level, true);
                 return;
             }
+            this.updateFrozenInfo(StasisTimeFreezeManager.getInfo(entity, level.getGameTime()));
             if (StasisTimeFreezeManager.shouldForceRelease(entity, level.getGameTime())
                 || StasisTimeFreezeManager.shouldForceReleaseByDamage(entity)) {
                 this.forceReleasedEntityId = this.frozenEntityId;
@@ -235,6 +239,7 @@ public class StasisBeaconBlockEntity extends BlockEntity {
         }
         this.frozenEntityId = entityId;
         this.frozenEntityClientId = clientId;
+        this.updateFrozenInfo(StasisTimeFreezeManager.getInfo(entity, entity.level().getGameTime()));
         this.syncToClient();
     }
 
@@ -244,7 +249,23 @@ public class StasisBeaconBlockEntity extends BlockEntity {
         }
         this.frozenEntityId = null;
         this.frozenEntityClientId = -1;
+        this.updateFrozenInfo(StasisTimeFreezeManager.StasisInfo.EMPTY);
         this.syncToClient();
+    }
+
+    private void updateFrozenInfo(StasisTimeFreezeManager.StasisInfo info) {
+        float damage = info.damage();
+        double speed = info.speed();
+        int ticks = info.ticks();
+        boolean changed = Math.abs(this.frozenAccumulatedDamage - damage) > 0.001f
+            || Math.abs(this.frozenAccumulatedSpeed - speed) > 0.001
+            || this.frozenTicks != ticks;
+        this.frozenAccumulatedDamage = damage;
+        this.frozenAccumulatedSpeed = speed;
+        this.frozenTicks = ticks;
+        if (changed && this.level != null && !this.level.isClientSide) {
+            this.syncToClient();
+        }
     }
 
     private void syncToClient() {
@@ -285,6 +306,15 @@ public class StasisBeaconBlockEntity extends BlockEntity {
         if (tag.contains("FrozenEntityClientId")) {
             this.frozenEntityClientId = tag.getInt("FrozenEntityClientId");
         }
+        if (tag.contains("FrozenAccumulatedDamage")) {
+            this.frozenAccumulatedDamage = tag.getFloat("FrozenAccumulatedDamage");
+        }
+        if (tag.contains("FrozenAccumulatedSpeed")) {
+            this.frozenAccumulatedSpeed = tag.getDouble("FrozenAccumulatedSpeed");
+        }
+        if (tag.contains("FrozenTicks")) {
+            this.frozenTicks = tag.getInt("FrozenTicks");
+        }
         if (tag.contains("HasFrozenEntity") && tag.getBoolean("HasFrozenEntity")) {
             this.frozenEntityId = tag.getUUID("FrozenEntityId");
         } else if (tag.contains("HasFrozenEntity")) {
@@ -295,6 +325,9 @@ public class StasisBeaconBlockEntity extends BlockEntity {
     private void writeUpdateTag(CompoundTag tag) {
         tag.putBoolean("HasFrozenEntity", this.frozenEntityId != null);
         tag.putInt("FrozenEntityClientId", this.frozenEntityClientId);
+        tag.putFloat("FrozenAccumulatedDamage", this.frozenAccumulatedDamage);
+        tag.putDouble("FrozenAccumulatedSpeed", this.frozenAccumulatedSpeed);
+        tag.putInt("FrozenTicks", this.frozenTicks);
         if (this.frozenEntityId != null) {
             tag.putUUID("FrozenEntityId", this.frozenEntityId);
         }
@@ -317,5 +350,17 @@ public class StasisBeaconBlockEntity extends BlockEntity {
 
     public int getFrozenEntityClientId() {
         return this.frozenEntityClientId;
+    }
+
+    public float getFrozenAccumulatedDamage() {
+        return this.frozenAccumulatedDamage;
+    }
+
+    public double getFrozenAccumulatedSpeed() {
+        return this.frozenAccumulatedSpeed;
+    }
+
+    public int getFrozenTicks() {
+        return this.frozenTicks;
     }
 }

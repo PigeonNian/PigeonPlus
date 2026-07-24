@@ -5,6 +5,7 @@ import dev.anvilcraft.pigeonplus.init.AddonHeaterInfos;
 import dev.anvilcraft.pigeonplus.init.AddonParticles;
 import dev.anvilcraft.pigeonplus.init.AddonVaporizationSources;
 import dev.anvilcraft.pigeonplus.util.NozzlePlasmaJetUtil;
+import dev.anvilcraft.pigeonplus.util.StasisTimeFreezeManager;
 import dev.dubhe.anvilcraft.api.chargecollector.ChargeCollectorManager;
 import dev.dubhe.anvilcraft.api.heat.HeaterManager;
 import dev.dubhe.anvilcraft.block.entity.ChargeCollectorBlockEntity;
@@ -35,6 +36,9 @@ import java.util.Set;
 
 @Mixin(PlasmaJetsBlockEntity.class)
 public abstract class PlasmaJetsBlockEntityMixin {
+    private static final double KEROSENE_ACCELERATION_PER_TICK = 320.0 / StasisTimeFreezeManager.MAX_FREEZE_TICKS;
+    private static final double METHANE_ACCELERATION_PER_TICK = 192.0 / StasisTimeFreezeManager.MAX_FREEZE_TICKS;
+
     @Shadow private @Nullable BlockPos cauldronPos;
     @Shadow private int duration;
     @Shadow @Final private Set<PlasmaJetsBlockEntity.TubeWallLayer> tubeWalls;
@@ -71,6 +75,7 @@ public abstract class PlasmaJetsBlockEntityMixin {
 
         HeaterManager.addProducer(this.pigeonplus$blockPos(), level, AddonHeaterInfos.NO_MAGNET_NOZZLE_PLASMA_JETS);
         HeaterManager.addProducer(this.pigeonplus$blockPos(), level, AddonHeaterInfos.MAGNET_NOZZLE_PLASMA_JETS);
+        this.pigeonplus$accelerateNozzleJetEntities(level, facing, propellant);
         this.pigeonplus$hurtNozzleJetEntities(level);
         this.provideCharge(level);
         this.duration++;
@@ -163,6 +168,32 @@ public abstract class PlasmaJetsBlockEntityMixin {
                 entity.playSound(SoundEvents.GENERIC_BURN, 0.4f, 2.0f + RandomSource.create().nextFloat() * 0.4f);
             }
         }
+    }
+
+    private void pigeonplus$accelerateNozzleJetEntities(
+        ServerLevel level,
+        Direction facing,
+        AddonVaporizationSources.JetPropellant propellant
+    ) {
+        BlockPos startPos = this.pigeonplus$blockPos();
+        Vec3 acceleration = Vec3.atLowerCornerOf(facing.getNormal()).scale(pigeonplus$accelerationPerTick(propellant));
+        Collection<Entity> entities = level.getEntitiesOfClass(
+            Entity.class,
+            NozzlePlasmaJetUtil.getJetEffectBounds(startPos, facing, NozzlePlasmaJetUtil.JET_RANGE_HEIGHT),
+            entity -> !entity.isSpectator() && NozzlePlasmaJetUtil.isInJetCenterLine(entity, startPos, facing)
+        );
+        for (Entity entity : entities) {
+            if (!StasisTimeFreezeManager.captureMomentum(entity, acceleration)) {
+                entity.setDeltaMovement(entity.getDeltaMovement().add(acceleration));
+                entity.hurtMarked = true;
+            }
+        }
+    }
+
+    private static double pigeonplus$accelerationPerTick(AddonVaporizationSources.JetPropellant propellant) {
+        return propellant == AddonVaporizationSources.JetPropellant.METHANE
+            ? METHANE_ACCELERATION_PER_TICK
+            : KEROSENE_ACCELERATION_PER_TICK;
     }
 
     private void pigeonplus$spawnNozzleJetParticles(net.minecraft.client.multiplayer.ClientLevel level) {

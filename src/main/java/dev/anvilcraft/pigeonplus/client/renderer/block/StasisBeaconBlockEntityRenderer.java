@@ -24,10 +24,8 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class StasisBeaconBlockEntityRenderer implements BlockEntityRenderer<StasisBeaconBlockEntity> {
@@ -60,7 +58,6 @@ public class StasisBeaconBlockEntityRenderer implements BlockEntityRenderer<Stas
     private static final List<ChainRenderData> DEFERRED_CHAINS = new ArrayList<>();
     private static final Set<Integer> ACTIVE_STASIS_EFFECT_ENTITY_IDS = new HashSet<>();
     private static final Set<Integer> NEXT_STASIS_EFFECT_ENTITY_IDS = new HashSet<>();
-    private static final Map<Integer, Boolean> ORIGINAL_GLOWING_TAGS = new HashMap<>();
 
     private record BeamRenderData(BlockPos pos, int beamTopY) {
     }
@@ -116,33 +113,6 @@ public class StasisBeaconBlockEntityRenderer implements BlockEntityRenderer<Stas
         ACTIVE_STASIS_EFFECT_ENTITY_IDS.clear();
         ACTIVE_STASIS_EFFECT_ENTITY_IDS.addAll(NEXT_STASIS_EFFECT_ENTITY_IDS);
         NEXT_STASIS_EFFECT_ENTITY_IDS.clear();
-        updateStasisGlowTags();
-    }
-
-    private static void updateStasisGlowTags() {
-        ClientLevel level = Minecraft.getInstance().level;
-        if (level == null) {
-            ORIGINAL_GLOWING_TAGS.clear();
-            return;
-        }
-
-        ORIGINAL_GLOWING_TAGS.entrySet().removeIf(entry -> {
-            Entity entity = level.getEntity(entry.getKey());
-            if (entity == null || ACTIVE_STASIS_EFFECT_ENTITY_IDS.contains(entry.getKey())) {
-                return entity == null;
-            }
-            entity.setGlowingTag(entry.getValue());
-            return true;
-        });
-
-        for (int entityId : ACTIVE_STASIS_EFFECT_ENTITY_IDS) {
-            Entity entity = level.getEntity(entityId);
-            if (entity == null) {
-                continue;
-            }
-            ORIGINAL_GLOWING_TAGS.putIfAbsent(entityId, entity.hasGlowingTag());
-            entity.setGlowingTag(true);
-        }
     }
 
     public static void renderDeferredBeams(PoseStack poseStack, MultiBufferSource bufferSource, Vec3 camera) {

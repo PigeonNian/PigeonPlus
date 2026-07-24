@@ -6,6 +6,7 @@ import dev.anvilcraft.pigeonplus.client.particle.RollingPlasmaParticle;
 import dev.anvilcraft.pigeonplus.client.renderer.block.AnvilPumpBlockEntityRenderer;
 import dev.anvilcraft.pigeonplus.client.renderer.block.BlenderBlockEntityRenderer;
 import dev.anvilcraft.pigeonplus.client.renderer.block.StasisBeaconBlockEntityRenderer;
+import dev.anvilcraft.pigeonplus.client.tooltip.StasisBeaconTooltipProvider;
 import dev.anvilcraft.pigeonplus.init.AddonBlocks;
 import dev.anvilcraft.pigeonplus.init.AddonFluids;
 import dev.anvilcraft.pigeonplus.init.AddonItems;
@@ -26,6 +27,7 @@ import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.model.DynamicFluidContainerModel;
+import dev.dubhe.anvilcraft.api.tooltip.HudTooltipManager;
 
 @Mod(value = AnvilCraftPigeonPlus.MOD_ID, dist = Dist.CLIENT)
 public class AnvilCraftPigeonPlusClient {
@@ -59,6 +61,7 @@ public class AnvilCraftPigeonPlusClient {
 
     private void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
+            HudTooltipManager.INSTANCE.registerBlockEntityTooltip(new StasisBeaconTooltipProvider());
             ItemBlockRenderTypes.setRenderLayer(AddonFluids.LIQUEFIED_BIOGAS.get(), RenderType.translucent());
             ItemBlockRenderTypes.setRenderLayer(AddonFluids.LIQUEFIED_BIOGAS_FLOWING.get(), RenderType.translucent());
             ItemBlockRenderTypes.setRenderLayer(AddonFluids.LIQUID_OXYGEN.get(), RenderType.translucent());

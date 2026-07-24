@@ -45,7 +45,11 @@ public class AddonBlocks {
     public static final BlockEntry<NozzleBlock> NOZZLE = REGISTRUM
         .block("nozzle", NozzleBlock::new)
         .initialProperties(() -> Blocks.IRON_BLOCK)
-        .properties(properties -> properties.noOcclusion().sound(SoundType.METAL))
+        .properties(properties -> properties
+            .noOcclusion()
+            .sound(SoundType.METAL)
+            .forceSolidOn()
+            .explosionResistance(1200.0F))
         .blockstate((ctx, provider) -> provider.getVariantBuilder(ctx.getEntry()).forAllStates(state ->
             ConfiguredModel.builder()
                 .modelFile(provider.models().getExistingFile(ResourceLocation.fromNamespaceAndPath(

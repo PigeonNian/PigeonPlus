@@ -67,6 +67,22 @@ public final class StasisTimeFreezeManager {
         return state != null && state.accumulatedDamage >= MAX_STORED_DAMAGE;
     }
 
+    public static StasisInfo getInfo(Entity entity, long gameTime) {
+        FrozenEntityState state = FROZEN_ENTITIES.get(entity.getUUID());
+        if (state == null) {
+            return StasisInfo.EMPTY;
+        }
+        return state.info(gameTime);
+    }
+
+    public static StasisInfo getInfo(UUID entityId, long gameTime) {
+        FrozenEntityState state = FROZEN_ENTITIES.get(entityId);
+        if (state == null) {
+            return StasisInfo.EMPTY;
+        }
+        return state.info(gameTime);
+    }
+
     public static boolean freezeTick(Entity entity) {
         FrozenEntityState state = FROZEN_ENTITIES.get(entity.getUUID());
         if (state == null) {
@@ -188,6 +204,15 @@ public final class StasisTimeFreezeManager {
             }
         }
 
+        private StasisInfo info(long gameTime) {
+            return new StasisInfo(
+                this.accumulatedDamage,
+                this.accumulatedMomentum.length(),
+                this.accumulatedMomentum,
+                (int) Math.max(0L, gameTime - this.startGameTime)
+            );
+        }
+
         private void restore(Entity entity) {
             entity.moveTo(this.frozenPos.x, this.frozenPos.y, this.frozenPos.z, this.yRot, this.xRot);
             entity.setDeltaMovement(Vec3.ZERO);
@@ -213,5 +238,9 @@ public final class StasisTimeFreezeManager {
     }
 
     private record StoredDamage(DamageSource source, float amount) {
+    }
+
+    public record StasisInfo(float damage, double speed, Vec3 momentum, int ticks) {
+        public static final StasisInfo EMPTY = new StasisInfo(0.0f, 0.0, Vec3.ZERO, 0);
     }
 }
