@@ -9,6 +9,7 @@ import dev.dubhe.anvilcraft.block.entity.PlasmaJetsBlockEntity;
 import dev.dubhe.anvilcraft.client.renderer.blockentity.PlasmaJetsRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -42,8 +43,18 @@ public class PlasmaJetsRendererMixin {
         if (facing == null) {
             return;
         }
+        BlockPos outletPos = NozzlePlasmaJetUtil.getStructuralOutletPos(entity.getLevel(), entity.getBlockPos());
+        if (outletPos == null) {
+            return;
+        }
         ci.cancel();
         AddonVaporizationSources.JetPropellant propellant = NozzlePlasmaJetUtil.getJetPropellant(entity.getLevel(), cauldron);
+        poseStack.pushPose();
+        poseStack.translate(
+            outletPos.getX() - entity.getBlockPos().getX(),
+            outletPos.getY() - entity.getBlockPos().getY(),
+            outletPos.getZ() - entity.getBlockPos().getZ()
+        );
         NozzlePlasmaJetRenderer.render(
             poseStack,
             bufferSource,
@@ -52,8 +63,15 @@ public class PlasmaJetsRendererMixin {
             facing,
             propellant == AddonVaporizationSources.JetPropellant.METHANE
                 ? NozzlePlasmaJetRenderer.Propellant.METHANE
-                : NozzlePlasmaJetRenderer.Propellant.KEROSENE
+                : NozzlePlasmaJetRenderer.Propellant.KEROSENE,
+            NozzlePlasmaJetUtil.getVisibleJetRenderLength(
+                entity.getLevel(),
+                outletPos,
+                facing,
+                NozzlePlasmaJetUtil.JET_VISUAL_HEIGHT
+            )
         );
+        poseStack.popPose();
     }
 
     public boolean shouldRenderOffScreen() {
@@ -79,6 +97,10 @@ public class PlasmaJetsRendererMixin {
         if (facing == null) {
             return new AABB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1.0, PIGEONPLUS_MAX_RENDER_Y, pos.getZ() + 1.0);
         }
-        return NozzlePlasmaJetUtil.getJetEffectBounds(pos, facing, NozzlePlasmaJetUtil.JET_VISUAL_HEIGHT).inflate(2.0);
+        BlockPos outletPos = NozzlePlasmaJetUtil.getStructuralOutletPos(blockEntity.getLevel(), pos);
+        if (outletPos == null) {
+            outletPos = pos;
+        }
+        return NozzlePlasmaJetUtil.getJetEffectBounds(outletPos, facing, NozzlePlasmaJetUtil.JET_VISUAL_HEIGHT).inflate(2.0);
     }
 }

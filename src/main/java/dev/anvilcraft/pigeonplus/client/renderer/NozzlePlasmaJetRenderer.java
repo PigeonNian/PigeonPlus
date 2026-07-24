@@ -31,11 +31,12 @@ public final class NozzlePlasmaJetRenderer {
         float time,
         BlockPos pos,
         Direction facing,
-        Propellant propellant
+        Propellant propellant,
+        float visibleLength
     ) {
         NozzleJetSoundController.tick(pos);
         float startupProgress = NozzleJetSoundController.getFlameStartupProgress(pos);
-        if (startupProgress <= 0.0F) {
+        if (startupProgress <= 0.0F || visibleLength <= 0.0F) {
             return;
         }
 
@@ -51,6 +52,7 @@ public final class NozzlePlasmaJetRenderer {
             buffer,
             time,
             heightScale,
+            visibleLength,
             radiusScale,
             alphaScale,
             facing,
@@ -70,6 +72,7 @@ public final class NozzlePlasmaJetRenderer {
             buffer,
             time + profile.corePhaseOffset,
             heightScale,
+            visibleLength,
             radiusScale,
             alphaScale,
             facing,
@@ -85,7 +88,7 @@ public final class NozzlePlasmaJetRenderer {
             profile.coreEndR, profile.coreEndG, profile.coreEndB
         );
         if (startupProgress >= 0.35F) {
-            renderMachDiamonds(pose, buffer, time, heightScale, radiusScale, alphaScale, facing, profile);
+            renderMachDiamonds(pose, buffer, time, heightScale, visibleLength, radiusScale, alphaScale, facing, profile);
         }
     }
 
@@ -94,6 +97,7 @@ public final class NozzlePlasmaJetRenderer {
         VertexConsumer buffer,
         float time,
         float heightScale,
+        float visibleLength,
         float radiusScale,
         float alphaScale,
         Direction facing,
@@ -112,6 +116,11 @@ public final class NozzlePlasmaJetRenderer {
         float endG,
         float endB
     ) {
+        float fullHeight = TOTAL_HEIGHT * heightScale;
+        float maxHeight = Math.min(fullHeight, visibleLength);
+        if (fullHeight <= 0.0F || maxHeight <= 0.0F) {
+            return;
+        }
         for (int plane = 0; plane < planes; plane++) {
             float angle = plane * (TWO_PI / planes);
             float dx = (float) Math.cos(angle);
@@ -119,8 +128,15 @@ public final class NozzlePlasmaJetRenderer {
             for (int segment = 0; segment < segments; segment++) {
                 float t0 = segment / (float) segments;
                 float t1 = (segment + 1) / (float) segments;
-                float y0 = TOTAL_HEIGHT * heightScale * t0;
-                float y1 = TOTAL_HEIGHT * heightScale * t1;
+                float y0 = fullHeight * t0;
+                float y1 = fullHeight * t1;
+                if (y0 >= maxHeight) {
+                    break;
+                }
+                if (y1 > maxHeight) {
+                    y1 = maxHeight;
+                    t1 = y1 / fullHeight;
+                }
                 float radius0 = plumeRadius(t0, time, startRadius, endRadius, waveAmplitude, waveFrequency) * radiusScale;
                 float radius1 = plumeRadius(t1, time, startRadius, endRadius, waveAmplitude, waveFrequency) * radiusScale;
                 float alpha0 = plumeAlpha(t0, time, baseAlpha, flickerAmplitude) * alphaScale;
@@ -160,18 +176,27 @@ public final class NozzlePlasmaJetRenderer {
         VertexConsumer buffer,
         float time,
         float heightScale,
+        float visibleLength,
         float radiusScale,
         float alphaScale,
         Direction facing,
         RenderProfile profile
     ) {
+        float fullHeight = TOTAL_HEIGHT * heightScale;
+        float maxHeight = Math.min(fullHeight, visibleLength);
+        if (fullHeight <= 0.0F || maxHeight <= 0.0F) {
+            return;
+        }
         for (int i = 0; i < profile.diamondCount; i++) {
             float center = (i + profile.diamondCenterOffset) / (profile.diamondCount + profile.diamondCountOffset);
             float bandHeight = profile.diamondBandHeightBase + i * profile.diamondBandHeightStep;
-            float scaledCenterY = center * TOTAL_HEIGHT * heightScale;
+            float scaledCenterY = center * fullHeight;
+            if (scaledCenterY >= maxHeight) {
+                break;
+            }
             float scaledBandHeight = bandHeight * heightScale;
             float y0 = Math.max(0.0F, scaledCenterY - scaledBandHeight * 0.5F);
-            float y1 = Math.min(TOTAL_HEIGHT * heightScale, scaledCenterY + scaledBandHeight * 0.5F);
+            float y1 = Math.min(maxHeight, scaledCenterY + scaledBandHeight * 0.5F);
             float pulse = profile.diamondPulseBase
                 + profile.diamondPulseAmplitude * (float) Math.sin(time * profile.diamondPulseFrequency + i * profile.diamondPulsePhaseStep);
             float coreRadius = plumeRadius(

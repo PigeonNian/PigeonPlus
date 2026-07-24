@@ -53,10 +53,15 @@ public class NozzleJetSoundInstance extends AbstractTickableSoundInstance {
             this.stop();
             return;
         }
+        BlockPos soundPos = NozzlePlasmaJetUtil.getStructuralOutletPos(level, this.pos);
+        if (soundPos == null) {
+            this.stop();
+            return;
+        }
 
-        this.x = this.pos.getX() + 0.5D;
-        this.y = this.pos.getY() + 0.5D;
-        this.z = this.pos.getZ() + 0.5D;
+        this.x = soundPos.getX() + 0.5D;
+        this.y = soundPos.getY() + 0.5D;
+        this.z = soundPos.getZ() + 0.5D;
 
         if (System.nanoTime() - this.startNanos >= this.durationNanos) {
             this.stop();

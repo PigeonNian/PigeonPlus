@@ -35,6 +35,7 @@ public final class NozzlePlasmaJetUtil {
     public static final int NOZZLE_MAIN_OFFSET_Y = 3;
     public static final int PLASMA_CONSUME_AMOUNT = FluidType.BUCKET_VOLUME;
     public static final int PLASMA_CONSUME_INTERVAL = 20;
+    private static final int MAX_JET_ANCHOR_OFFSET = 1;
 
     private NozzlePlasmaJetUtil() {
     }
@@ -48,15 +49,19 @@ public final class NozzlePlasmaJetUtil {
         if (facing == null || !canSustainJet(level, cauldron)) {
             return false;
         }
-        BlockPos outletPos = getJetOutletPos(cauldron.getBlockPos(), facing);
-        BlockState outletState = level.getBlockState(outletPos);
-        if (outletState.is(ModBlocks.PLASMA_JETS)) {
-            return true;
-        }
-        if (!outletState.isAir()) {
+        BlockPos anchorPos = getJetAnchorPos(level, cauldron.getBlockPos(), facing);
+        if (anchorPos == null) {
             return false;
         }
-        return level.setBlock(outletPos, ModBlocks.PLASMA_JETS.getDefaultState(), 3);
+        removeRedundantJetAnchors(level, cauldron.getBlockPos(), facing, anchorPos);
+        BlockState anchorState = level.getBlockState(anchorPos);
+        if (anchorState.is(ModBlocks.PLASMA_JETS)) {
+            return true;
+        }
+        if (!anchorState.isAir()) {
+            return false;
+        }
+        return level.setBlock(anchorPos, ModBlocks.PLASMA_JETS.getDefaultState(), 3);
     }
 
     public static boolean canSustainJet(Level level, LargeCauldronBlockEntity cauldron) {
@@ -89,6 +94,11 @@ public final class NozzlePlasmaJetUtil {
         return jet != null ? jet.facing() : null;
     }
 
+    public static @Nullable BlockPos getStructuralOutletPos(Level level, BlockPos jetPos) {
+        StructuralJet jet = findStructuralJet(level, jetPos);
+        return jet != null ? jet.outletPos() : null;
+    }
+
     public static boolean isNozzleJetActive(Level level, BlockPos jetPos) {
         StructuralJet jet = findStructuralJet(level, jetPos);
         return jet != null && canSustainJet(level, jet.cauldron());
@@ -104,10 +114,11 @@ public final class NozzlePlasmaJetUtil {
     }
 
     public static NozzleRingTargets collectRingTargets(Level level, BlockPos jetPos) {
-        Direction facing = getStructuralFacing(level, jetPos);
-        if (facing == null) {
+        StructuralJet jet = findStructuralJet(level, jetPos);
+        if (jet == null) {
             return new NozzleRingTargets(Set.of(), Set.of(), Set.of());
         }
+        Direction facing = jet.facing();
         Set<BlockPos> noMagnetHeatablePoses = new HashSet<>();
         Set<BlockPos> magnetHeatablePoses = new HashSet<>();
         Set<BlockPos> magnetPoses = new HashSet<>();
@@ -115,7 +126,7 @@ public final class NozzlePlasmaJetUtil {
         Direction firstAxis = plane[0];
         Direction secondAxis = plane[1];
         for (int i = 0; i < JET_RANGE_HEIGHT; i++) {
-            BlockPos layerCenter = jetPos.relative(facing, i);
+            BlockPos layerCenter = jet.outletPos().relative(facing, i);
             BlockPos[] firstFace = createFace(layerCenter, firstAxis, secondAxis);
             BlockPos[] oppositeFirstFace = createFace(layerCenter, firstAxis.getOpposite(), secondAxis);
             BlockPos[] secondFace = createFace(layerCenter, secondAxis, firstAxis);
@@ -201,6 +212,30 @@ public final class NozzlePlasmaJetUtil {
                 jetPos.getZ() + JET_RANGE_RADIUS + 2
             );
         };
+    }
+
+    public static float getVisibleJetRenderLength(Level level, BlockPos jetPos, Direction facing, int length) {
+        BlockPos obstructionPos = getJetRenderObstructionPos(level, jetPos, facing, length);
+        if (obstructionPos == null) {
+            return length;
+        }
+        int offset = Math.abs(
+            (obstructionPos.getX() - jetPos.getX()) * facing.getStepX()
+                + (obstructionPos.getY() - jetPos.getY()) * facing.getStepY()
+                + (obstructionPos.getZ() - jetPos.getZ()) * facing.getStepZ()
+        );
+        return Math.min(length, offset);
+    }
+
+    public static @Nullable BlockPos getJetRenderObstructionPos(Level level, BlockPos jetPos, Direction facing, int length) {
+        for (int offset = 0; offset <= length; offset++) {
+            BlockPos pos = jetPos.relative(facing, offset);
+            BlockState state = level.getBlockState(pos);
+            if (!state.is(ModBlocks.PLASMA_JETS) && !state.getCollisionShape(level, pos).isEmpty()) {
+                return pos;
+            }
+        }
+        return null;
     }
 
     public static boolean isInJetCenterLine(Entity entity, BlockPos jetPos, Direction facing) {
@@ -307,16 +342,41 @@ public final class NozzlePlasmaJetUtil {
 
     private static @Nullable StructuralJet findStructuralJet(Level level, BlockPos jetPos) {
         for (Direction facing : Direction.values()) {
-            BlockPos cauldronMainPos = jetPos.relative(facing.getOpposite(), JET_OUTLET_OFFSET_Y);
-            if (!(level.getBlockEntity(cauldronMainPos) instanceof LargeCauldronBlockEntity cauldron) || !cauldron.isMainPart()) {
-                continue;
-            }
-            Direction nozzleFacing = getNozzleFacing(level, cauldronMainPos);
-            if (nozzleFacing == facing && getJetOutletPos(cauldronMainPos, facing).equals(jetPos)) {
-                return new StructuralJet(cauldron, facing);
+            for (int anchorOffset = 0; anchorOffset <= MAX_JET_ANCHOR_OFFSET; anchorOffset++) {
+                BlockPos cauldronMainPos = jetPos.relative(facing.getOpposite(), JET_OUTLET_OFFSET_Y + anchorOffset);
+                if (!(level.getBlockEntity(cauldronMainPos) instanceof LargeCauldronBlockEntity cauldron) || !cauldron.isMainPart()) {
+                    continue;
+                }
+                Direction nozzleFacing = getNozzleFacing(level, cauldronMainPos);
+                BlockPos anchorPos = getJetAnchorPos(level, cauldronMainPos, facing);
+                if (nozzleFacing == facing && jetPos.equals(anchorPos)) {
+                    return new StructuralJet(cauldron, facing, getJetOutletPos(cauldronMainPos, facing));
+                }
             }
         }
         return null;
+    }
+
+    private static @Nullable BlockPos getJetAnchorPos(Level level, BlockPos cauldronMainPos, Direction facing) {
+        BlockPos outletPos = getJetOutletPos(cauldronMainPos, facing);
+        for (int anchorOffset = 0; anchorOffset <= MAX_JET_ANCHOR_OFFSET; anchorOffset++) {
+            BlockPos anchorPos = outletPos.relative(facing, anchorOffset);
+            BlockState state = level.getBlockState(anchorPos);
+            if (state.isAir() || state.is(ModBlocks.PLASMA_JETS)) {
+                return anchorPos;
+            }
+        }
+        return null;
+    }
+
+    private static void removeRedundantJetAnchors(Level level, BlockPos cauldronMainPos, Direction facing, BlockPos keptAnchorPos) {
+        BlockPos outletPos = getJetOutletPos(cauldronMainPos, facing);
+        for (int anchorOffset = 0; anchorOffset <= MAX_JET_ANCHOR_OFFSET; anchorOffset++) {
+            BlockPos anchorPos = outletPos.relative(facing, anchorOffset);
+            if (!anchorPos.equals(keptAnchorPos) && level.getBlockState(anchorPos).is(ModBlocks.PLASMA_JETS)) {
+                level.removeBlock(anchorPos, false);
+            }
+        }
     }
 
     private static Direction[] getPlaneDirections(Direction facing) {
@@ -345,6 +405,6 @@ public final class NozzlePlasmaJetUtil {
         }
     }
 
-    private record StructuralJet(LargeCauldronBlockEntity cauldron, Direction facing) {
+    private record StructuralJet(LargeCauldronBlockEntity cauldron, Direction facing, BlockPos outletPos) {
     }
 }

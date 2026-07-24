@@ -12,6 +12,8 @@ import dev.dubhe.anvilcraft.block.entity.ChargeCollectorBlockEntity;
 import dev.dubhe.anvilcraft.block.entity.LargeCauldronBlockEntity;
 import dev.dubhe.anvilcraft.block.entity.PlasmaJetsBlockEntity;
 import dev.dubhe.anvilcraft.init.ModParticles;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
 import dev.dubhe.anvilcraft.init.entity.ModDamageTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -20,6 +22,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -60,7 +63,12 @@ public abstract class PlasmaJetsBlockEntityMixin {
             this.pigeonplus$removeJet(level);
             return;
         }
-        NozzlePlasmaJetUtil.seedTubeWalls(this.tubeWalls, this.pigeonplus$blockPos(), facing);
+        BlockPos outletPos = NozzlePlasmaJetUtil.getStructuralOutletPos(level, this.pigeonplus$blockPos());
+        if (outletPos == null) {
+            this.pigeonplus$removeJet(level);
+            return;
+        }
+        NozzlePlasmaJetUtil.seedTubeWalls(this.tubeWalls, outletPos, facing);
         AddonVaporizationSources.JetPropellant propellant = NozzlePlasmaJetUtil.getJetPropellant(level, cauldron);
         if (propellant == null || !NozzlePlasmaJetUtil.canSustainJet(level, cauldron)) {
             this.pigeonplus$removeJet(level);
@@ -75,8 +83,8 @@ public abstract class PlasmaJetsBlockEntityMixin {
 
         HeaterManager.addProducer(this.pigeonplus$blockPos(), level, AddonHeaterInfos.NO_MAGNET_NOZZLE_PLASMA_JETS);
         HeaterManager.addProducer(this.pigeonplus$blockPos(), level, AddonHeaterInfos.MAGNET_NOZZLE_PLASMA_JETS);
-        this.pigeonplus$accelerateNozzleJetEntities(level, facing, propellant);
-        this.pigeonplus$hurtNozzleJetEntities(level);
+        this.pigeonplus$accelerateNozzleJetEntities(level, outletPos, facing, propellant);
+        this.pigeonplus$hurtNozzleJetEntities(level, outletPos, facing);
         this.provideCharge(level);
         this.duration++;
     }
@@ -93,7 +101,11 @@ public abstract class PlasmaJetsBlockEntityMixin {
         if (facing == null) {
             return;
         }
-        NozzlePlasmaJetUtil.seedTubeWalls(this.tubeWalls, this.pigeonplus$blockPos(), facing);
+        BlockPos outletPos = NozzlePlasmaJetUtil.getStructuralOutletPos(level, this.pigeonplus$blockPos());
+        if (outletPos == null) {
+            return;
+        }
+        NozzlePlasmaJetUtil.seedTubeWalls(this.tubeWalls, outletPos, facing);
         this.pigeonplus$spawnNozzleJetParticles(level);
     }
 
@@ -148,13 +160,8 @@ public abstract class PlasmaJetsBlockEntityMixin {
         level.removeBlock(this.pigeonplus$blockPos(), false);
     }
 
-    private void pigeonplus$hurtNozzleJetEntities(Level level) {
+    private void pigeonplus$hurtNozzleJetEntities(Level level, BlockPos startPos, Direction facing) {
         if (level.getGameTime() % 10 != 0) {
-            return;
-        }
-        BlockPos startPos = this.pigeonplus$blockPos();
-        Direction facing = NozzlePlasmaJetUtil.getStructuralFacing(level, startPos);
-        if (facing == null) {
             return;
         }
         Collection<Entity> entities = level.getEntitiesOfClass(
@@ -172,10 +179,10 @@ public abstract class PlasmaJetsBlockEntityMixin {
 
     private void pigeonplus$accelerateNozzleJetEntities(
         ServerLevel level,
+        BlockPos startPos,
         Direction facing,
         AddonVaporizationSources.JetPropellant propellant
     ) {
-        BlockPos startPos = this.pigeonplus$blockPos();
         Vec3 acceleration = Vec3.atLowerCornerOf(facing.getNormal()).scale(pigeonplus$accelerationPerTick(propellant));
         Collection<Entity> entities = level.getEntitiesOfClass(
             Entity.class,
@@ -203,6 +210,10 @@ public abstract class PlasmaJetsBlockEntityMixin {
         if (facing == null) {
             return;
         }
+        BlockPos outletPos = NozzlePlasmaJetUtil.getStructuralOutletPos(level, jetPos);
+        if (outletPos == null) {
+            return;
+        }
         LargeCauldronBlockEntity cauldron = NozzlePlasmaJetUtil.getStructuralCauldron(level, jetPos);
         AddonVaporizationSources.JetPropellant propellant = cauldron == null
             ? AddonVaporizationSources.JetPropellant.KEROSENE
@@ -213,7 +224,7 @@ public abstract class PlasmaJetsBlockEntityMixin {
 
         for (int i = 0; i < 6; i++) {
             Vec3 pos = pigeonplus$point(
-                jetPos,
+                outletPos,
                 facing,
                 -0.55 + random.nextDouble() * 2.1,
                 baseAxis + random.nextDouble() * 0.28,
@@ -259,7 +270,7 @@ public abstract class PlasmaJetsBlockEntityMixin {
                 inwardY = inwardY / inwardLength * speed;
                 inwardZ = inwardZ / inwardLength * speed;
             }
-            Vec3 pos = pigeonplus$point(jetPos, facing, rimX, rimAxis, rimZ);
+            Vec3 pos = pigeonplus$point(outletPos, facing, rimX, rimAxis, rimZ);
             Vec3 fastVelocity = pigeonplus$vector(
                 facing,
                 inwardX * 0.72 + (random.nextDouble() - 0.5) * 0.012,
@@ -291,6 +302,105 @@ public abstract class PlasmaJetsBlockEntityMixin {
                 slowVelocity.z
             );
         }
+
+        this.pigeonplus$spawnNozzleJetImpactParticles(level, outletPos, facing);
+    }
+
+    private void pigeonplus$spawnNozzleJetImpactParticles(
+        net.minecraft.client.multiplayer.ClientLevel level,
+        BlockPos jetPos,
+        Direction facing
+    ) {
+        BlockPos obstructionPos = NozzlePlasmaJetUtil.getJetRenderObstructionPos(
+            level,
+            jetPos,
+            facing,
+            NozzlePlasmaJetUtil.JET_VISUAL_HEIGHT
+        );
+        if (obstructionPos == null) {
+            return;
+        }
+
+        RandomSource random = level.getRandom();
+        Direction[] plane = pigeonplus$planeDirections(facing);
+        Vec3 firstAxis = Vec3.atLowerCornerOf(plane[0].getNormal());
+        Vec3 secondAxis = Vec3.atLowerCornerOf(plane[1].getNormal());
+        Vec3 normal = Vec3.atLowerCornerOf(facing.getNormal());
+        Vec3 impactCenter = Vec3.atCenterOf(obstructionPos).subtract(normal.scale(0.51));
+        BlockState obstructionState = level.getBlockState(obstructionPos);
+        BlockParticleOption blockParticle = new BlockParticleOption(ParticleTypes.BLOCK, obstructionState);
+
+        for (int i = 0; i < 14; i++) {
+            double firstOffset = (random.nextDouble() - 0.5) * 1.55;
+            double secondOffset = (random.nextDouble() - 0.5) * 1.55;
+            Vec3 pos = impactCenter
+                .add(firstAxis.scale(firstOffset))
+                .add(secondAxis.scale(secondOffset));
+            Vec3 tangent = firstAxis
+                .scale(firstOffset + (random.nextDouble() - 0.5) * 0.35)
+                .add(secondAxis.scale(secondOffset + (random.nextDouble() - 0.5) * 0.35));
+            if (tangent.lengthSqr() < 1.0E-6) {
+                tangent = firstAxis.scale(random.nextBoolean() ? 1.0 : -1.0);
+            }
+            tangent = tangent.normalize().scale(0.16 + random.nextDouble() * 0.26);
+            Vec3 velocity = tangent
+                .subtract(normal.scale(0.05 + random.nextDouble() * 0.08))
+                .add(
+                    (random.nextDouble() - 0.5) * 0.026,
+                    (random.nextDouble() - 0.5) * 0.026,
+                    (random.nextDouble() - 0.5) * 0.026
+                );
+            level.addParticle(
+                ModParticles.PLASMA_JETS.get(),
+                true,
+                pos.x,
+                pos.y,
+                pos.z,
+                velocity.x,
+                velocity.y,
+                velocity.z
+            );
+            if (i < 8) {
+                Vec3 chipVelocity = tangent
+                    .scale(0.68)
+                    .subtract(normal.scale(0.035 + random.nextDouble() * 0.055))
+                    .add(0.0, random.nextDouble() * 0.035, 0.0);
+                level.addParticle(
+                    blockParticle,
+                    true,
+                    pos.x,
+                    pos.y,
+                    pos.z,
+                    chipVelocity.x,
+                    chipVelocity.y,
+                    chipVelocity.z
+                );
+            }
+            if (i < 6) {
+                Vec3 smokeVelocity = tangent
+                    .scale(0.24)
+                    .subtract(normal.scale(0.016 + random.nextDouble() * 0.030))
+                    .add(0.0, 0.035 + random.nextDouble() * 0.055, 0.0);
+                level.addParticle(
+                    ParticleTypes.CLOUD,
+                    true,
+                    pos.x,
+                    pos.y,
+                    pos.z,
+                    smokeVelocity.x,
+                    smokeVelocity.y,
+                    smokeVelocity.z
+                );
+            }
+        }
+    }
+
+    private static Direction[] pigeonplus$planeDirections(Direction facing) {
+        return switch (facing.getAxis()) {
+            case Y -> new Direction[] {Direction.NORTH, Direction.EAST};
+            case X -> new Direction[] {Direction.UP, Direction.NORTH};
+            case Z -> new Direction[] {Direction.UP, Direction.EAST};
+        };
     }
 
     private static Vec3 pigeonplus$point(BlockPos jetPos, Direction facing, double sideX, double axis, double sideZ) {

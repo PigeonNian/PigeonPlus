@@ -56,7 +56,11 @@ public final class NozzleJetSoundController {
         if (facing == null) {
             return;
         }
-        NozzleScreenShakeManager.getInstance().sustain(Vec3.atCenterOf(pos), CONTINUOUS_SHAKE_RADIUS);
+        BlockPos outletPos = NozzlePlasmaJetUtil.getStructuralOutletPos(minecraft.level, pos);
+        if (outletPos == null) {
+            return;
+        }
+        NozzleScreenShakeManager.getInstance().sustain(Vec3.atCenterOf(outletPos), CONTINUOUS_SHAKE_RADIUS);
 
         SoundState state = SOUND_STATES.get(pos);
         if (state == null) {
@@ -66,8 +70,8 @@ public final class NozzleJetSoundController {
             }
             NozzleJetSoundInstance created = new NozzleJetSoundInstance(pos, true);
             minecraft.getSoundManager().play(created);
-            NozzleScreenShakeManager.getInstance().trigger(Vec3.atCenterOf(pos), STARTUP_SHAKE_RADIUS);
-            NozzleStartupParticleUtil.spawnStartupRing((ClientLevel) minecraft.level, pos, facing, 0);
+            NozzleScreenShakeManager.getInstance().trigger(Vec3.atCenterOf(outletPos), STARTUP_SHAKE_RADIUS);
+            NozzleStartupParticleUtil.spawnStartupRing((ClientLevel) minecraft.level, outletPos, facing, 0);
             List<NozzleJetSoundInstance> sounds = new ArrayList<>();
             sounds.add(created);
             SOUND_STATES.put(pos, new SoundState(
@@ -85,7 +89,7 @@ public final class NozzleJetSoundController {
         int lastStartupRingAge = state.lastStartupRingAge();
         int targetStartupRingAge = Math.min(startupRingAge, NozzleStartupParticleUtil.STARTUP_RING_TICKS - 1);
         for (int age = lastStartupRingAge + 1; age <= targetStartupRingAge; age++) {
-            NozzleStartupParticleUtil.spawnStartupRing((ClientLevel) minecraft.level, pos, facing, age);
+            NozzleStartupParticleUtil.spawnStartupRing((ClientLevel) minecraft.level, outletPos, facing, age);
         }
         state = state.withLastStartupRingAge(Math.max(lastStartupRingAge, targetStartupRingAge));
 
