@@ -1,6 +1,9 @@
 {
   "variants": {
-    "": {
+    "lit=false": {
+      "model": "anvilcraft_pigeon_plus:block/stasis_beacon"
+    },
+    "lit=true": {
       "model": "anvilcraft_pigeon_plus:block/stasis_beacon"
     }
   }

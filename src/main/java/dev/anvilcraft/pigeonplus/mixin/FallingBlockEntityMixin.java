@@ -1,10 +1,12 @@
 package dev.anvilcraft.pigeonplus.mixin;
 
 import dev.anvilcraft.pigeonplus.block.entity.AnvilPumpBlockEntity;
+import dev.anvilcraft.pigeonplus.block.entity.StasisBeaconBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AnvilBlock;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,6 +19,41 @@ public class FallingBlockEntityMixin {
 
     @Unique
     private boolean pigeonplus$notifiedAnvilPump;
+    @Unique
+    private boolean pigeonplus$recordedInitialFallingPosition;
+    @Unique
+    private double pigeonplus$initialFallingX;
+    @Unique
+    private double pigeonplus$initialFallingY;
+    @Unique
+    private double pigeonplus$initialFallingZ;
+
+    @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
+    private void pigeonplus$holdStasisFallingBlockAtInitialHeight(CallbackInfo ci) {
+        FallingBlockEntity entity = (FallingBlockEntity) (Object) this;
+        if (!this.pigeonplus$recordedInitialFallingPosition) {
+            this.pigeonplus$recordedInitialFallingPosition = true;
+            this.pigeonplus$initialFallingX = entity.getX();
+            this.pigeonplus$initialFallingY = entity.getY();
+            this.pigeonplus$initialFallingZ = entity.getZ();
+        }
+
+        Level level = entity.level();
+        if (!level.isClientSide() || !StasisBeaconBlockEntity.isInActiveBeam(level, entity)) {
+            return;
+        }
+
+        entity.moveTo(
+            this.pigeonplus$initialFallingX,
+            this.pigeonplus$initialFallingY,
+            this.pigeonplus$initialFallingZ,
+            entity.getYRot(),
+            entity.getXRot()
+        );
+        entity.setDeltaMovement(Vec3.ZERO);
+        entity.fallDistance = 0.0f;
+        ci.cancel();
+    }
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void pigeonplus$startAnvilPumpPistonAnimation(CallbackInfo ci) {

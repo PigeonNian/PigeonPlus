@@ -10,6 +10,7 @@
     "FluidNetworkScannerMixin",
     "FluidPipeNetworkMixin",
     "LargeCauldronBlockEntityMixin",
+    "LivingEntityMixin",
     "PlasmaJetsBlockEntityMixin"
   ],
   "client": [

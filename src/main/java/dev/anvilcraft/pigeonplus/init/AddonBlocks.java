@@ -6,6 +6,7 @@ import dev.anvilcraft.pigeonplus.block.AnvilPumpBlock;
 import dev.anvilcraft.pigeonplus.block.BlenderBlock;
 import dev.anvilcraft.pigeonplus.block.MixedBiomassCauldronBlock;
 import dev.anvilcraft.pigeonplus.block.NozzleBlock;
+import dev.anvilcraft.pigeonplus.block.StasisBeaconBlock;
 import dev.dubhe.anvilcraft.block.item.FlexibleMultiPartBlockItem;
 import dev.dubhe.anvilcraft.block.multipart.FlexibleMultiPartBlock;
 import dev.dubhe.anvilcraft.block.state.DirectionCube3x3PartHalf;
@@ -15,7 +16,6 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
@@ -65,17 +65,17 @@ public class AddonBlocks {
         .tag(BlockTags.MINEABLE_WITH_PICKAXE)
         .register();
 
-    public static final BlockEntry<Block> STASIS_BEACON = REGISTRUM
-        .block("stasis_beacon", Block::new)
+    public static final BlockEntry<StasisBeaconBlock> STASIS_BEACON = REGISTRUM
+        .block("stasis_beacon", StasisBeaconBlock::new)
         .initialProperties(() -> Blocks.BEACON)
         .properties(properties -> properties.isValidSpawn(Blocks::never))
-        .blockstate((ctx, provider) -> provider.simpleBlock(
-            ctx.getEntry(),
-            provider.models().getExistingFile(ResourceLocation.fromNamespaceAndPath(
-                AnvilCraftPigeonPlus.MOD_ID,
-                "block/stasis_beacon"
-            ))
-        ))
+        .blockstate((ctx, provider) -> provider.getVariantBuilder(ctx.getEntry()).forAllStates(state ->
+            ConfiguredModel.builder()
+                .modelFile(provider.models().getExistingFile(ResourceLocation.fromNamespaceAndPath(
+                    AnvilCraftPigeonPlus.MOD_ID,
+                    "block/stasis_beacon"
+                )))
+                .build()))
         .item((block, props) -> new BlockItem(block, props))
             .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
                 ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/stasis_beacon")))
