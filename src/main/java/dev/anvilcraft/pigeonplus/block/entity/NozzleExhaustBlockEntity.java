@@ -47,6 +47,10 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
     }
 
     private void serverTick(ServerLevel level) {
+        if (!NozzleExhaustUtil.isNozzleActive(level, this.worldPosition)) {
+            this.duration = 0;
+            return;
+        }
         LargeCauldronBlockEntity cauldron = NozzleExhaustUtil.getStructuralCauldron(level, this.worldPosition);
         if (cauldron == null) {
             this.duration = 0;
@@ -79,7 +83,7 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
     }
 
     private void clientTick(Level level) {
-        if (NozzleExhaustUtil.getStructuralCauldron(level, this.worldPosition) == null) {
+        if (!NozzleExhaustUtil.isNozzleActive(level, this.worldPosition)) {
             return;
         }
         this.spawnParticles(level);

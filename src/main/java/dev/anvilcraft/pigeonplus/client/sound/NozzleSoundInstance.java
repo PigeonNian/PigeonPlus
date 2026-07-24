@@ -49,7 +49,7 @@ public class NozzleSoundInstance extends AbstractTickableSoundInstance {
         Level level = minecraft.level;
         if (level == null
             || !(level.getBlockEntity(this.pos) instanceof NozzleExhaustBlockEntity)
-            || NozzleExhaustUtil.getStructuralCauldron(level, this.pos) == null) {
+            || !NozzleExhaustUtil.isNozzleActive(level, this.pos)) {
             this.stop();
             return;
         }

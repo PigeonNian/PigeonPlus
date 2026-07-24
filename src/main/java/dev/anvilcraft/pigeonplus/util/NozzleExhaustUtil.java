@@ -42,7 +42,12 @@ public final class NozzleExhaustUtil {
     }
 
     public static boolean canSustainJet(Level level, LargeCauldronBlockEntity cauldron) {
-        return getNozzleFacing(level, cauldron.getBlockPos()) != null
+        Direction facing = getNozzleFacing(level, cauldron.getBlockPos());
+        if (facing == null) {
+            return false;
+        }
+        BlockPos nozzlePos = cauldron.getBlockPos().relative(facing, NOZZLE_MAIN_OFFSET_Y);
+        return !isNozzlePowered(level, nozzlePos)
             && cauldron.isIgnited()
             && getJetPropellant(level, cauldron) != null;
     }
@@ -78,12 +83,29 @@ public final class NozzleExhaustUtil {
 
     public static boolean isNozzleActive(Level level, BlockPos nozzlePos) {
         StructuralJet jet = findStructuralJet(level, nozzlePos);
-        return jet != null && canSustainJet(level, jet.cauldron());
+        return jet != null
+            && !isNozzlePowered(level, nozzlePos)
+            && canSustainJet(level, jet.cauldron());
+    }
+
+    public static boolean isNozzlePowered(Level level, BlockPos nozzlePos) {
+        Direction facing = getStructuralFacing(level, nozzlePos);
+        if (facing == null) {
+            return level.hasNeighborSignal(nozzlePos);
+        }
+        for (BlockPos pos : BlockPos.betweenClosed(nozzlePos.offset(-1, -1, -1), nozzlePos.offset(1, 1, 1))) {
+            BlockState state = level.getBlockState(pos);
+            if (state.getBlock() instanceof NozzleBlock && state.getValue(NozzleBlock.FACING) == facing
+                && level.hasNeighborSignal(pos)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static NozzleRingTargets collectRingTargets(Level level, BlockPos nozzlePos) {
         StructuralJet jet = findStructuralJet(level, nozzlePos);
-        if (jet == null) {
+        if (jet == null || !isNozzleActive(level, nozzlePos)) {
             return new NozzleRingTargets(Set.of(), Set.of(), Set.of());
         }
         Direction facing = jet.facing();
@@ -197,7 +219,7 @@ public final class NozzleExhaustUtil {
                 + (obstructionPos.getY() - jetPos.getY()) * facing.getStepY()
                 + (obstructionPos.getZ() - jetPos.getZ()) * facing.getStepZ()
         );
-        return Math.min(length, offset);
+        return Math.min(length, offset + 1);
     }
 
     public static @Nullable BlockPos getJetRenderObstructionPos(Level level, BlockPos jetPos, Direction facing, int length) {

@@ -52,6 +52,10 @@ public final class NozzleSoundController {
         }
         long now = System.nanoTime();
         refreshObservedLevel((ClientLevel) minecraft.level, now);
+        if (!NozzleExhaustUtil.isNozzleActive(minecraft.level, pos)) {
+            cleanup();
+            return;
+        }
         Direction facing = NozzleExhaustUtil.getStructuralFacing(minecraft.level, pos);
         if (facing == null) {
             return;
@@ -160,7 +164,7 @@ public final class NozzleSoundController {
             state.playingSounds().removeIf(NozzleSoundInstance::isStopped);
 
             boolean active = level.getBlockEntity(pos) instanceof NozzleExhaustBlockEntity
-                && NozzleExhaustUtil.getStructuralCauldron(level, pos) != null;
+                && NozzleExhaustUtil.isNozzleActive(level, pos);
             if (active) {
                 continue;
             }

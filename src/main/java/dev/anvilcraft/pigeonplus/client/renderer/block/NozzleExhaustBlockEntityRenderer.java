@@ -34,6 +34,10 @@ public class NozzleExhaustBlockEntityRenderer implements BlockEntityRenderer<Noz
         if (blockEntity.getLevel() == null) {
             return;
         }
+        if (!NozzleExhaustUtil.isNozzleActive(blockEntity.getLevel(), blockEntity.getBlockPos())) {
+            NozzleSoundController.cleanup();
+            return;
+        }
         LargeCauldronBlockEntity cauldron = NozzleExhaustUtil.getStructuralCauldron(
             blockEntity.getLevel(),
             blockEntity.getBlockPos()
