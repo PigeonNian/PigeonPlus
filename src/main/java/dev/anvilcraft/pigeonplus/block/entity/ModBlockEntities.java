@@ -26,6 +26,10 @@ public class ModBlockEntities {
         BLOCK_ENTITIES.register("stasis_beacon", () ->
             BlockEntityType.Builder.of(StasisBeaconBlockEntity::new, AddonBlocks.STASIS_BEACON.get()).build(null));
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<NozzleExhaustBlockEntity>> NOZZLE_EXHAUST =
+        BLOCK_ENTITIES.register("nozzle_exhaust", () ->
+            BlockEntityType.Builder.of(NozzleExhaustBlockEntity::new, AddonBlocks.NOZZLE.get()).build(null));
+
     public static void register(IEventBus bus) {
         BLOCK_ENTITIES.register(bus);
     }

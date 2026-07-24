@@ -2,8 +2,8 @@ package dev.anvilcraft.pigeonplus.client.sound;
 
 import dev.anvilcraft.pigeonplus.client.particle.NozzleStartupParticleUtil;
 import dev.anvilcraft.pigeonplus.client.support.NozzleScreenShakeManager;
-import dev.anvilcraft.pigeonplus.util.NozzlePlasmaJetUtil;
-import dev.dubhe.anvilcraft.block.entity.PlasmaJetsBlockEntity;
+import dev.anvilcraft.pigeonplus.block.entity.NozzleExhaustBlockEntity;
+import dev.anvilcraft.pigeonplus.util.NozzleExhaustUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -16,7 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public final class NozzleJetSoundController {
+public final class NozzleSoundController {
     private static final Map<BlockPos, SoundState> SOUND_STATES = new HashMap<>();
     private static final long NANOS_PER_MILLI = 1_000_000L;
     private static final long LEVEL_STARTUP_WARM_START_NANOS = 5_000_000_000L;
@@ -28,7 +28,7 @@ public final class NozzleJetSoundController {
     private static long levelWarmStartUntilNanos;
 
     private record SoundState(
-        List<NozzleJetSoundInstance> playingSounds,
+        List<NozzleSoundInstance> playingSounds,
         long startNanos,
         long nextFireNanos,
         int lastStartupRingAge
@@ -42,7 +42,7 @@ public final class NozzleJetSoundController {
         }
     }
 
-    private NozzleJetSoundController() {
+    private NozzleSoundController() {
     }
 
     public static void tick(BlockPos pos) {
@@ -52,11 +52,11 @@ public final class NozzleJetSoundController {
         }
         long now = System.nanoTime();
         refreshObservedLevel((ClientLevel) minecraft.level, now);
-        Direction facing = NozzlePlasmaJetUtil.getStructuralFacing(minecraft.level, pos);
+        Direction facing = NozzleExhaustUtil.getStructuralFacing(minecraft.level, pos);
         if (facing == null) {
             return;
         }
-        BlockPos outletPos = NozzlePlasmaJetUtil.getStructuralOutletPos(minecraft.level, pos);
+        BlockPos outletPos = NozzleExhaustUtil.getStructuralOutletPos(minecraft.level, pos);
         if (outletPos == null) {
             return;
         }
@@ -68,22 +68,22 @@ public final class NozzleJetSoundController {
                 SOUND_STATES.put(pos, createWarmState(minecraft, pos, now));
                 return;
             }
-            NozzleJetSoundInstance created = new NozzleJetSoundInstance(pos, true);
+            NozzleSoundInstance created = new NozzleSoundInstance(pos, true);
             minecraft.getSoundManager().play(created);
             NozzleScreenShakeManager.getInstance().trigger(Vec3.atCenterOf(outletPos), STARTUP_SHAKE_RADIUS);
             NozzleStartupParticleUtil.spawnStartupRing((ClientLevel) minecraft.level, outletPos, facing, 0);
-            List<NozzleJetSoundInstance> sounds = new ArrayList<>();
+            List<NozzleSoundInstance> sounds = new ArrayList<>();
             sounds.add(created);
             SOUND_STATES.put(pos, new SoundState(
                 sounds,
                 now,
-                now + millisToNanos(NozzleJetSoundInstance.ENGINE_ON_MILLIS - NozzleJetSoundInstance.ENGINE_ON_TO_FIRE_LEAD_MILLIS),
+                now + millisToNanos(NozzleSoundInstance.ENGINE_ON_MILLIS - NozzleSoundInstance.ENGINE_ON_TO_FIRE_LEAD_MILLIS),
                 0
             ));
             return;
         }
 
-        state.playingSounds().removeIf(NozzleJetSoundInstance::isStopped);
+        state.playingSounds().removeIf(NozzleSoundInstance::isStopped);
 
         int startupRingAge = elapsedTicks(now, state.startNanos());
         int lastStartupRingAge = state.lastStartupRingAge();
@@ -94,12 +94,12 @@ public final class NozzleJetSoundController {
         state = state.withLastStartupRingAge(Math.max(lastStartupRingAge, targetStartupRingAge));
 
         if (now >= state.nextFireNanos()) {
-            NozzleJetSoundInstance fireSound = new NozzleJetSoundInstance(pos, false);
+            NozzleSoundInstance fireSound = new NozzleSoundInstance(pos, false);
             minecraft.getSoundManager().play(fireSound);
             state.playingSounds().add(fireSound);
             long nextFireNanos = state.nextFireNanos();
             long fireIntervalNanos = millisToNanos(
-                NozzleJetSoundInstance.ENGINE_FIRE_MILLIS - NozzleJetSoundInstance.ENGINE_FIRE_TO_FIRE_LEAD_MILLIS
+                NozzleSoundInstance.ENGINE_FIRE_MILLIS - NozzleSoundInstance.ENGINE_FIRE_TO_FIRE_LEAD_MILLIS
             );
             do {
                 nextFireNanos += fireIntervalNanos;
@@ -111,16 +111,16 @@ public final class NozzleJetSoundController {
     }
 
     private static SoundState createWarmState(Minecraft minecraft, BlockPos pos, long now) {
-        NozzleJetSoundInstance fireSound = new NozzleJetSoundInstance(pos, false);
+        NozzleSoundInstance fireSound = new NozzleSoundInstance(pos, false);
         minecraft.getSoundManager().play(fireSound);
-        List<NozzleJetSoundInstance> sounds = new ArrayList<>();
+        List<NozzleSoundInstance> sounds = new ArrayList<>();
         sounds.add(fireSound);
         long fireIntervalNanos = millisToNanos(
-            NozzleJetSoundInstance.ENGINE_FIRE_MILLIS - NozzleJetSoundInstance.ENGINE_FIRE_TO_FIRE_LEAD_MILLIS
+            NozzleSoundInstance.ENGINE_FIRE_MILLIS - NozzleSoundInstance.ENGINE_FIRE_TO_FIRE_LEAD_MILLIS
         );
         return new SoundState(
             sounds,
-            now - millisToNanos((FLAME_DELAY_TICKS + FLAME_GROWTH_TICKS) * NozzleJetSoundInstance.TICK_MILLIS),
+            now - millisToNanos((FLAME_DELAY_TICKS + FLAME_GROWTH_TICKS) * NozzleSoundInstance.TICK_MILLIS),
             now + fireIntervalNanos,
             NozzleStartupParticleUtil.STARTUP_RING_TICKS - 1
         );
@@ -140,7 +140,7 @@ public final class NozzleJetSoundController {
         ClientLevel level = minecraft.level;
         if (level == null) {
             for (SoundState state : SOUND_STATES.values()) {
-                for (NozzleJetSoundInstance sound : state.playingSounds()) {
+                for (NozzleSoundInstance sound : state.playingSounds()) {
                     if (!sound.isStopped()) {
                         sound.forceStop();
                     }
@@ -157,15 +157,15 @@ public final class NozzleJetSoundController {
             Map.Entry<BlockPos, SoundState> entry = iterator.next();
             BlockPos pos = entry.getKey();
             SoundState state = entry.getValue();
-            state.playingSounds().removeIf(NozzleJetSoundInstance::isStopped);
+            state.playingSounds().removeIf(NozzleSoundInstance::isStopped);
 
-            boolean active = level.getBlockEntity(pos) instanceof PlasmaJetsBlockEntity
-                && NozzlePlasmaJetUtil.getStructuralCauldron(level, pos) != null;
+            boolean active = level.getBlockEntity(pos) instanceof NozzleExhaustBlockEntity
+                && NozzleExhaustUtil.getStructuralCauldron(level, pos) != null;
             if (active) {
                 continue;
             }
 
-            for (NozzleJetSoundInstance sound : state.playingSounds()) {
+            for (NozzleSoundInstance sound : state.playingSounds()) {
                 if (!sound.isStopped()) {
                     sound.forceStop();
                 }
@@ -188,7 +188,7 @@ public final class NozzleJetSoundController {
     }
 
     private static int elapsedTicks(long nowNanos, long startNanos) {
-        return (int) Math.max(0L, (nowNanos - startNanos) / millisToNanos(NozzleJetSoundInstance.TICK_MILLIS));
+        return (int) Math.max(0L, (nowNanos - startNanos) / millisToNanos(NozzleSoundInstance.TICK_MILLIS));
     }
 
     private static long millisToNanos(long millis) {

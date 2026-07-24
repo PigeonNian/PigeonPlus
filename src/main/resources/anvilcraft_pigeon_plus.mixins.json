@@ -10,8 +10,7 @@
     "FluidNetworkScannerMixin",
     "FluidPipeNetworkMixin",
     "LargeCauldronBlockEntityMixin",
-    "LivingEntityMixin",
-    "PlasmaJetsBlockEntityMixin"
+    "LivingEntityMixin"
   ],
   "client": [
     "client.EntityClientMixin",
@@ -20,9 +19,7 @@
     "client.FluidTankRenderUtilMixin",
     "client.LargeCauldronBlockEntityRendererMixin",
     "client.LargeFluidTankBlockEntityRendererMixin",
-    "client.MinecraftClientMixin",
-    "client.PlasmaJetsBlockEntityClientMixin",
-    "client.PlasmaJetsRendererMixin"
+    "client.MinecraftClientMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -2,6 +2,8 @@ package dev.anvilcraft.pigeonplus.block;
 
 import com.mojang.serialization.MapCodec;
 import dev.anvilcraft.lib.v2.util.ShapeUtil;
+import dev.anvilcraft.pigeonplus.block.entity.ModBlockEntities;
+import dev.anvilcraft.pigeonplus.block.entity.NozzleExhaustBlockEntity;
 import dev.dubhe.anvilcraft.block.multipart.FlexibleMultiPartBlock;
 import dev.dubhe.anvilcraft.block.state.DirectionCube3x3PartHalf;
 import net.minecraft.core.BlockPos;
@@ -9,10 +11,15 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DirectionalBlock;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
@@ -28,7 +35,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-public class NozzleBlock extends FlexibleMultiPartBlock<DirectionCube3x3PartHalf, DirectionProperty, Direction> {
+public class NozzleBlock extends FlexibleMultiPartBlock<DirectionCube3x3PartHalf, DirectionProperty, Direction> implements EntityBlock {
     public static final MapCodec<NozzleBlock> CODEC = simpleCodec(NozzleBlock::new);
     public static final EnumProperty<DirectionCube3x3PartHalf> PART =
         EnumProperty.create("part", DirectionCube3x3PartHalf.class);
@@ -127,6 +134,27 @@ public class NozzleBlock extends FlexibleMultiPartBlock<DirectionCube3x3PartHalf
     @Override
     protected boolean propagatesSkylightDown(BlockState state, BlockGetter level, net.minecraft.core.BlockPos pos) {
         return true;
+    }
+
+    @Nullable
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return this.isMainPart(state) ? new NozzleExhaustBlockEntity(pos, state) : null;
+    }
+
+    @Nullable
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
+        Level level,
+        BlockState state,
+        BlockEntityType<T> blockEntityType
+    ) {
+        if (!this.isMainPart(state) || blockEntityType != ModBlockEntities.NOZZLE_EXHAUST.get()) {
+            return null;
+        }
+        return (tickerLevel, pos, tickerState, blockEntity) ->
+            NozzleExhaustBlockEntity.tick(tickerLevel, pos, tickerState, (NozzleExhaustBlockEntity) blockEntity);
     }
 
     private static VoxelShape getPartShape(BlockState state) {

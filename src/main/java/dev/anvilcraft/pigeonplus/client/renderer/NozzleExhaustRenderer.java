@@ -2,27 +2,27 @@ package dev.anvilcraft.pigeonplus.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import dev.anvilcraft.pigeonplus.client.sound.NozzleJetSoundController;
-import dev.anvilcraft.pigeonplus.util.NozzlePlasmaJetUtil;
+import dev.anvilcraft.pigeonplus.client.sound.NozzleSoundController;
+import dev.anvilcraft.pigeonplus.util.NozzleExhaustUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 
-public final class NozzlePlasmaJetRenderer {
+public final class NozzleExhaustRenderer {
     private static final ResourceLocation BEAM_TEXTURE =
         ResourceLocation.withDefaultNamespace("textures/entity/beacon_beam.png");
     private static final int FULL_BRIGHT = 0x00F000F0;
     private static final float CENTER_X = 0.5F;
     private static final float CENTER_Z = 0.5F;
     private static final float BASE_Y_OFFSET = -1.0F;
-    private static final float TOTAL_HEIGHT = NozzlePlasmaJetUtil.JET_VISUAL_HEIGHT;
+    private static final float TOTAL_HEIGHT = NozzleExhaustUtil.JET_VISUAL_HEIGHT;
     private static final float TWO_PI = (float) (Math.PI * 2.0);
     private static final float PLUME_WAVE_TIME_SCALE = 0.180F;
     private static final float PLUME_FLICKER_TIME_SCALE = 0.720F;
 
-    private NozzlePlasmaJetRenderer() {
+    private NozzleExhaustRenderer() {
     }
 
     public static void render(
@@ -34,8 +34,8 @@ public final class NozzlePlasmaJetRenderer {
         Propellant propellant,
         float visibleLength
     ) {
-        NozzleJetSoundController.tick(pos);
-        float startupProgress = NozzleJetSoundController.getFlameStartupProgress(pos);
+        NozzleSoundController.tick(pos);
+        float startupProgress = NozzleSoundController.getFlameStartupProgress(pos);
         if (startupProgress <= 0.0F || visibleLength <= 0.0F) {
             return;
         }

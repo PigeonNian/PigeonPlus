@@ -1,8 +1,8 @@
 package dev.anvilcraft.pigeonplus.client.sound;
 
+import dev.anvilcraft.pigeonplus.block.entity.NozzleExhaustBlockEntity;
 import dev.anvilcraft.pigeonplus.init.AddonSounds;
-import dev.anvilcraft.pigeonplus.util.NozzlePlasmaJetUtil;
-import dev.dubhe.anvilcraft.block.entity.PlasmaJetsBlockEntity;
+import dev.anvilcraft.pigeonplus.util.NozzleExhaustUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.core.BlockPos;
@@ -10,7 +10,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 
-public class NozzleJetSoundInstance extends AbstractTickableSoundInstance {
+public class NozzleSoundInstance extends AbstractTickableSoundInstance {
     public static final int ENGINE_ON_TICKS = 28;
     public static final int ENGINE_ON_TO_FIRE_LEAD_TICKS = 8;
     public static final int ENGINE_FIRE_TO_FIRE_LEAD_TICKS = 10;
@@ -27,7 +27,7 @@ public class NozzleJetSoundInstance extends AbstractTickableSoundInstance {
     private final long startNanos;
     private final long durationNanos;
 
-    public NozzleJetSoundInstance(BlockPos pos, boolean startup) {
+    public NozzleSoundInstance(BlockPos pos, boolean startup) {
         super(startup ? AddonSounds.ENGINE_ON.get() : AddonSounds.ENGINE_FIRE.get(), SoundSource.BLOCKS, RandomSource.create());
         this.pos = pos.immutable();
         this.startup = startup;
@@ -48,12 +48,12 @@ public class NozzleJetSoundInstance extends AbstractTickableSoundInstance {
         Minecraft minecraft = Minecraft.getInstance();
         Level level = minecraft.level;
         if (level == null
-            || !(level.getBlockEntity(this.pos) instanceof PlasmaJetsBlockEntity)
-            || NozzlePlasmaJetUtil.getStructuralCauldron(level, this.pos) == null) {
+            || !(level.getBlockEntity(this.pos) instanceof NozzleExhaustBlockEntity)
+            || NozzleExhaustUtil.getStructuralCauldron(level, this.pos) == null) {
             this.stop();
             return;
         }
-        BlockPos soundPos = NozzlePlasmaJetUtil.getStructuralOutletPos(level, this.pos);
+        BlockPos soundPos = NozzleExhaustUtil.getStructuralOutletPos(level, this.pos);
         if (soundPos == null) {
             this.stop();
             return;
