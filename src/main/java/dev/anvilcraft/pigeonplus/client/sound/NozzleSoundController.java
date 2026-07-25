@@ -22,14 +22,16 @@ public final class NozzleSoundController {
     private static final Map<BlockPos, SoundState> SOUND_STATES = new HashMap<>();
     private static final Map<BlockPos, ShutdownState> SHUTDOWN_STATES = new HashMap<>();
     private static final long NANOS_PER_MILLI = 1_000_000L;
-    private static final float STARTUP_SHAKE_RADIUS = 24.0F;
     private static final float CONTINUOUS_SHAKE_RADIUS = 12.0F;
-    public static final int FLAME_DELAY_TICKS = 6;
-    public static final int FLAME_GROWTH_TICKS = 12;
+    public static final int FLAME_DELAY_TICKS = 10;
+    public static final int FLAME_GROWTH_TICKS = 8;
     public static final int FLAME_SHUTDOWN_TICKS = 12;
     private static final int FIRST_FLAME_SHUTDOWN_BURST_TICKS = 4;
     private static final int SECOND_FLAME_SHUTDOWN_BURST_TICKS = 8;
     private static final int THIRD_FLAME_SHUTDOWN_BURST_TICKS = 12;
+    private static final int STARTUP_FLAME_BURST_TICKS = 10;
+    private static final int LAST_STARTUP_GAS_TICK = NozzleStartupParticleUtil.STARTUP_RING_TICKS - 1;
+    private static final int STARTUP_FLAME_BURST_PARTICLES = 44;
     private static final int SHUTDOWN_BURST_PARTICLES = 28;
     private static final int LARGE_SHUTDOWN_BURST_PARTICLES = 56;
     private static ClientLevel observedLevel;
@@ -38,14 +40,37 @@ public final class NozzleSoundController {
         List<NozzleSoundInstance> playingSounds,
         long startNanos,
         long nextFireNanos,
-        int lastStartupRingAge
+        int lastStartupRingAge,
+        boolean startupFlameBurstSpawned
     ) {
         private SoundState withNextFireNanos(long nextFireNanos) {
-            return new SoundState(this.playingSounds, this.startNanos, nextFireNanos, this.lastStartupRingAge);
+            return new SoundState(
+                this.playingSounds,
+                this.startNanos,
+                nextFireNanos,
+                this.lastStartupRingAge,
+                this.startupFlameBurstSpawned
+            );
         }
 
         private SoundState withLastStartupRingAge(int lastStartupRingAge) {
-            return new SoundState(this.playingSounds, this.startNanos, this.nextFireNanos, lastStartupRingAge);
+            return new SoundState(
+                this.playingSounds,
+                this.startNanos,
+                this.nextFireNanos,
+                lastStartupRingAge,
+                this.startupFlameBurstSpawned
+            );
+        }
+
+        private SoundState withStartupFlameBurstSpawned() {
+            return new SoundState(
+                this.playingSounds,
+                this.startNanos,
+                this.nextFireNanos,
+                this.lastStartupRingAge,
+                true
+            );
         }
     }
 
@@ -130,15 +155,15 @@ public final class NozzleSoundController {
             }
             NozzleSoundInstance created = new NozzleSoundInstance(pos, true);
             minecraft.getSoundManager().play(created);
-            NozzleScreenShakeManager.getInstance().trigger(Vec3.atCenterOf(outletPos), STARTUP_SHAKE_RADIUS);
-            NozzleStartupParticleUtil.spawnStartupRing((ClientLevel) minecraft.level, outletPos, facing, 0);
+            spawnStartupGasPulses((ClientLevel) minecraft.level, outletPos, facing, 0);
             List<NozzleSoundInstance> sounds = new ArrayList<>();
             sounds.add(created);
             SOUND_STATES.put(pos, new SoundState(
                 sounds,
                 now,
                 now + millisToNanos(NozzleSoundInstance.ENGINE_ON_MILLIS - NozzleSoundInstance.ENGINE_ON_TO_FIRE_LEAD_MILLIS),
-                0
+                0,
+                false
             ));
             return;
         }
@@ -147,11 +172,12 @@ public final class NozzleSoundController {
 
         int startupRingAge = elapsedTicks(now, state.startNanos());
         int lastStartupRingAge = state.lastStartupRingAge();
-        int targetStartupRingAge = Math.min(startupRingAge, NozzleStartupParticleUtil.STARTUP_RING_TICKS - 1);
+        int targetStartupRingAge = Math.min(startupRingAge, LAST_STARTUP_GAS_TICK);
         for (int age = lastStartupRingAge + 1; age <= targetStartupRingAge; age++) {
-            NozzleStartupParticleUtil.spawnStartupRing((ClientLevel) minecraft.level, outletPos, facing, age);
+            spawnStartupGasPulses((ClientLevel) minecraft.level, outletPos, facing, age);
         }
         state = state.withLastStartupRingAge(Math.max(lastStartupRingAge, targetStartupRingAge));
+        state = tickStartupFlameBurst(state, outletPos, facing, now);
 
         if (now >= state.nextFireNanos()) {
             NozzleSoundInstance fireSound = new NozzleSoundInstance(pos, false);
@@ -182,7 +208,8 @@ public final class NozzleSoundController {
             sounds,
             now - millisToNanos((FLAME_DELAY_TICKS + FLAME_GROWTH_TICKS) * NozzleSoundInstance.TICK_MILLIS),
             now + fireIntervalNanos,
-            NozzleStartupParticleUtil.STARTUP_RING_TICKS - 1
+            LAST_STARTUP_GAS_TICK,
+            true
         );
     }
 
@@ -332,38 +359,67 @@ public final class NozzleSoundController {
         int age = elapsedTicks(nowNanos, state.startNanos());
         ShutdownState current = state;
         if (!current.firstBurstSpawned() && age >= FIRST_FLAME_SHUTDOWN_BURST_TICKS) {
-            spawnShutdownBurst(current, false);
+            spawnNozzleBurst(current.outletPos(), current.facing(), false);
             current = current.withFirstBurstSpawned();
         }
         if (!current.secondBurstSpawned() && age >= SECOND_FLAME_SHUTDOWN_BURST_TICKS) {
-            spawnShutdownBurst(current, false);
+            spawnNozzleBurst(current.outletPos(), current.facing(), false);
             current = current.withSecondBurstSpawned();
         }
         if (!current.thirdBurstSpawned() && age >= THIRD_FLAME_SHUTDOWN_BURST_TICKS) {
-            spawnShutdownBurst(current, true);
+            spawnNozzleBurst(current.outletPos(), current.facing(), true);
             current = current.withThirdBurstSpawned();
         }
         return current;
     }
 
-    private static void spawnShutdownBurst(ShutdownState state, boolean large) {
+    private static SoundState tickStartupFlameBurst(SoundState state, BlockPos outletPos, Direction facing, long nowNanos) {
+        if (state.startupFlameBurstSpawned()) {
+            return state;
+        }
+        if (elapsedTicks(nowNanos, state.startNanos()) < STARTUP_FLAME_BURST_TICKS) {
+            return state;
+        }
+        spawnNozzleBurst(outletPos, facing, STARTUP_FLAME_BURST_PARTICLES, 1.45, 1.45, 1.15);
+        return state.withStartupFlameBurstSpawned();
+    }
+
+    private static void spawnNozzleBurst(BlockPos outletPos, Direction facing, boolean large) {
+        spawnNozzleBurst(
+            outletPos,
+            facing,
+            large ? LARGE_SHUTDOWN_BURST_PARTICLES : SHUTDOWN_BURST_PARTICLES,
+            large ? 1.0 : 1.0,
+            large ? 1.0 : 1.0,
+            large ? 1.0 : 1.0
+        );
+    }
+
+    private static void spawnNozzleBurst(
+        BlockPos outletPos,
+        Direction facing,
+        int count,
+        double radiusScale,
+        double spreadScale,
+        double speedScale
+    ) {
         Minecraft minecraft = Minecraft.getInstance();
         if (!(minecraft.level instanceof ClientLevel level)) {
             return;
         }
         RandomSource random = level.getRandom();
-        int count = large ? LARGE_SHUTDOWN_BURST_PARTICLES : SHUTDOWN_BURST_PARTICLES;
         for (int i = 0; i < count; i++) {
             double angle = random.nextDouble() * Math.PI * 2.0;
-            double radius = random.nextDouble() * (large ? 1.05 : 0.55);
+            boolean large = count >= LARGE_SHUTDOWN_BURST_PARTICLES;
+            double radius = random.nextDouble() * (large ? 1.05 : 0.55) * radiusScale;
             double sideX = 0.5 + Math.cos(angle) * radius;
             double sideZ = 0.5 + Math.sin(angle) * radius;
             double axis = -0.75 + random.nextDouble() * (large ? 0.50 : 0.30);
-            double axialSpeed = (large ? 1.30 : 1.10) + random.nextDouble() * (large ? 0.75 : 0.55);
-            double spread = (large ? 0.16 : 0.08) + random.nextDouble() * (large ? 0.22 : 0.10);
-            Vec3 pos = point(state.outletPos(), state.facing(), sideX, axis, sideZ);
+            double axialSpeed = ((large ? 1.30 : 1.10) + random.nextDouble() * (large ? 0.75 : 0.55)) * speedScale;
+            double spread = ((large ? 0.16 : 0.08) + random.nextDouble() * (large ? 0.22 : 0.10)) * spreadScale;
+            Vec3 pos = point(outletPos, facing, sideX, axis, sideZ);
             Vec3 velocity = vector(
-                state.facing(),
+                facing,
                 Math.cos(angle) * spread + (random.nextDouble() - 0.5) * 0.035,
                 axialSpeed,
                 Math.sin(angle) * spread + (random.nextDouble() - 0.5) * 0.035
@@ -378,6 +434,12 @@ public final class NozzleSoundController {
                 velocity.y,
                 velocity.z
             );
+        }
+    }
+
+    private static void spawnStartupGasPulses(ClientLevel level, BlockPos outletPos, Direction facing, int age) {
+        if (age >= 0 && age < NozzleStartupParticleUtil.STARTUP_RING_TICKS) {
+            NozzleStartupParticleUtil.spawnStartupRing(level, outletPos, facing, age, true);
         }
     }
 

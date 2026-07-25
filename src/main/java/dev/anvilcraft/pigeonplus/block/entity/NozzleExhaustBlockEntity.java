@@ -35,6 +35,7 @@ import java.util.Set;
 
 public class NozzleExhaustBlockEntity extends BlockEntity {
     public static final int STARTUP_TICKS = 28;
+    public static final int VISUAL_PARTICLE_DELAY_TICKS = 10;
     private static final double KEROSENE_ACCELERATION_PER_TICK = 320.0 / StasisTimeFreezeManager.MAX_FREEZE_TICKS;
     private static final double METHANE_ACCELERATION_PER_TICK = 192.0 / StasisTimeFreezeManager.MAX_FREEZE_TICKS;
     private static final String EXHAUST_TICKS_TAG = "ExhaustTicks";
@@ -95,7 +96,12 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
             || this.getExhaustPhase() == ExhaustPhase.IDLE) {
             return;
         }
+        if (this.duration < VISUAL_PARTICLE_DELAY_TICKS) {
+            this.duration++;
+            return;
+        }
         this.spawnParticles(level);
+        this.duration++;
     }
 
     public ExhaustPhase getExhaustPhase() {
