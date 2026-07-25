@@ -20,5 +20,6 @@ public class AddonLangHandler {
         provider.add("block.anvilcraft_pigeon_plus.liquid_oxygen", "Liquid Oxygen");
         provider.add("subtitles.anvilcraft_pigeon_plus.engine_on", "Nozzle engine starts");
         provider.add("subtitles.anvilcraft_pigeon_plus.engine_fire", "Nozzle engine roars");
+        provider.add("death.attack.nozzleExhaust", "%1$s sat in the duct seat");
     }
 }

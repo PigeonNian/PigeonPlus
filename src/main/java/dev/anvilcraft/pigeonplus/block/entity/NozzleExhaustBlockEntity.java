@@ -1,6 +1,7 @@
 package dev.anvilcraft.pigeonplus.block.entity;
 
 import com.mojang.datafixers.util.Pair;
+import dev.anvilcraft.pigeonplus.init.AddonDamageTypes;
 import dev.anvilcraft.pigeonplus.init.AddonHeaterInfos;
 import dev.anvilcraft.pigeonplus.init.AddonParticles;
 import dev.anvilcraft.pigeonplus.init.AddonVaporizationSources;
@@ -11,9 +12,11 @@ import dev.dubhe.anvilcraft.api.heat.HeaterManager;
 import dev.dubhe.anvilcraft.block.entity.ChargeCollectorBlockEntity;
 import dev.dubhe.anvilcraft.block.entity.LargeCauldronBlockEntity;
 import dev.dubhe.anvilcraft.init.ModParticles;
-import dev.dubhe.anvilcraft.init.entity.ModDamageTypes;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -21,6 +24,8 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseFireBlock;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -29,8 +34,10 @@ import java.util.Collection;
 import java.util.Set;
 
 public class NozzleExhaustBlockEntity extends BlockEntity {
+    public static final int STARTUP_TICKS = 28;
     private static final double KEROSENE_ACCELERATION_PER_TICK = 320.0 / StasisTimeFreezeManager.MAX_FREEZE_TICKS;
     private static final double METHANE_ACCELERATION_PER_TICK = 192.0 / StasisTimeFreezeManager.MAX_FREEZE_TICKS;
+    private static final String EXHAUST_TICKS_TAG = "ExhaustTicks";
 
     private int duration;
 
@@ -48,29 +55,29 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
 
     private void serverTick(ServerLevel level) {
         if (!NozzleExhaustUtil.isNozzleActive(level, this.worldPosition)) {
-            this.duration = 0;
+            this.stopExhaust();
             return;
         }
         LargeCauldronBlockEntity cauldron = NozzleExhaustUtil.getStructuralCauldron(level, this.worldPosition);
         if (cauldron == null) {
-            this.duration = 0;
+            this.stopExhaust();
             return;
         }
         Direction facing = NozzleExhaustUtil.getStructuralFacing(level, this.worldPosition);
         BlockPos outletPos = NozzleExhaustUtil.getStructuralOutletPos(level, this.worldPosition);
         if (facing == null || outletPos == null) {
-            this.duration = 0;
+            this.stopExhaust();
             return;
         }
         AddonVaporizationSources.JetPropellant propellant = NozzleExhaustUtil.getJetPropellant(level, cauldron);
         if (propellant == null || !NozzleExhaustUtil.canSustainJet(level, cauldron)) {
-            this.duration = 0;
+            this.stopExhaust();
             return;
         }
 
         if (level.getGameTime() % NozzleExhaustUtil.PLASMA_CONSUME_INTERVAL == 0
             && !NozzleExhaustUtil.consumeTopFuelOnce(cauldron, propellant)) {
-            this.duration = 0;
+            this.stopExhaust();
             return;
         }
 
@@ -78,15 +85,58 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
         HeaterManager.addProducer(this.worldPosition, level, AddonHeaterInfos.MAGNET_NOZZLE_EXHAUST);
         this.accelerateEntities(level, outletPos, facing, propellant);
         this.hurtEntities(level, outletPos, facing);
+        this.igniteObstructingBlock(level, outletPos, facing);
         this.provideCharge(level);
-        this.duration++;
+        this.tickExhaust();
     }
 
     private void clientTick(Level level) {
-        if (!NozzleExhaustUtil.isNozzleActive(level, this.worldPosition)) {
+        if (!NozzleExhaustUtil.isNozzleActive(level, this.worldPosition)
+            || this.getExhaustPhase() == ExhaustPhase.IDLE) {
             return;
         }
         this.spawnParticles(level);
+    }
+
+    public ExhaustPhase getExhaustPhase() {
+        if (this.duration <= 0) {
+            return ExhaustPhase.IDLE;
+        }
+        return this.duration <= STARTUP_TICKS ? ExhaustPhase.STARTING : ExhaustPhase.FIRING;
+    }
+
+    public boolean isExhaustStarting() {
+        return this.getExhaustPhase() == ExhaustPhase.STARTING;
+    }
+
+    public boolean isExhaustFiring() {
+        return this.getExhaustPhase() == ExhaustPhase.FIRING;
+    }
+
+    private void tickExhaust() {
+        ExhaustPhase previous = this.getExhaustPhase();
+        this.duration++;
+        if (previous != this.getExhaustPhase()) {
+            this.syncToClient();
+        } else {
+            this.setChanged();
+        }
+    }
+
+    private void stopExhaust() {
+        if (this.duration == 0) {
+            return;
+        }
+        this.duration = 0;
+        this.syncToClient();
+    }
+
+    private void syncToClient() {
+        this.setChanged();
+        if (this.level != null && !this.level.isClientSide) {
+            BlockState state = this.getBlockState();
+            this.level.sendBlockUpdated(this.worldPosition, state, state, Block.UPDATE_CLIENTS);
+        }
     }
 
     public Pair<Set<BlockPos>, Set<BlockPos>> getHeatingPoses() {
@@ -116,10 +166,34 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
         );
         for (Entity entity : entities) {
             entity.igniteForSeconds(15.0f);
-            if (entity.hurt(ModDamageTypes.plasmaJets(level), 16.0f)) {
+            if (entity.hurt(AddonDamageTypes.nozzleExhaust(level), 16.0f)) {
                 entity.playSound(SoundEvents.GENERIC_BURN, 0.4f, 2.0f + RandomSource.create().nextFloat() * 0.4f);
             }
         }
+    }
+
+    private void igniteObstructingBlock(ServerLevel level, BlockPos startPos, Direction facing) {
+        if (level.getGameTime() % 10 != 0) {
+            return;
+        }
+        BlockPos obstructionPos = NozzleExhaustUtil.getJetRenderObstructionPos(
+            level,
+            startPos,
+            facing,
+            NozzleExhaustUtil.JET_VISUAL_HEIGHT
+        );
+        if (obstructionPos == null) {
+            return;
+        }
+        BlockState obstructionState = level.getBlockState(obstructionPos);
+        if (!obstructionState.isFlammable(level, obstructionPos, facing.getOpposite())) {
+            return;
+        }
+        BlockPos firePos = obstructionPos.relative(facing.getOpposite());
+        if (!BaseFireBlock.canBePlacedAt(level, firePos, facing)) {
+            return;
+        }
+        level.setBlockAndUpdate(firePos, BaseFireBlock.getState(level, firePos));
     }
 
     private void accelerateEntities(
@@ -335,5 +409,34 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
             case NORTH -> new Vec3(sideX, sideZ, -axis);
             default -> new Vec3(sideX, axis, sideZ);
         };
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        tag.putInt(EXHAUST_TICKS_TAG, this.duration);
+    }
+
+    @Override
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        if (tag.contains(EXHAUST_TICKS_TAG)) {
+            this.duration = Math.max(0, tag.getInt(EXHAUST_TICKS_TAG));
+        }
+    }
+
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return this.saveWithoutMetadata(registries);
+    }
+
+    public enum ExhaustPhase {
+        IDLE,
+        STARTING,
+        FIRING
     }
 }

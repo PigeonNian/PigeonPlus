@@ -36,7 +36,7 @@ public class AddonBlocks {
                     ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/blender_bottom")))
                 .rotationY(rotationY(state.getValue(BlenderBlock.FACING)))
                 .build()))
-        .item((block, props) -> new BlockItem(block, props))
+        .item(BlockItem::new)
             .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
                 ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/blender")))
         .build()
@@ -61,7 +61,7 @@ public class AddonBlocks {
                 .rotationX(nozzleRotationX(state.getValue(NozzleBlock.FACING)))
                 .rotationY(nozzleRotationY(state.getValue(NozzleBlock.FACING)))
                 .build()))
-        .loot((tables, block) -> FlexibleMultiPartBlock.loot(tables, block))
+        .loot(FlexibleMultiPartBlock::loot)
         .item(FlexibleMultiPartBlockItem<DirectionCube3x3PartHalf, DirectionProperty, Direction>::new)
             .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
                 ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/nozzle")))
@@ -80,7 +80,7 @@ public class AddonBlocks {
                     "block/stasis_beacon"
                 )))
                 .build()))
-        .item((block, props) -> new BlockItem(block, props))
+        .item(BlockItem::new)
             .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
                 ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/stasis_beacon")))
             .build()
@@ -91,16 +91,14 @@ public class AddonBlocks {
         .block("anvil_pump", AnvilPumpBlock::new)
         .initialProperties(() -> Blocks.IRON_BLOCK)
         .properties(properties -> properties.noOcclusion().sound(SoundType.METAL))
-        .blockstate((ctx, provider) -> provider.getVariantBuilder(ctx.getEntry()).forAllStates(state -> {
-            return ConfiguredModel.builder()
-                .modelFile(provider.models().getExistingFile(ResourceLocation.fromNamespaceAndPath(
-                    AnvilCraftPigeonPlus.MOD_ID,
-                    "block/anvil_pump"
-                )))
-                .rotationY(pumpRotationY(state.getValue(AnvilPumpBlock.FACING)))
-                .build();
-        }))
-        .item((block, props) -> new BlockItem(block, props))
+        .blockstate((ctx, provider) -> provider.getVariantBuilder(ctx.getEntry()).forAllStates(state -> ConfiguredModel.builder()
+            .modelFile(provider.models().getExistingFile(ResourceLocation.fromNamespaceAndPath(
+                AnvilCraftPigeonPlus.MOD_ID,
+                "block/anvil_pump"
+            )))
+            .rotationY(pumpRotationY(state.getValue(AnvilPumpBlock.FACING)))
+            .build()))
+        .item(BlockItem::new)
             .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
                 ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/anvil_pump_full")))
             .build()

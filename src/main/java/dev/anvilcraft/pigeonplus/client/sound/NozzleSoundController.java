@@ -4,10 +4,12 @@ import dev.anvilcraft.pigeonplus.client.particle.NozzleStartupParticleUtil;
 import dev.anvilcraft.pigeonplus.client.support.NozzleScreenShakeManager;
 import dev.anvilcraft.pigeonplus.block.entity.NozzleExhaustBlockEntity;
 import dev.anvilcraft.pigeonplus.util.NozzleExhaustUtil;
+import dev.dubhe.anvilcraft.init.ModParticles;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
@@ -18,14 +20,19 @@ import java.util.Map;
 
 public final class NozzleSoundController {
     private static final Map<BlockPos, SoundState> SOUND_STATES = new HashMap<>();
+    private static final Map<BlockPos, ShutdownState> SHUTDOWN_STATES = new HashMap<>();
     private static final long NANOS_PER_MILLI = 1_000_000L;
-    private static final long LEVEL_STARTUP_WARM_START_NANOS = 5_000_000_000L;
     private static final float STARTUP_SHAKE_RADIUS = 24.0F;
     private static final float CONTINUOUS_SHAKE_RADIUS = 12.0F;
     public static final int FLAME_DELAY_TICKS = 6;
     public static final int FLAME_GROWTH_TICKS = 12;
+    public static final int FLAME_SHUTDOWN_TICKS = 12;
+    private static final int FIRST_FLAME_SHUTDOWN_BURST_TICKS = 4;
+    private static final int SECOND_FLAME_SHUTDOWN_BURST_TICKS = 8;
+    private static final int THIRD_FLAME_SHUTDOWN_BURST_TICKS = 12;
+    private static final int SHUTDOWN_BURST_PARTICLES = 28;
+    private static final int LARGE_SHUTDOWN_BURST_PARTICLES = 56;
     private static ClientLevel observedLevel;
-    private static long levelWarmStartUntilNanos;
 
     private record SoundState(
         List<NozzleSoundInstance> playingSounds,
@@ -42,6 +49,52 @@ public final class NozzleSoundController {
         }
     }
 
+    private record ShutdownState(
+        long startNanos,
+        float startProgress,
+        BlockPos outletPos,
+        Direction facing,
+        boolean firstBurstSpawned,
+        boolean secondBurstSpawned,
+        boolean thirdBurstSpawned
+    ) {
+        private ShutdownState withFirstBurstSpawned() {
+            return new ShutdownState(
+                this.startNanos,
+                this.startProgress,
+                this.outletPos,
+                this.facing,
+                true,
+                this.secondBurstSpawned,
+                this.thirdBurstSpawned
+            );
+        }
+
+        private ShutdownState withSecondBurstSpawned() {
+            return new ShutdownState(
+                this.startNanos,
+                this.startProgress,
+                this.outletPos,
+                this.facing,
+                this.firstBurstSpawned,
+                true,
+                this.thirdBurstSpawned
+            );
+        }
+
+        private ShutdownState withThirdBurstSpawned() {
+            return new ShutdownState(
+                this.startNanos,
+                this.startProgress,
+                this.outletPos,
+                this.facing,
+                this.firstBurstSpawned,
+                this.secondBurstSpawned,
+                true
+            );
+        }
+    }
+
     private NozzleSoundController() {
     }
 
@@ -51,11 +104,14 @@ public final class NozzleSoundController {
             return;
         }
         long now = System.nanoTime();
-        refreshObservedLevel((ClientLevel) minecraft.level, now);
-        if (!NozzleExhaustUtil.isNozzleActive(minecraft.level, pos)) {
-            cleanup();
+        refreshObservedLevel((ClientLevel) minecraft.level);
+        if (!(minecraft.level.getBlockEntity(pos) instanceof NozzleExhaustBlockEntity blockEntity)
+            || !NozzleExhaustUtil.isNozzleActive(minecraft.level, pos)
+            || blockEntity.getExhaustPhase() == NozzleExhaustBlockEntity.ExhaustPhase.IDLE) {
+            beginShutdown(pos);
             return;
         }
+        SHUTDOWN_STATES.remove(pos);
         Direction facing = NozzleExhaustUtil.getStructuralFacing(minecraft.level, pos);
         if (facing == null) {
             return;
@@ -68,8 +124,8 @@ public final class NozzleSoundController {
 
         SoundState state = SOUND_STATES.get(pos);
         if (state == null) {
-            if (now <= levelWarmStartUntilNanos) {
-                SOUND_STATES.put(pos, createWarmState(minecraft, pos, now));
+            if (blockEntity.isExhaustFiring()) {
+                SOUND_STATES.put(pos, createFiringState(minecraft, pos, now));
                 return;
             }
             NozzleSoundInstance created = new NozzleSoundInstance(pos, true);
@@ -114,7 +170,7 @@ public final class NozzleSoundController {
         SOUND_STATES.put(pos, state);
     }
 
-    private static SoundState createWarmState(Minecraft minecraft, BlockPos pos, long now) {
+    private static SoundState createFiringState(Minecraft minecraft, BlockPos pos, long now) {
         NozzleSoundInstance fireSound = new NozzleSoundInstance(pos, false);
         minecraft.getSoundManager().play(fireSound);
         List<NozzleSoundInstance> sounds = new ArrayList<>();
@@ -130,13 +186,13 @@ public final class NozzleSoundController {
         );
     }
 
-    private static void refreshObservedLevel(ClientLevel level, long now) {
+    private static void refreshObservedLevel(ClientLevel level) {
         if (observedLevel == level) {
             return;
         }
         observedLevel = level;
-        levelWarmStartUntilNanos = now + LEVEL_STARTUP_WARM_START_NANOS;
         SOUND_STATES.clear();
+        SHUTDOWN_STATES.clear();
     }
 
     public static void cleanup() {
@@ -151,8 +207,8 @@ public final class NozzleSoundController {
                 }
             }
             SOUND_STATES.clear();
+            SHUTDOWN_STATES.clear();
             observedLevel = null;
-            levelWarmStartUntilNanos = 0L;
             return;
         }
 
@@ -176,19 +232,176 @@ public final class NozzleSoundController {
             }
             iterator.remove();
         }
+        Iterator<Map.Entry<BlockPos, ShutdownState>> shutdownIterator = SHUTDOWN_STATES.entrySet().iterator();
+        while (shutdownIterator.hasNext()) {
+            Map.Entry<BlockPos, ShutdownState> entry = shutdownIterator.next();
+            ShutdownState shutdownState = tickShutdownBurst(entry.getValue(), System.nanoTime());
+            if (getShutdownProgress(shutdownState, System.nanoTime()) <= 0.0F) {
+                shutdownIterator.remove();
+            } else if (shutdownState != entry.getValue()) {
+                entry.setValue(shutdownState);
+            }
+        }
     }
 
-    public static float getFlameStartupProgress(BlockPos pos) {
-        SoundState state = SOUND_STATES.get(pos);
+    public static void stop(BlockPos pos) {
+        SoundState state = SOUND_STATES.remove(pos);
         if (state == null) {
-            return 1.0F;
+            SHUTDOWN_STATES.remove(pos);
+            return;
         }
-        int age = elapsedTicks(System.nanoTime(), state.startNanos());
+        for (NozzleSoundInstance sound : state.playingSounds()) {
+            if (!sound.isStopped()) {
+                sound.forceStop();
+            }
+        }
+        SHUTDOWN_STATES.remove(pos);
+    }
+
+    public static void beginShutdown(BlockPos pos) {
+        if (SHUTDOWN_STATES.containsKey(pos)) {
+            return;
+        }
+        SoundState state = SOUND_STATES.remove(pos);
+        if (state == null) {
+            return;
+        }
+        for (NozzleSoundInstance sound : state.playingSounds()) {
+            if (!sound.isStopped()) {
+                sound.forceStop();
+            }
+        }
+        float progress = calculateStartupProgress(System.nanoTime(), state.startNanos());
+        if (progress > 0.0F) {
+            Minecraft minecraft = Minecraft.getInstance();
+            if (minecraft.level == null) {
+                return;
+            }
+            Direction facing = NozzleExhaustUtil.getStructuralFacing(minecraft.level, pos);
+            BlockPos outletPos = NozzleExhaustUtil.getStructuralOutletPos(minecraft.level, pos);
+            if (facing != null && outletPos != null) {
+                SHUTDOWN_STATES.put(pos, new ShutdownState(
+                    System.nanoTime(),
+                    progress,
+                    outletPos,
+                    facing,
+                    false,
+                    false,
+                    false
+                ));
+            }
+        }
+    }
+
+    public static float getFlameProgress(BlockPos pos) {
+        long now = System.nanoTime();
+        SoundState state = SOUND_STATES.get(pos);
+        if (state != null) {
+            return calculateStartupProgress(now, state.startNanos());
+        }
+        ShutdownState shutdownState = SHUTDOWN_STATES.get(pos);
+        if (shutdownState == null) {
+            return 0.0F;
+        }
+        shutdownState = tickShutdownBurst(shutdownState, now);
+        SHUTDOWN_STATES.put(pos, shutdownState);
+        float progress = getShutdownProgress(shutdownState, now);
+        if (progress <= 0.0F) {
+            SHUTDOWN_STATES.remove(pos);
+            return 0.0F;
+        }
+        return progress;
+    }
+
+    private static float calculateStartupProgress(long nowNanos, long startNanos) {
+        int age = elapsedTicks(nowNanos, startNanos);
         if (age <= FLAME_DELAY_TICKS) {
             return 0.0F;
         }
         float progress = (age - FLAME_DELAY_TICKS) / (float) FLAME_GROWTH_TICKS;
         return Math.min(1.0F, Math.max(0.0F, progress));
+    }
+
+    private static float getShutdownProgress(ShutdownState state, long nowNanos) {
+        int age = elapsedTicks(nowNanos, state.startNanos());
+        float progress = 1.0F - age / (float) FLAME_SHUTDOWN_TICKS;
+        return state.startProgress() * Math.min(1.0F, Math.max(0.0F, progress));
+    }
+
+    private static ShutdownState tickShutdownBurst(ShutdownState state, long nowNanos) {
+        int age = elapsedTicks(nowNanos, state.startNanos());
+        ShutdownState current = state;
+        if (!current.firstBurstSpawned() && age >= FIRST_FLAME_SHUTDOWN_BURST_TICKS) {
+            spawnShutdownBurst(current, false);
+            current = current.withFirstBurstSpawned();
+        }
+        if (!current.secondBurstSpawned() && age >= SECOND_FLAME_SHUTDOWN_BURST_TICKS) {
+            spawnShutdownBurst(current, false);
+            current = current.withSecondBurstSpawned();
+        }
+        if (!current.thirdBurstSpawned() && age >= THIRD_FLAME_SHUTDOWN_BURST_TICKS) {
+            spawnShutdownBurst(current, true);
+            current = current.withThirdBurstSpawned();
+        }
+        return current;
+    }
+
+    private static void spawnShutdownBurst(ShutdownState state, boolean large) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (!(minecraft.level instanceof ClientLevel level)) {
+            return;
+        }
+        RandomSource random = level.getRandom();
+        int count = large ? LARGE_SHUTDOWN_BURST_PARTICLES : SHUTDOWN_BURST_PARTICLES;
+        for (int i = 0; i < count; i++) {
+            double angle = random.nextDouble() * Math.PI * 2.0;
+            double radius = random.nextDouble() * (large ? 1.05 : 0.55);
+            double sideX = 0.5 + Math.cos(angle) * radius;
+            double sideZ = 0.5 + Math.sin(angle) * radius;
+            double axis = -0.75 + random.nextDouble() * (large ? 0.50 : 0.30);
+            double axialSpeed = (large ? 1.30 : 1.10) + random.nextDouble() * (large ? 0.75 : 0.55);
+            double spread = (large ? 0.16 : 0.08) + random.nextDouble() * (large ? 0.22 : 0.10);
+            Vec3 pos = point(state.outletPos(), state.facing(), sideX, axis, sideZ);
+            Vec3 velocity = vector(
+                state.facing(),
+                Math.cos(angle) * spread + (random.nextDouble() - 0.5) * 0.035,
+                axialSpeed,
+                Math.sin(angle) * spread + (random.nextDouble() - 0.5) * 0.035
+            );
+            level.addParticle(
+                ModParticles.PLASMA_JETS.get(),
+                true,
+                pos.x,
+                pos.y,
+                pos.z,
+                velocity.x,
+                velocity.y,
+                velocity.z
+            );
+        }
+    }
+
+    private static Vec3 point(BlockPos jetPos, Direction facing, double sideX, double axis, double sideZ) {
+        Vec3 local = vector(facing, sideX, axis, sideZ);
+        if (facing == Direction.DOWN || facing == Direction.WEST || facing == Direction.NORTH) {
+            local = local.add(
+                facing == Direction.WEST ? 1.0 : 0.0,
+                facing == Direction.DOWN ? 1.0 : 0.0,
+                facing == Direction.NORTH ? 1.0 : 0.0
+            );
+        }
+        return new Vec3(jetPos.getX() + local.x, jetPos.getY() + local.y, jetPos.getZ() + local.z);
+    }
+
+    private static Vec3 vector(Direction facing, double sideX, double axis, double sideZ) {
+        return switch (facing) {
+            case DOWN -> new Vec3(sideX, -axis, sideZ);
+            case EAST -> new Vec3(axis, sideX, sideZ);
+            case WEST -> new Vec3(-axis, sideX, sideZ);
+            case SOUTH -> new Vec3(sideX, sideZ, axis);
+            case NORTH -> new Vec3(sideX, sideZ, -axis);
+            default -> new Vec3(sideX, axis, sideZ);
+        };
     }
 
     private static int elapsedTicks(long nowNanos, long startNanos) {

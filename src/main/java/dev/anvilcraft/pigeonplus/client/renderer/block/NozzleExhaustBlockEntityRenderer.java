@@ -34,22 +34,29 @@ public class NozzleExhaustBlockEntityRenderer implements BlockEntityRenderer<Noz
         if (blockEntity.getLevel() == null) {
             return;
         }
-        if (!NozzleExhaustUtil.isNozzleActive(blockEntity.getLevel(), blockEntity.getBlockPos())) {
-            NozzleSoundController.cleanup();
-            return;
-        }
         LargeCauldronBlockEntity cauldron = NozzleExhaustUtil.getStructuralCauldron(
             blockEntity.getLevel(),
             blockEntity.getBlockPos()
         );
         if (cauldron == null) {
-            NozzleSoundController.cleanup();
+            NozzleSoundController.beginShutdown(blockEntity.getBlockPos());
             return;
         }
         Direction facing = NozzleExhaustUtil.getStructuralFacing(blockEntity.getLevel(), blockEntity.getBlockPos());
         BlockPos outletPos = NozzleExhaustUtil.getStructuralOutletPos(blockEntity.getLevel(), blockEntity.getBlockPos());
         if (facing == null || outletPos == null) {
-            NozzleSoundController.cleanup();
+            NozzleSoundController.beginShutdown(blockEntity.getBlockPos());
+            return;
+        }
+        boolean active = NozzleExhaustUtil.isNozzleActive(blockEntity.getLevel(), blockEntity.getBlockPos())
+            && blockEntity.getExhaustPhase() != NozzleExhaustBlockEntity.ExhaustPhase.IDLE;
+        if (active) {
+            NozzleSoundController.tick(blockEntity.getBlockPos());
+        } else {
+            NozzleSoundController.beginShutdown(blockEntity.getBlockPos());
+        }
+        float flameProgress = NozzleSoundController.getFlameProgress(blockEntity.getBlockPos());
+        if (flameProgress <= 0.0F) {
             return;
         }
         AddonVaporizationSources.JetPropellant propellant = NozzleExhaustUtil.getJetPropellant(blockEntity.getLevel(), cauldron);
@@ -73,7 +80,8 @@ public class NozzleExhaustBlockEntityRenderer implements BlockEntityRenderer<Noz
                 outletPos,
                 facing,
                 NozzleExhaustUtil.JET_VISUAL_HEIGHT
-            )
+            ),
+            flameProgress
         );
         poseStack.popPose();
     }

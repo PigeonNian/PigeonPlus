@@ -26,5 +26,6 @@
   "item.anvilcraft_pigeon_plus.mixed_biomass_bucket": "混合生物质桶",
   "itemGroup.anvilcraft_pigeon_plus.addon_items": "铁砧工艺：鸽+",
   "subtitles.anvilcraft_pigeon_plus.engine_fire": "喷管：轰鸣",
-  "subtitles.anvilcraft_pigeon_plus.engine_on": "喷管：点火"
+  "subtitles.anvilcraft_pigeon_plus.engine_on": "喷管：点火",
+  "death.attack.nozzleExhaust": "%1$s坐上了导流槽雅座"
 }

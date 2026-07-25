@@ -2,7 +2,6 @@ package dev.anvilcraft.pigeonplus.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import dev.anvilcraft.pigeonplus.client.sound.NozzleSoundController;
 import dev.anvilcraft.pigeonplus.util.NozzleExhaustUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -32,20 +31,19 @@ public final class NozzleExhaustRenderer {
         BlockPos pos,
         Direction facing,
         Propellant propellant,
-        float visibleLength
+        float visibleLength,
+        float flameProgress
     ) {
-        NozzleSoundController.tick(pos);
-        float startupProgress = NozzleSoundController.getFlameStartupProgress(pos);
-        if (startupProgress <= 0.0F || visibleLength <= 0.0F) {
+        if (flameProgress <= 0.0F || visibleLength <= 0.0F) {
             return;
         }
 
         VertexConsumer buffer = buffers.getBuffer(RenderType.beaconBeam(BEAM_TEXTURE, true));
         PoseStack.Pose pose = poseStack.last();
         RenderProfile profile = profile(propellant);
-        float heightScale = startupProgress * startupProgress * (3.0F - 2.0F * startupProgress);
-        float radiusScale = 0.30F + startupProgress * 0.70F;
-        float alphaScale = 0.20F + startupProgress * 0.80F;
+        float heightScale = flameProgress * flameProgress * (3.0F - 2.0F * flameProgress);
+        float radiusScale = 0.30F + flameProgress * 0.70F;
+        float alphaScale = 0.20F + flameProgress * 0.80F;
 
         renderLayer(
             pose,
@@ -87,7 +85,7 @@ public final class NozzleExhaustRenderer {
             profile.coreStartR, profile.coreStartG, profile.coreStartB,
             profile.coreEndR, profile.coreEndG, profile.coreEndB
         );
-        if (startupProgress >= 0.35F) {
+        if (flameProgress >= 0.35F) {
             renderMachDiamonds(pose, buffer, time, heightScale, visibleLength, radiusScale, alphaScale, facing, profile);
         }
     }

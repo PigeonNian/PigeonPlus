@@ -5,6 +5,7 @@ import dev.anvilcraft.pigeonplus.init.AddonSounds;
 import dev.anvilcraft.pigeonplus.util.NozzleExhaustUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
@@ -20,7 +21,8 @@ public class NozzleSoundInstance extends AbstractTickableSoundInstance {
     public static final long ENGINE_ON_TO_FIRE_LEAD_MILLIS = ENGINE_ON_TO_FIRE_LEAD_TICKS * TICK_MILLIS;
     public static final long ENGINE_FIRE_TO_FIRE_LEAD_MILLIS = ENGINE_FIRE_TO_FIRE_LEAD_TICKS * TICK_MILLIS;
     public static final long ENGINE_FIRE_MILLIS = ENGINE_FIRE_TICKS * TICK_MILLIS;
-    private static final float VOLUME = 5.0F;
+    private static final float STARTUP_VOLUME = 1.0F;
+    private static final float FIRE_VOLUME = 1.0F;
 
     private final BlockPos pos;
     private final boolean startup;
@@ -35,8 +37,9 @@ public class NozzleSoundInstance extends AbstractTickableSoundInstance {
         this.durationNanos = millisToNanos(startup ? ENGINE_ON_MILLIS : ENGINE_FIRE_MILLIS);
         this.looping = false;
         this.delay = 0;
-        this.volume = VOLUME;
+        this.volume = startup ? STARTUP_VOLUME : FIRE_VOLUME;
         this.pitch = 1.0F;
+        this.attenuation = SoundInstance.Attenuation.LINEAR;
         this.relative = false;
         this.x = pos.getX() + 0.5D;
         this.y = pos.getY() + 0.5D;
@@ -50,11 +53,13 @@ public class NozzleSoundInstance extends AbstractTickableSoundInstance {
         if (level == null
             || !(level.getBlockEntity(this.pos) instanceof NozzleExhaustBlockEntity)
             || !NozzleExhaustUtil.isNozzleActive(level, this.pos)) {
+            NozzleSoundController.beginShutdown(this.pos);
             this.stop();
             return;
         }
         BlockPos soundPos = NozzleExhaustUtil.getStructuralOutletPos(level, this.pos);
         if (soundPos == null) {
+            NozzleSoundController.beginShutdown(this.pos);
             this.stop();
             return;
         }
