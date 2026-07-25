@@ -4,6 +4,7 @@ import dev.anvilcraft.lib.v2.registrum.util.entry.BlockEntry;
 import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
 import dev.anvilcraft.pigeonplus.block.AnvilPumpBlock;
 import dev.anvilcraft.pigeonplus.block.BlenderBlock;
+import dev.anvilcraft.pigeonplus.block.FeedSpreaderBlock;
 import dev.anvilcraft.pigeonplus.block.MixedBiomassCauldronBlock;
 import dev.anvilcraft.pigeonplus.block.NozzleBlock;
 import dev.anvilcraft.pigeonplus.block.StasisBeaconBlock;
@@ -101,6 +102,24 @@ public class AddonBlocks {
         .item(BlockItem::new)
             .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
                 ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/anvil_pump_full")))
+            .build()
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+        .register();
+
+    public static final BlockEntry<FeedSpreaderBlock> FEED_SPREADER = REGISTRUM
+        .block("feed_spreader", FeedSpreaderBlock::new)
+        .initialProperties(() -> Blocks.IRON_BLOCK)
+        .properties(properties -> properties.noOcclusion().sound(SoundType.METAL))
+        .blockstate((ctx, provider) -> provider.simpleBlock(
+            ctx.getEntry(),
+            provider.models().getExistingFile(ResourceLocation.fromNamespaceAndPath(
+                AnvilCraftPigeonPlus.MOD_ID,
+                "block/feed_spreader_bottom"
+            ))
+        ))
+        .item(BlockItem::new)
+            .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
+                ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/feed_spreader_full")))
             .build()
         .tag(BlockTags.MINEABLE_WITH_PICKAXE)
         .register();

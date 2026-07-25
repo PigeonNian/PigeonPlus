@@ -22,6 +22,10 @@ public class ModBlockEntities {
         BLOCK_ENTITIES.register("anvil_pump", () ->
             BlockEntityType.Builder.of(AnvilPumpBlockEntity::new, AddonBlocks.ANVIL_PUMP.get()).build(null));
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FeedSpreaderBlockEntity>> FEED_SPREADER =
+        BLOCK_ENTITIES.register("feed_spreader", () ->
+            BlockEntityType.Builder.of(FeedSpreaderBlockEntity::new, AddonBlocks.FEED_SPREADER.get()).build(null));
+
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<StasisBeaconBlockEntity>> STASIS_BEACON =
         BLOCK_ENTITIES.register("stasis_beacon", () ->
             BlockEntityType.Builder.of(StasisBeaconBlockEntity::new, AddonBlocks.STASIS_BEACON.get()).build(null));

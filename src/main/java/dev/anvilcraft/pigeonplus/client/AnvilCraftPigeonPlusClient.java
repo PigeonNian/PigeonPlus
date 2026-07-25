@@ -5,6 +5,7 @@ import dev.anvilcraft.pigeonplus.block.entity.ModBlockEntities;
 import dev.anvilcraft.pigeonplus.client.particle.RollingPlasmaParticle;
 import dev.anvilcraft.pigeonplus.client.renderer.block.AnvilPumpBlockEntityRenderer;
 import dev.anvilcraft.pigeonplus.client.renderer.block.BlenderBlockEntityRenderer;
+import dev.anvilcraft.pigeonplus.client.renderer.block.FeedSpreaderBlockEntityRenderer;
 import dev.anvilcraft.pigeonplus.client.renderer.block.NozzleExhaustBlockEntityRenderer;
 import dev.anvilcraft.pigeonplus.client.renderer.block.StasisBeaconBlockEntityRenderer;
 import dev.anvilcraft.pigeonplus.client.tooltip.StasisBeaconTooltipProvider;
@@ -53,16 +54,23 @@ public class AnvilCraftPigeonPlusClient {
             AnvilCraftPigeonPlus.MOD_ID, "block/large_cauldron_top");
         ResourceLocation largeCauldronBottom = ResourceLocation.fromNamespaceAndPath(
             AnvilCraftPigeonPlus.MOD_ID, "block/large_cauldron_bottom");
+        ResourceLocation feedSpreaderBucket = ResourceLocation.fromNamespaceAndPath(
+            AnvilCraftPigeonPlus.MOD_ID, "block/feed_spreader_bucket");
+        ResourceLocation feedSpreaderPiston = ResourceLocation.fromNamespaceAndPath(
+            AnvilCraftPigeonPlus.MOD_ID, "block/feed_spreader_piston");
         event.register(new ModelResourceLocation(bottom, "standalone"));
         event.register(new ModelResourceLocation(top, "standalone"));
         event.register(new ModelResourceLocation(anvilPumpPiston, "standalone"));
         event.register(new ModelResourceLocation(largeCauldronTop, "standalone"));
         event.register(new ModelResourceLocation(largeCauldronBottom, "standalone"));
+        event.register(new ModelResourceLocation(feedSpreaderBucket, "standalone"));
+        event.register(new ModelResourceLocation(feedSpreaderPiston, "standalone"));
     }
 
     private void onRegisterBER(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(ModBlockEntities.BLENDER.get(), BlenderBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.ANVIL_PUMP.get(), AnvilPumpBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.FEED_SPREADER.get(), FeedSpreaderBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.STASIS_BEACON.get(), StasisBeaconBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.NOZZLE_EXHAUST.get(), NozzleExhaustBlockEntityRenderer::new);
     }

@@ -1,0 +1,48 @@
+{
+	"format_version": "1.21.6",
+	"credit": "Made with Blockbench",
+	"textures": {
+		"3": "anvilcraft_pigeon_plus:block/feed_spreader_base",
+		"particle": "anvilcraft_pigeon_plus:block/feed_spreader_bucket"
+	},
+	"elements": [
+		{
+			"from": [5, 29.1, 5],
+			"to": [11, 31.1, 11],
+			"rotation": {"angle": 0, "axis": "y", "origin": [5, 29.1, 5]},
+			"faces": {
+				"north": {"uv": [13, 15, 16, 16], "texture": "#3"},
+				"east": {"uv": [13, 15, 16, 16], "texture": "#3"},
+				"south": {"uv": [13, 15, 16, 16], "texture": "#3"},
+				"west": {"uv": [13, 15, 16, 16], "texture": "#3"},
+				"up": {"uv": [13, 12, 16, 15], "texture": "#3"},
+				"down": {"uv": [13, 12, 16, 15], "texture": "#3"}
+			}
+		},
+		{
+			"name": "stick",
+			"from": [6, 15.1, 6],
+			"to": [10, 29.1, 10],
+			"rotation": {"angle": 0, "axis": "y", "origin": [6, 15.1, 6]},
+			"faces": {
+				"north": {"uv": [8, 9, 10, 16], "texture": "#3"},
+				"east": {"uv": [8, 9, 10, 16], "texture": "#3"},
+				"south": {"uv": [8, 9, 10, 16], "texture": "#3"},
+				"west": {"uv": [8, 9, 10, 16], "texture": "#3"},
+				"up": {"uv": [10, 8, 12, 10], "texture": "#3"},
+				"down": {"uv": [10, 8, 12, 10], "texture": "#3"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "bucket",
+			"origin": [2, 9, 2],
+			"scope": 0,
+			"color": 0,
+			"children": []
+		},
+		0,
+		1
+	]
+}

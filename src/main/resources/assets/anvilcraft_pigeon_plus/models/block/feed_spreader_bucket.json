@@ -1,0 +1,47 @@
+{
+	"format_version": "1.21.6",
+	"credit": "Made with Blockbench",
+	"textures": {
+		"1": "anvilcraft_pigeon_plus:block/feed_spreader_bucket",
+		"particle": "anvilcraft_pigeon_plus:block/feed_spreader_bucket"
+	},
+	"elements": [
+		{
+			"name": "bucket-up",
+			"from": [2, 9, 2],
+			"to": [14, 15, 14],
+			"rotation": {"angle": 0, "axis": "y", "origin": [1, 9, 1]},
+			"faces": {
+				"north": {"uv": [10, 6, 16, 9], "texture": "#1"},
+				"east": {"uv": [10, 6, 16, 9], "texture": "#1"},
+				"south": {"uv": [10, 6, 16, 9], "texture": "#1"},
+				"west": {"uv": [10, 6, 16, 9], "texture": "#1"},
+				"up": {"uv": [10, 0, 16, 6], "texture": "#1"},
+				"down": {"uv": [10, 10, 16, 16], "rotation": 90, "texture": "#1"}
+			}
+		},
+		{
+			"name": "bucket-down",
+			"from": [3, 4, 3],
+			"to": [13, 9, 13],
+			"rotation": {"angle": 0, "axis": "y", "origin": [3, 4, 3]},
+			"faces": {
+				"north": {"uv": [0, 7, 5, 9.5], "texture": "#1"},
+				"east": {"uv": [0, 7, 5, 9.5], "texture": "#1"},
+				"south": {"uv": [0, 7, 5, 9.5], "texture": "#1"},
+				"west": {"uv": [0, 7, 5, 9.5], "texture": "#1"},
+				"up": {"uv": [0, 0, 5, 5], "texture": "#1"},
+				"down": {"uv": [0, 9.5, 5, 14.5], "texture": "#1"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "bucket",
+			"origin": [2, 9, 2],
+			"scope": 0,
+			"color": 0,
+			"children": [0, 1]
+		}
+	]
+}
