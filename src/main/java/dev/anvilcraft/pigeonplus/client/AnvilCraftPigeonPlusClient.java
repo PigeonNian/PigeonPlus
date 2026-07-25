@@ -49,9 +49,15 @@ public class AnvilCraftPigeonPlusClient {
             AnvilCraftPigeonPlus.MOD_ID, "block/blender_top");
         ResourceLocation anvilPumpPiston = ResourceLocation.fromNamespaceAndPath(
             AnvilCraftPigeonPlus.MOD_ID, "block/anvil_pump_pistion");
+        ResourceLocation largeCauldronTop = ResourceLocation.fromNamespaceAndPath(
+            AnvilCraftPigeonPlus.MOD_ID, "block/large_cauldron_top");
+        ResourceLocation largeCauldronBottom = ResourceLocation.fromNamespaceAndPath(
+            AnvilCraftPigeonPlus.MOD_ID, "block/large_cauldron_bottom");
         event.register(new ModelResourceLocation(bottom, "standalone"));
         event.register(new ModelResourceLocation(top, "standalone"));
         event.register(new ModelResourceLocation(anvilPumpPiston, "standalone"));
+        event.register(new ModelResourceLocation(largeCauldronTop, "standalone"));
+        event.register(new ModelResourceLocation(largeCauldronBottom, "standalone"));
     }
 
     private void onRegisterBER(EntityRenderersEvent.RegisterRenderers event) {

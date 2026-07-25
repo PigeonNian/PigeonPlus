@@ -183,9 +183,9 @@ public class NozzleBlock extends FlexibleMultiPartBlock<DirectionCube3x3PartHalf
         };
         float yRotation = switch (facing) {
             case UP, DOWN, NORTH -> 0.0F;
-            case EAST -> 90.0F;
+            case EAST -> 270.0F;
             case SOUTH -> 180.0F;
-            case WEST -> 270.0F;
+            case WEST -> 90.0F;
         };
         AABB[] rotated = new AABB[UP_GLOBAL_SHAPE_PARTS.length];
         for (int i = 0; i < UP_GLOBAL_SHAPE_PARTS.length; i++) {

@@ -1,0 +1,33 @@
+{
+	"format_version": "1.9.0",
+	"credit": "Made by XeKr with Blockbench",
+	"parent": "anvilcraft:block/template_large_block",
+	"render_type": "minecraft:cutout",
+	"texture_size": [64, 64],
+	"textures": {
+		"4": "anvilcraft:block/giant_anvil_side",
+		"bottom": "anvilcraft:block/large_cauldron_bottom"
+	},
+	"elements": [
+		{
+			"from": [-5, -16, -5],
+			"to": [21, -12, 21],
+			"rotation": {"angle": 0, "axis": "y", "origin": [-5, -16, -5]},
+			"faces": {
+				"north": {"uv": [2.75, 10.25, 9.25, 11.25], "texture": "#4"},
+				"east": {"uv": [2.75, 10.25, 9.25, 11.25], "texture": "#4"},
+				"south": {"uv": [2.75, 10.25, 9.25, 11.25], "texture": "#4"},
+				"west": {"uv": [2.75, 10.25, 9.25, 11.25], "texture": "#4"}
+			}
+		},
+		{
+			"from": [-12, 28, -12],
+			"to": [28, 32, 28],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 12, 8]},
+			"faces": {
+				"up": {"uv": [1, 11, 11, 1], "texture": "#bottom"},
+				"down": {"uv": [1, 11, 11, 1], "texture": "#bottom"}
+			}
+		}
+	]
+}

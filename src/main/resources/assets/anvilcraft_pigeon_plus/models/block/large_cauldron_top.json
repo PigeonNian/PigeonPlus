@@ -1,0 +1,22 @@
+{
+	"format_version": "1.9.0",
+	"credit": "Made by XeKr with Blockbench",
+	"parent": "anvilcraft:block/template_large_block",
+	"render_type": "minecraft:cutout",
+	"texture_size": [64, 64],
+	"textures": {
+		"bottom": "anvilcraft:block/large_cauldron_bottom",
+		"particle": "anvilcraft:block/polished_heavy_iron_block"
+	},
+	"elements": [
+		{
+			"from": [-12, 28, -12],
+			"to": [28, 32, 28],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 12, 8]},
+			"faces": {
+				"up": {"uv": [1, 11, 11, 1], "texture": "#bottom"},
+				"down": {"uv": [1, 11, 11, 1], "texture": "#bottom"}
+			}
+		}
+	]
+}
