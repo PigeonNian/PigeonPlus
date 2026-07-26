@@ -2,6 +2,7 @@ package dev.anvilcraft.pigeonplus.event;
 
 import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
 import dev.anvilcraft.pigeonplus.block.entity.AnvilPumpBlockEntity;
+import dev.anvilcraft.pigeonplus.block.entity.FeedSpreaderBlockEntity;
 import dev.dubhe.anvilcraft.api.event.AnvilEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -19,6 +20,9 @@ public class AnvilPumpEventListener {
         BlockPos pumpPos = event.getPos().below();
         if (level.getBlockEntity(pumpPos) instanceof AnvilPumpBlockEntity pump) {
             pump.activate(event.getFallDistance());
+        }
+        if (level.getBlockEntity(pumpPos) instanceof FeedSpreaderBlockEntity feedSpreader) {
+            feedSpreader.activate(event.getFallDistance());
         }
     }
 }

@@ -44,5 +44,10 @@ public class ModBlockEntities {
             BLENDER.get(),
             BlenderBlockEntity::getFluidHandler
         );
+        event.registerBlockEntity(
+            Capabilities.ItemHandler.BLOCK,
+            FEED_SPREADER.get(),
+            (blockEntity, side) -> blockEntity.getInventory()
+        );
     }
 }
