@@ -94,9 +94,7 @@ public class FeedSpreaderBlock extends BaseEntityBlock {
         if (!level.isClientSide()) {
             ItemStack insertedRemainder = feedSpreader.insertFeed(stack.copy(), false);
             int inserted = stack.getCount() - insertedRemainder.getCount();
-            if (!player.getAbilities().instabuild) {
-                stack.shrink(inserted);
-            }
+            stack.shrink(inserted);
             level.sendBlockUpdated(pos, state, state, Block.UPDATE_CLIENTS);
         }
         return ItemInteractionResult.sidedSuccess(level.isClientSide());
