@@ -1,7 +1,5 @@
 package dev.anvilcraft.pigeonplus.data.lang;
 
-import dev.anvilcraft.pigeonplus.AddonConfig;
-import dev.anvilcraft.lib.v2.config.ConfigData;
 import dev.anvilcraft.lib.v2.registrum.providers.RegistrumLangProvider;
 
 public class AddonLangHandler {
@@ -12,7 +10,6 @@ public class AddonLangHandler {
      * @param provider 提供器
      */
     public static void init(RegistrumLangProvider provider) {
-        ConfigData.readConfigClass(provider, AddonConfig.class);
         provider.add("block.anvilcraft_pigeon_plus.gaseous_biogas", "Gaseous Biogas");
         provider.add("block.anvilcraft_pigeon_plus.liquefied_biogas", "Liquefied Biogas");
         provider.add("block.anvilcraft_pigeon_plus.compressed_air", "Compressed Air");
