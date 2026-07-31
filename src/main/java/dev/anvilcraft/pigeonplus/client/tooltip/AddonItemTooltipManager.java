@@ -33,7 +33,12 @@ public final class AddonItemTooltipManager {
         );
         normal(AddonBlocks.FEED_SPREADER.asItem(), "Spreads feed or bone meal when pressed by an anvil");
         normal(AddonBlocks.BLENDER.asItem(), "Blends fluid ingredients under a cauldron");
-        normal(AddonItems.GASEOUS_BIOGAS_BUCKET.asItem(), "Gas, can be liquefied by continued pumping");
+        normal(
+            AddonItems.GASEOUS_BIOGAS_BUCKET.asItem(),
+            """
+                Gas, can be liquefied by continued pumping
+                """
+        );
         normal(AddonItems.LIQUEFIED_BIOGAS_BUCKET.asItem(), "Liquid methane-rich fuel for nozzle exhaust");
         normal(
             AddonItems.COMPRESSED_AIR_BUCKET.asItem(),
