@@ -23,5 +23,19 @@
   "item.anvilcraft_pigeon_plus.mixed_biomass_bucket": "Mixed Biomass Bucket",
   "itemGroup.anvilcraft_pigeon_plus.addon_items": "AnvilCraft: Pigeon+",
   "subtitles.anvilcraft_pigeon_plus.engine_fire": "Nozzle engine roars",
-  "subtitles.anvilcraft_pigeon_plus.engine_on": "Nozzle engine starts"
+  "subtitles.anvilcraft_pigeon_plus.engine_on": "Nozzle engine starts",
+  "tooltip.anvilcraft_pigeon_plus.item.anvil_pump": "Pumps fluids and gases with anvil-driven pressure\nThe flow rate and head are determined by the falling height of the anvil",
+  "tooltip.anvilcraft_pigeon_plus.item.blender": "Blends fluid ingredients under a cauldron",
+  "tooltip.anvilcraft_pigeon_plus.item.compressed_air_bucket": "Compressed gas, can be liquefied into liquid oxygen\nCan be obtained by pumping from the drain port exposed to air",
+  "tooltip.anvilcraft_pigeon_plus.item.feed_spreader": "Spreads feed or bone meal when pressed by an anvil",
+  "tooltip.anvilcraft_pigeon_plus.item.feed_spreader.shift": "Anvil height controls the square working range, up to 9x9\nWhen ripening crops, each crop has a 30% chance to consume bone meal",
+  "tooltip.anvilcraft_pigeon_plus.item.gaseous_biogas_bucket": "Gas, can be liquefied by continued pumping",
+  "tooltip.anvilcraft_pigeon_plus.item.liquefied_biogas_bucket": "Liquid methane-rich fuel for nozzle exhaust",
+  "tooltip.anvilcraft_pigeon_plus.item.liquid_oxygen_bucket": "Oxidizer for nozzle propellant reactions",
+  "tooltip.anvilcraft_pigeon_plus.item.mixed_biomass_bucket": "Very fresh, very delicious\nCan be converted into gaseous biogas in a heated cauldron",
+  "tooltip.anvilcraft_pigeon_plus.item.nozzle": "Forms a directional nozzle exhaust from propellant in a large cauldron",
+  "tooltip.anvilcraft_pigeon_plus.item.nozzle.shift": "Requires a matching large cauldron propellant reaction\nRedstone signal disables the exhaust\nThe center exhaust can heat blocks, damage entities, and apply momentum",
+  "tooltip.anvilcraft_pigeon_plus.item.stasis_beacon": "Freezes one non-player entity or falling block inside its beam",
+  "tooltip.anvilcraft_pigeon_plus.item.stasis_beacon.shift": "Requires a Frost Metal Block beacon base\nStores incoming damage and momentum while time is stopped\nReleases after 30 seconds or 5 hearts of accumulated damage",
+  "tooltip.anvilcraft_pigeon_plus.press_key": "Hold %s for details"
 }

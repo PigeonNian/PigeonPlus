@@ -2,6 +2,7 @@ package dev.anvilcraft.pigeonplus.mixin;
 
 import dev.anvilcraft.pigeonplus.fluid.GasFluid;
 import dev.anvilcraft.pigeonplus.init.AddonFluids;
+import dev.anvilcraft.pigeonplus.util.CompressedAirDrainFluidHandler;
 import dev.anvilcraft.pigeonplus.util.GasLiquefactionTracker;
 import dev.dubhe.anvilcraft.api.fluid.network.FluidEndpoint;
 import dev.dubhe.anvilcraft.api.fluid.network.FluidPipeNetwork;
@@ -196,6 +197,11 @@ public abstract class FluidPipeNetworkMixin {
         int targetAmount = pigeonplus$gasAmount(target, gas);
         long numerator = (long) sourceAmount * targetCapacity - (long) targetAmount * sourceCapacity;
         int pumpPressureDiff = pigeonplus$pumpPressureDiff(source, target);
+        if (source.handler() instanceof CompressedAirDrainFluidHandler
+            && gas.isSame(AddonFluids.COMPRESSED_AIR.get())
+            && pumpPressureDiff <= 0) {
+            return 0;
+        }
         if (pumpPressureDiff > 0) {
             numerator += (long) sourceCapacity * targetCapacity * pumpPressureDiff / FluidPipeNetwork.FULL_SPEED_HEIGHT;
         }

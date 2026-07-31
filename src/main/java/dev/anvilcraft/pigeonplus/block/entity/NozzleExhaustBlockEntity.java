@@ -8,10 +8,14 @@ import dev.anvilcraft.pigeonplus.init.AddonVaporizationSources;
 import dev.anvilcraft.pigeonplus.util.NozzleExhaustUtil;
 import dev.anvilcraft.pigeonplus.util.StasisTimeFreezeManager;
 import dev.dubhe.anvilcraft.api.chargecollector.ChargeCollectorManager;
+import dev.dubhe.anvilcraft.api.heat.HeatRecorder;
+import dev.dubhe.anvilcraft.api.heat.HeatTier;
 import dev.dubhe.anvilcraft.api.heat.HeaterManager;
+import dev.dubhe.anvilcraft.block.entity.heatable.HeatableBlockEntity;
 import dev.dubhe.anvilcraft.block.entity.ChargeCollectorBlockEntity;
 import dev.dubhe.anvilcraft.block.entity.LargeCauldronBlockEntity;
 import dev.dubhe.anvilcraft.init.ModParticles;
+import dev.dubhe.anvilcraft.init.block.ModBlockTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -26,11 +30,13 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 
 public class NozzleExhaustBlockEntity extends BlockEntity {
@@ -38,6 +44,8 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
     public static final int VISUAL_PARTICLE_DELAY_TICKS = 10;
     private static final double KEROSENE_ACCELERATION_PER_TICK = 320.0 / StasisTimeFreezeManager.MAX_FREEZE_TICKS;
     private static final double METHANE_ACCELERATION_PER_TICK = 192.0 / StasisTimeFreezeManager.MAX_FREEZE_TICKS;
+    private static final int CENTER_HEAT_INTERVAL_TICKS = 10;
+    private static final int CENTER_HEAT_DURATION_TICKS = 20 * 20;
     private static final String EXHAUST_TICKS_TAG = "ExhaustTicks";
 
     private int duration;
@@ -179,7 +187,7 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
     }
 
     private void igniteObstructingBlock(ServerLevel level, BlockPos startPos, Direction facing) {
-        if (level.getGameTime() % 10 != 0) {
+        if (level.getGameTime() % CENTER_HEAT_INTERVAL_TICKS != 0) {
             return;
         }
         BlockPos obstructionPos = NozzleExhaustUtil.getJetRenderObstructionPos(
@@ -192,6 +200,9 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
             return;
         }
         BlockState obstructionState = level.getBlockState(obstructionPos);
+        if (this.heatObstructingBlockToIncandescent(level, obstructionPos, obstructionState)) {
+            return;
+        }
         if (!obstructionState.isFlammable(level, obstructionPos, facing.getOpposite())) {
             return;
         }
@@ -200,6 +211,35 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
             return;
         }
         level.setBlockAndUpdate(firePos, BaseFireBlock.getState(level, firePos));
+    }
+
+    private boolean heatObstructingBlockToIncandescent(ServerLevel level, BlockPos pos, BlockState state) {
+        if (!state.is(ModBlockTags.HEATABLE_BLOCKS)) {
+            return false;
+        }
+        Optional<HeatTier> currentTier = HeatRecorder.getTier(level, pos, state);
+        if (currentTier.isPresent() && currentTier.get().compareTo(HeatTier.INCANDESCENT) >= 0) {
+            if (level.getBlockEntity(pos) instanceof HeatableBlockEntity heatable) {
+                heatable.addDurationInTick(CENTER_HEAT_DURATION_TICKS);
+            }
+            return true;
+        }
+        Optional<Block> incandescentBlock = HeatRecorder.getId(level, pos, state)
+            .flatMap(id -> HeatRecorder.getHeatableBlock(id, HeatTier.INCANDESCENT));
+        if (incandescentBlock.isEmpty()) {
+            return false;
+        }
+        Block block = incandescentBlock.get();
+        BlockState incandescentState = block.defaultBlockState();
+        level.setBlock(pos, incandescentState, Block.UPDATE_CLIENTS);
+        if (block instanceof EntityBlock entityBlock) {
+            BlockEntity blockEntity = entityBlock.newBlockEntity(pos, incandescentState);
+            if (blockEntity instanceof HeatableBlockEntity heatable) {
+                level.setBlockEntity(heatable);
+                heatable.addDurationInTick(CENTER_HEAT_DURATION_TICKS);
+            }
+        }
+        return true;
     }
 
     private void accelerateEntities(

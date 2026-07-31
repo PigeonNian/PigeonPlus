@@ -1,6 +1,10 @@
 package dev.anvilcraft.pigeonplus.data.lang;
 
 import dev.anvilcraft.lib.v2.registrum.providers.RegistrumLangProvider;
+import dev.anvilcraft.pigeonplus.client.tooltip.AddonItemTooltipManager;
+import net.minecraft.world.item.Item;
+
+import java.util.Map;
 
 public class AddonLangHandler {
 
@@ -23,5 +27,12 @@ public class AddonLangHandler {
         provider.add("gui.anvilcraft_pigeon_plus.gas_liquefaction.fill_then", "After Full");
         provider.add("gui.anvilcraft_pigeon_plus.gas_liquefaction.keep_pumping", "Keep Pumping");
         provider.add("gui.anvilcraft_pigeon_plus.gas_liquefaction.liquefy", "Liquefy");
+        provider.add("tooltip.anvilcraft_pigeon_plus.press_key", AddonItemTooltipManager.PRESS_KEY);
+        for (Map.Entry<Item, String> entry : AddonItemTooltipManager.getNormalMap().entrySet()) {
+            provider.add(AddonItemTooltipManager.getTranslationKey(entry.getKey()), entry.getValue());
+        }
+        for (Map.Entry<Item, String> entry : AddonItemTooltipManager.getShiftMap().entrySet()) {
+            provider.add(AddonItemTooltipManager.getShiftTranslationKey(entry.getKey()), entry.getValue());
+        }
     }
 }

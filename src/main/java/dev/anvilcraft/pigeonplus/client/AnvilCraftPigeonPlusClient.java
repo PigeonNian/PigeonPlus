@@ -8,6 +8,7 @@ import dev.anvilcraft.pigeonplus.client.renderer.block.BlenderBlockEntityRendere
 import dev.anvilcraft.pigeonplus.client.renderer.block.FeedSpreaderBlockEntityRenderer;
 import dev.anvilcraft.pigeonplus.client.renderer.block.NozzleExhaustBlockEntityRenderer;
 import dev.anvilcraft.pigeonplus.client.renderer.block.StasisBeaconBlockEntityRenderer;
+import dev.anvilcraft.pigeonplus.client.tooltip.AddonItemTooltipManager;
 import dev.anvilcraft.pigeonplus.client.tooltip.StasisBeaconTooltipProvider;
 import dev.anvilcraft.pigeonplus.init.AddonBlocks;
 import dev.anvilcraft.pigeonplus.init.AddonFluids;
@@ -29,6 +30,8 @@ import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.model.DynamicFluidContainerModel;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import dev.dubhe.anvilcraft.api.tooltip.HudTooltipManager;
 
 @Mod(value = AnvilCraftPigeonPlus.MOD_ID, dist = Dist.CLIENT)
@@ -41,6 +44,11 @@ public class AnvilCraftPigeonPlusClient {
         modBus.addListener(this::onRegisterBlockColors);
         modBus.addListener(this::onRegisterItemColors);
         modBus.addListener(this::onRegisterParticleProviders);
+        NeoForge.EVENT_BUS.addListener(this::onItemTooltip);
+    }
+
+    private void onItemTooltip(ItemTooltipEvent event) {
+        AddonItemTooltipManager.addTooltip(event.getItemStack(), event.getToolTip());
     }
 
     private void onRegisterAdditionalModels(ModelEvent.RegisterAdditional event) {
