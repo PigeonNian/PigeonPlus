@@ -18,5 +18,10 @@ public class AddonLangHandler {
         provider.add("subtitles.anvilcraft_pigeon_plus.engine_on", "Nozzle engine starts");
         provider.add("subtitles.anvilcraft_pigeon_plus.engine_fire", "Nozzle engine roars");
         provider.add("death.attack.nozzleExhaust", "%1$s sat in the duct seat");
+        provider.add("gui.anvilcraft_pigeon_plus.category.blending", "Blending");
+        provider.add("gui.anvilcraft_pigeon_plus.category.gas_liquefaction", "Gas Liquefaction");
+        provider.add("gui.anvilcraft_pigeon_plus.gas_liquefaction.fill_then", "After Full");
+        provider.add("gui.anvilcraft_pigeon_plus.gas_liquefaction.keep_pumping", "Keep Pumping");
+        provider.add("gui.anvilcraft_pigeon_plus.gas_liquefaction.liquefy", "Liquefy");
     }
 }

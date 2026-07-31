@@ -29,20 +29,6 @@ public class AddonBlocks {
         REGISTRUM.defaultCreativeTab(AddonItemGroups.ADDON_ITEMS.getKey());
     }
 
-    public static final BlockEntry<BlenderBlock> BLENDER = REGISTRUM
-        .block("blender", BlenderBlock::new)
-        .blockstate((ctx, prov) -> prov.getVariantBuilder(ctx.getEntry()).forAllStates(state ->
-            ConfiguredModel.builder()
-                .modelFile(prov.models().getExistingFile(
-                    ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/blender_bottom")))
-                .rotationY(rotationY(state.getValue(BlenderBlock.FACING)))
-                .build()))
-        .item(BlockItem::new)
-            .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
-                ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/blender")))
-        .build()
-        .register();
-
     public static final BlockEntry<NozzleBlock> NOZZLE = REGISTRUM
         .block("nozzle", NozzleBlock::new)
         .initialProperties(() -> Blocks.IRON_BLOCK)
@@ -68,6 +54,20 @@ public class AddonBlocks {
                 ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/nozzle")))
             .build()
         .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+        .register();
+
+    public static final BlockEntry<BlenderBlock> BLENDER = REGISTRUM
+        .block("blender", BlenderBlock::new)
+        .blockstate((ctx, prov) -> prov.getVariantBuilder(ctx.getEntry()).forAllStates(state ->
+            ConfiguredModel.builder()
+                .modelFile(prov.models().getExistingFile(
+                    ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/blender_bottom")))
+                .rotationY(rotationY(state.getValue(BlenderBlock.FACING)))
+                .build()))
+        .item(BlockItem::new)
+        .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
+            ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/blender")))
+        .build()
         .register();
 
     public static final BlockEntry<StasisBeaconBlock> STASIS_BEACON = REGISTRUM

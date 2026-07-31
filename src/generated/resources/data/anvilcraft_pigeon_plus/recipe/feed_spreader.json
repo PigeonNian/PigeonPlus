@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "minecraft:piston"
+    },
+    "B": {
+      "item": "minecraft:bucket"
+    },
+    "C": {
+      "item": "anvilcraft:polished_heavy_iron_slab"
+    }
+  },
+  "pattern": [
+    " A ",
+    " B ",
+    "CCC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "anvilcraft_pigeon_plus:feed_spreader"
+  }
+}

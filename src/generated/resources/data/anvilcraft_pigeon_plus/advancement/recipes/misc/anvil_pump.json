@@ -1,0 +1,54 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_anvil": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:anvil"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_pipe": {
+      "conditions": {
+        "items": [
+          {
+            "items": "anvilcraft:pipe"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_piston": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:piston"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "anvilcraft_pigeon_plus:anvil_pump"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_piston",
+      "has_anvil",
+      "has_pipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "anvilcraft_pigeon_plus:anvil_pump"
+    ]
+  }
+}

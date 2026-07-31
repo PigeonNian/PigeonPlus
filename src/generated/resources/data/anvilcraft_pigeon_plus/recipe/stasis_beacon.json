@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "anvilcraft:frost_metal_ingot"
+    },
+    "B": {
+      "item": "minecraft:emerald_block"
+    },
+    "C": {
+      "item": "anvilcraft:corrupted_beacon"
+    }
+  },
+  "pattern": [
+    "AAA",
+    "ACA",
+    "ABA"
+  ],
+  "result": {
+    "count": 1,
+    "id": "anvilcraft_pigeon_plus:stasis_beacon"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "anvilcraft:fluid_mixing",
+  "consume_maximum": true,
+  "fluid_results": [
+    {
+      "amount": 2000,
+      "id": "anvilcraft_pigeon_plus:gaseous_biogas"
+    }
+  ],
+  "ingredients": [
+    {
+      "amount": 1000,
+      "fluid": "anvilcraft_pigeon_plus:mixed_biomass"
+    }
+  ]
+}

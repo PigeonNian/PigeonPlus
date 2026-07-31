@@ -6,6 +6,7 @@
   "mixins": [
     "FallingBlockEntityMixin",
     "FishTankBlockEntityMixin",
+    "FluidMixingRecipeSerializerMixin",
     "LargeCauldronBlockMixin",
     "FluidNetworkScannerMixin",
     "FluidPipeNetworkMixin",
@@ -15,6 +16,7 @@
   "client": [
     "client.EntityClientMixin",
     "client.FishTankBlockEntityRendererMixin",
+    "client.FluidMixingCategoryMixin",
     "client.FluidRenderHelperMixin",
     "client.FluidTankRenderUtilMixin",
     "client.LargeCauldronBlockEntityRendererMixin",
