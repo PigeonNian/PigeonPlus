@@ -37,5 +37,5 @@
   "tooltip.anvilcraft_pigeon_plus.item.nozzle.shift": "需要匹配的大型炼药锅推进剂反应\n红石信号会关闭燃气\n中心燃气可以加热方块、伤害实体并施加动量",
   "tooltip.anvilcraft_pigeon_plus.item.stasis_beacon": "冻结光柱内的一个非玩家实体或下落方块",
   "tooltip.anvilcraft_pigeon_plus.item.stasis_beacon.shift": "需要浮霜金属块信标底座\n时停期间储存受到的伤害和动量\n达到 30 秒或累计 5 颗心伤害后解除",
-  "tooltip.anvilcraft_pigeon_plus.press_key": "按住 %s 查看更多信息"
+  "tooltip.anvilcraft_pigeon_plus.press_key": "按住 %s 以查看更多信息"
 }
