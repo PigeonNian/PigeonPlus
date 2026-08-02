@@ -10,18 +10,26 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public final class NozzleSoundController {
     private static final Map<BlockPos, SoundState> SOUND_STATES = new HashMap<>();
     private static final Map<BlockPos, ShutdownState> SHUTDOWN_STATES = new HashMap<>();
+    private static final Set<BlockPos> ACTIVE_HINTS = new HashSet<>();
     private static final long NANOS_PER_MILLI = 1_000_000L;
+    private static final int DISCOVERY_INTERVAL_TICKS = 10;
+    private static final int DISCOVERY_RADIUS = 96;
     private static final float CONTINUOUS_SHAKE_RADIUS = 12.0F;
     public static final int FLAME_DELAY_TICKS = 10;
     public static final int FLAME_GROWTH_TICKS = 8;
@@ -123,6 +131,39 @@ public final class NozzleSoundController {
     private NozzleSoundController() {
     }
 
+    public static void registerActive(BlockPos pos) {
+        ACTIVE_HINTS.add(pos.immutable());
+    }
+
+    public static void clientTick() {
+        Minecraft minecraft = Minecraft.getInstance();
+        ClientLevel level = minecraft.level;
+        if (level == null) {
+            cleanup();
+            return;
+        }
+        if (minecraft.isPaused()) {
+            return;
+        }
+        refreshObservedLevel(level);
+
+        Set<BlockPos> activePositions = new HashSet<>(ACTIVE_HINTS);
+        ACTIVE_HINTS.clear();
+        if (minecraft.player != null && level.getGameTime() % DISCOVERY_INTERVAL_TICKS == 0) {
+            discoverLoadedExhausts(level, minecraft.player.blockPosition(), activePositions);
+        }
+
+        for (BlockPos pos : activePositions) {
+            tick(pos);
+        }
+        for (BlockPos pos : new ArrayList<>(SOUND_STATES.keySet())) {
+            if (!activePositions.contains(pos)) {
+                tick(pos);
+            }
+        }
+        cleanup();
+    }
+
     public static void tick(BlockPos pos) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.isPaused() || minecraft.level == null) {
@@ -196,6 +237,35 @@ public final class NozzleSoundController {
         SOUND_STATES.put(pos, state);
     }
 
+    private static void discoverLoadedExhausts(ClientLevel level, BlockPos center, Set<BlockPos> activePositions) {
+        int chunkRadius = (DISCOVERY_RADIUS + 15) >> 4;
+        int centerChunkX = center.getX() >> 4;
+        int centerChunkZ = center.getZ() >> 4;
+        double maxDistanceSqr = DISCOVERY_RADIUS * DISCOVERY_RADIUS;
+        for (int chunkX = centerChunkX - chunkRadius; chunkX <= centerChunkX + chunkRadius; chunkX++) {
+            for (int chunkZ = centerChunkZ - chunkRadius; chunkZ <= centerChunkZ + chunkRadius; chunkZ++) {
+                if (!level.hasChunk(chunkX, chunkZ)) {
+                    continue;
+                }
+                if (!(level.getChunkSource().getChunk(chunkX, chunkZ, ChunkStatus.FULL, false) instanceof LevelChunk chunk)) {
+                    continue;
+                }
+                for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
+                    if (!(blockEntity instanceof NozzleExhaustBlockEntity nozzleExhaust)) {
+                        continue;
+                    }
+                    BlockPos pos = nozzleExhaust.getBlockPos();
+                    if (pos.distSqr(center) > maxDistanceSqr
+                        || nozzleExhaust.getExhaustPhase() == NozzleExhaustBlockEntity.ExhaustPhase.IDLE
+                        || !NozzleExhaustUtil.isNozzleActive(level, pos)) {
+                        continue;
+                    }
+                    activePositions.add(pos.immutable());
+                }
+            }
+        }
+    }
+
     private static SoundState createFiringState(Minecraft minecraft, BlockPos pos, long now) {
         NozzleSoundInstance fireSound = new NozzleSoundInstance(pos, false);
         minecraft.getSoundManager().play(fireSound);
@@ -246,7 +316,8 @@ public final class NozzleSoundController {
             SoundState state = entry.getValue();
             state.playingSounds().removeIf(NozzleSoundInstance::isStopped);
 
-            boolean active = level.getBlockEntity(pos) instanceof NozzleExhaustBlockEntity
+            boolean active = level.isLoaded(pos)
+                && level.getBlockEntity(pos) instanceof NozzleExhaustBlockEntity
                 && NozzleExhaustUtil.isNozzleActive(level, pos);
             if (active) {
                 continue;

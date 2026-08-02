@@ -51,7 +51,7 @@ public class NozzleExhaustBlockEntityRenderer implements BlockEntityRenderer<Noz
         boolean active = NozzleExhaustUtil.isNozzleActive(blockEntity.getLevel(), blockEntity.getBlockPos())
             && blockEntity.getExhaustPhase() != NozzleExhaustBlockEntity.ExhaustPhase.IDLE;
         if (active) {
-            NozzleSoundController.tick(blockEntity.getBlockPos());
+            NozzleSoundController.registerActive(blockEntity.getBlockPos());
         } else {
             NozzleSoundController.beginShutdown(blockEntity.getBlockPos());
         }

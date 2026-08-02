@@ -8,6 +8,7 @@ import dev.anvilcraft.pigeonplus.client.renderer.block.BlenderBlockEntityRendere
 import dev.anvilcraft.pigeonplus.client.renderer.block.FeedSpreaderBlockEntityRenderer;
 import dev.anvilcraft.pigeonplus.client.renderer.block.NozzleExhaustBlockEntityRenderer;
 import dev.anvilcraft.pigeonplus.client.renderer.block.StasisBeaconBlockEntityRenderer;
+import dev.anvilcraft.pigeonplus.client.sound.NozzleSoundController;
 import dev.anvilcraft.pigeonplus.client.tooltip.AddonItemTooltipManager;
 import dev.anvilcraft.pigeonplus.client.tooltip.StasisBeaconTooltipProvider;
 import dev.anvilcraft.pigeonplus.init.AddonBlocks;
@@ -24,6 +25,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
@@ -45,6 +47,11 @@ public class AnvilCraftPigeonPlusClient {
         modBus.addListener(this::onRegisterItemColors);
         modBus.addListener(this::onRegisterParticleProviders);
         NeoForge.EVENT_BUS.addListener(this::onItemTooltip);
+        NeoForge.EVENT_BUS.addListener(this::onClientTick);
+    }
+
+    private void onClientTick(ClientTickEvent.Post event) {
+        NozzleSoundController.clientTick();
     }
 
     private void onItemTooltip(ItemTooltipEvent event) {

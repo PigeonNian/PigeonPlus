@@ -1,7 +1,5 @@
 <div align="center" style="align-items: center">
 
-<img src=".idea/icon.svg" alt="icon" style="height: 256px; width: 256px">
-
 ## Minecraft模组 by [鸽の念@bilibili](https://space.bilibili.com/23416735)
 
 # 铁砧工艺：鸽+ | [AnvilCraft: Pigeon+](./README_en.md)
