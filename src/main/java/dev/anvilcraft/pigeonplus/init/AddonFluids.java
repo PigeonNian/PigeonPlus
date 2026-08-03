@@ -1,6 +1,7 @@
 package dev.anvilcraft.pigeonplus.init;
 
 import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
+import dev.anvilcraft.pigeonplus.block.EvaporatingLiquidBlock;
 import dev.anvilcraft.pigeonplus.block.MixedBiomassBlock;
 import dev.anvilcraft.pigeonplus.fluid.GasFluid;
 import net.minecraft.core.registries.Registries;
@@ -17,6 +18,7 @@ import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import org.joml.Vector3f;
 
 public class AddonFluids {
     public static final DeferredRegister<FluidType> FLUID_TYPES = DeferredRegister.create(
@@ -73,13 +75,15 @@ public class AddonFluids {
 
     public static final DeferredHolder<Block, LiquidBlock> LIQUEFIED_BIOGAS_BLOCK = BLOCKS.register(
         "liquefied_biogas",
-        () -> new LiquidBlock(LIQUEFIED_BIOGAS.get(), BlockBehaviour.Properties.of()
+        () -> new EvaporatingLiquidBlock(LIQUEFIED_BIOGAS.get(), BlockBehaviour.Properties.of()
             .replaceable()
             .noCollission()
             .strength(100.0f)
             .pushReaction(PushReaction.DESTROY)
             .noLootTable()
-            .liquid())
+            .liquid()
+            .randomTicks(),
+            new Vector3f(0.42f, 0.56f, 0.24f))
     );
 
     public static final DeferredHolder<FluidType, FluidType> COMPRESSED_AIR_TYPE = FLUID_TYPES.register(
@@ -155,13 +159,15 @@ public class AddonFluids {
 
     public static final DeferredHolder<Block, LiquidBlock> LIQUID_OXYGEN_BLOCK = BLOCKS.register(
         "liquid_oxygen",
-        () -> new LiquidBlock(LIQUID_OXYGEN.get(), BlockBehaviour.Properties.of()
+        () -> new EvaporatingLiquidBlock(LIQUID_OXYGEN.get(), BlockBehaviour.Properties.of()
             .replaceable()
             .noCollission()
             .strength(100.0f)
             .pushReaction(PushReaction.DESTROY)
             .noLootTable()
-            .liquid())
+            .liquid()
+            .randomTicks(),
+            new Vector3f(0.85f, 0.95f, 1.0f))
     );
 
     private static BaseFlowingFluid.Properties mixedBiomassProperties() {
