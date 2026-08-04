@@ -1,6 +1,7 @@
 package dev.anvilcraft.pigeonplus.data;
 
 import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
+import dev.anvilcraft.pigeonplus.data.advancement.AddonAdvancementHandler;
 import dev.anvilcraft.pigeonplus.data.lang.AddonLangHandler;
 import dev.anvilcraft.pigeonplus.data.provider.AddonSoundDefinitionsProvider;
 import dev.anvilcraft.pigeonplus.data.recipe.AddonRecipeHandler;
@@ -27,5 +28,6 @@ public class AddonDatagen {
     public static void init() {
         REGISTRUM.addDataGenerator(ProviderType.LANG, AddonLangHandler::init);
         REGISTRUM.addDataGenerator(ProviderType.RECIPE, AddonRecipeHandler::init);
+        REGISTRUM.addDataGenerator(ProviderType.ADVANCEMENT, AddonAdvancementHandler::init);
     }
 }

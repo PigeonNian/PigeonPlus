@@ -5,6 +5,7 @@ import dev.anvilcraft.pigeonplus.init.AddonDamageTypes;
 import dev.anvilcraft.pigeonplus.init.AddonHeaterInfos;
 import dev.anvilcraft.pigeonplus.init.AddonParticles;
 import dev.anvilcraft.pigeonplus.init.AddonVaporizationSources;
+import dev.anvilcraft.pigeonplus.init.ModCriterionTriggers;
 import dev.anvilcraft.pigeonplus.util.NozzleExhaustUtil;
 import dev.anvilcraft.pigeonplus.util.StasisTimeFreezeManager;
 import dev.dubhe.anvilcraft.api.chargecollector.ChargeCollectorManager;
@@ -24,6 +25,7 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
@@ -42,6 +44,7 @@ import java.util.Set;
 public class NozzleExhaustBlockEntity extends BlockEntity {
     public static final int STARTUP_TICKS = 28;
     public static final int VISUAL_PARTICLE_DELAY_TICKS = 10;
+    public static final double NOZZLE_ACTIVATION_RADIUS = 8.0;
     private static final double KEROSENE_ACCELERATION_PER_TICK = 320.0 / StasisTimeFreezeManager.MAX_FREEZE_TICKS;
     private static final double METHANE_ACCELERATION_PER_TICK = 192.0 / StasisTimeFreezeManager.MAX_FREEZE_TICKS;
     private static final int CENTER_HEAT_INTERVAL_TICKS = 10;
@@ -96,7 +99,11 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
         this.hurtEntities(level, outletPos, facing);
         this.igniteObstructingBlock(level, outletPos, facing);
         this.provideCharge(level);
+        boolean activating = this.duration == 0;
         this.tickExhaust();
+        if (activating) {
+            this.grantNozzleActivation(level);
+        }
     }
 
     private void clientTick(Level level) {
@@ -143,6 +150,17 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
         }
         this.duration = 0;
         this.syncToClient();
+    }
+
+    private void grantNozzleActivation(ServerLevel level) {
+        Vec3 center = Vec3.atCenterOf(this.worldPosition);
+        double radiusSqr = NOZZLE_ACTIVATION_RADIUS * NOZZLE_ACTIVATION_RADIUS;
+        for (ServerPlayer player : level.players()) {
+            if (player.isSpectator() || player.distanceToSqr(center) > radiusSqr) {
+                continue;
+            }
+            ModCriterionTriggers.NOZZLE_GAS_ACTIVATED.get().trigger(player);
+        }
     }
 
     private void syncToClient() {

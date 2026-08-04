@@ -14,6 +14,13 @@ public class AddonLangHandler {
      * @param provider 提供器
      */
     public static void init(RegistrumLangProvider provider) {
+        provider.add("advancements.anvilcraft_pigeon_plus.root.title", "AnvilCraft: Pigeon Plus");
+        provider.add("advancements.anvilcraft_pigeon_plus.root.description", "Welcome to the Pigeon Plus addon");
+        provider.add("advancements.anvilcraft_pigeon_plus.nozzle_ignition.title", "The test pad is launch pad!");
+        provider.add(
+            "advancements.anvilcraft_pigeon_plus.nozzle_ignition.description",
+            "Activate a nozzle to convert mixed combustion in the large cauldron into a directed gas jet"
+        );
         provider.add("block.anvilcraft_pigeon_plus.gaseous_biogas", "Gaseous Biogas");
         provider.add("block.anvilcraft_pigeon_plus.liquefied_biogas", "Liquefied Biogas");
         provider.add("block.anvilcraft_pigeon_plus.compressed_air", "Compressed Air");

@@ -1,0 +1,26 @@
+{
+  "parent": "anvilcraft_pigeon_plus:root",
+  "criteria": {
+    "activate_nozzle_gas": {
+      "trigger": "anvilcraft_pigeon_plus:nozzle_gas_activated"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.anvilcraft_pigeon_plus.nozzle_ignition.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "anvilcraft_pigeon_plus:nozzle"
+    },
+    "title": {
+      "translate": "advancements.anvilcraft_pigeon_plus.nozzle_ignition.title"
+    }
+  },
+  "requirements": [
+    [
+      "activate_nozzle_gas"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

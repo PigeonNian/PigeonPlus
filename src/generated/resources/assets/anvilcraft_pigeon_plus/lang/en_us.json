@@ -1,4 +1,8 @@
 {
+  "advancements.anvilcraft_pigeon_plus.nozzle_ignition.description": "Activate a nozzle to convert mixed combustion in the large cauldron into a directed gas jet",
+  "advancements.anvilcraft_pigeon_plus.nozzle_ignition.title": "The test stand is the launch pad",
+  "advancements.anvilcraft_pigeon_plus.root.description": "Welcome to the Pigeon Plus addon",
+  "advancements.anvilcraft_pigeon_plus.root.title": "AnvilCraft: Pigeon Plus",
   "block.anvilcraft_pigeon_plus.anvil_pump": "Anvil Pump",
   "block.anvilcraft_pigeon_plus.blender": "Blender",
   "block.anvilcraft_pigeon_plus.compressed_air": "Compressed Air",
@@ -29,7 +33,7 @@
   "tooltip.anvilcraft_pigeon_plus.item.compressed_air_bucket": "Compressed gas, can be liquefied into liquid oxygen\nCan be obtained by pumping from the drain port exposed to air",
   "tooltip.anvilcraft_pigeon_plus.item.feed_spreader": "Spreads feed or bone meal when pressed by an anvil",
   "tooltip.anvilcraft_pigeon_plus.item.feed_spreader.shift": "Anvil height controls the square working range, up to 9x9\nWhen ripening crops, each crop has a 30% chance to consume bone meal",
-  "tooltip.anvilcraft_pigeon_plus.item.gaseous_biogas_bucket": "Gas, can be liquefied by continued pumping",
+  "tooltip.anvilcraft_pigeon_plus.item.gaseous_biogas_bucket": "Gas, can be liquefied by continued pumping\n",
   "tooltip.anvilcraft_pigeon_plus.item.liquefied_biogas_bucket": "Liquid methane-rich fuel for nozzle exhaust",
   "tooltip.anvilcraft_pigeon_plus.item.liquid_oxygen_bucket": "Oxidizer for nozzle propellant reactions",
   "tooltip.anvilcraft_pigeon_plus.item.mixed_biomass_bucket": "Very fresh, very delicious\nCan be converted into gaseous biogas in a heated cauldron",

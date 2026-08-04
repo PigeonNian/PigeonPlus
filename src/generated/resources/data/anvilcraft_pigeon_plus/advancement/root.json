@@ -1,0 +1,27 @@
+{
+  "criteria": {
+    "join": {
+      "trigger": "minecraft:tick"
+    }
+  },
+  "display": {
+    "background": "anvilcraft:textures/gui/misc/background/advancement.png",
+    "description": {
+      "translate": "advancements.anvilcraft_pigeon_plus.root.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "anvilcraft_pigeon_plus:liquefied_biogas_bucket"
+    },
+    "show_toast": false,
+    "title": {
+      "translate": "advancements.anvilcraft_pigeon_plus.root.title"
+    }
+  },
+  "requirements": [
+    [
+      "join"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

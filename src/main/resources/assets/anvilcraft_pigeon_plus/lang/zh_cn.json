@@ -1,4 +1,8 @@
 {
+  "advancements.anvilcraft_pigeon_plus.nozzle_ignition.description": "激活喷管，将大型炼药锅内的混合燃烧转化为定向燃气",
+  "advancements.anvilcraft_pigeon_plus.nozzle_ignition.title": "上试车台就是上发射台！",
+  "advancements.anvilcraft_pigeon_plus.root.description": "欢迎来到鸽+",
+  "advancements.anvilcraft_pigeon_plus.root.title": "铁砧工艺：鸽+",
   "block.anvilcraft_pigeon_plus.anvil_pump": "铁砧泵",
   "block.anvilcraft_pigeon_plus.blender": "搅拌机",
   "block.anvilcraft_pigeon_plus.compressed_air": "压缩空气",

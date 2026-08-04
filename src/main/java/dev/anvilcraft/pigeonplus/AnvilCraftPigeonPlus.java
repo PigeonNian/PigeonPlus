@@ -8,6 +8,7 @@ import dev.anvilcraft.pigeonplus.init.AddonFluids;
 import dev.anvilcraft.pigeonplus.init.AddonInteractionMap;
 import dev.anvilcraft.pigeonplus.init.AddonItemGroups;
 import dev.anvilcraft.pigeonplus.init.AddonItems;
+import dev.anvilcraft.pigeonplus.init.ModCriterionTriggers;
 import dev.anvilcraft.pigeonplus.init.AddonParticles;
 import dev.anvilcraft.pigeonplus.init.AddonVaporizationSources;
 import dev.anvilcraft.pigeonplus.init.AddonRecipeTypes;
@@ -38,6 +39,7 @@ public class AnvilCraftPigeonPlus {
         AddonBlocks.register();
         AddonItems.register();
         AddonDatagen.init();
+        ModCriterionTriggers.register(modEventBus);
         ModBlockEntities.register(modEventBus);
     }
 
