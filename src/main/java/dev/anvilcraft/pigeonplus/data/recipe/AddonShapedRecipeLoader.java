@@ -14,6 +14,7 @@ public class AddonShapedRecipeLoader {
         this.stasisBeacon(provider);
         this.anvilPump(provider);
         this.feedSpreader(provider);
+        this.pigeonAnvil(provider);
     }
 
     private void blender(RegistrumRecipeProvider provider) {
@@ -71,6 +72,20 @@ public class AddonShapedRecipeLoader {
             .unlockedBy("has_piston", RegistrumRecipeProvider.has(Items.PISTON))
             .unlockedBy("has_bucket", RegistrumRecipeProvider.has(Items.BUCKET))
             .unlockedBy("has_polished_heavy_iron_slab", RegistrumRecipeProvider.has(ModBlocks.POLISHED_HEAVY_IRON_SLAB))
+            .save(provider);
+    }
+
+    private void pigeonAnvil(RegistrumRecipeProvider provider) {
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, AddonBlocks.PIGEON_ANVIL)
+            .pattern("FIF")
+            .pattern("IAI")
+            .pattern("FIF")
+            .define('F', Items.FEATHER)
+            .define('I', Items.IRON_INGOT)
+            .define('A', Items.ANVIL)
+            .unlockedBy("has_anvil", RegistrumRecipeProvider.has(Items.ANVIL))
+            .unlockedBy("has_feather", RegistrumRecipeProvider.has(Items.FEATHER))
+            .unlockedBy("has_iron_ingot", RegistrumRecipeProvider.has(Items.IRON_INGOT))
             .save(provider);
     }
 }

@@ -7,6 +7,7 @@ import dev.anvilcraft.pigeonplus.block.BlenderBlock;
 import dev.anvilcraft.pigeonplus.block.FeedSpreaderBlock;
 import dev.anvilcraft.pigeonplus.block.MixedBiomassCauldronBlock;
 import dev.anvilcraft.pigeonplus.block.NozzleBlock;
+import dev.anvilcraft.pigeonplus.block.PigeonAnvilBlock;
 import dev.anvilcraft.pigeonplus.block.StasisBeaconBlock;
 import dev.dubhe.anvilcraft.block.item.FlexibleMultiPartBlockItem;
 import dev.dubhe.anvilcraft.block.multipart.FlexibleMultiPartBlock;
@@ -124,6 +125,25 @@ public class AddonBlocks {
         .tag(BlockTags.MINEABLE_WITH_PICKAXE)
         .register();
 
+    public static final BlockEntry<PigeonAnvilBlock> PIGEON_ANVIL = REGISTRUM
+        .block("pigeon_anvil", PigeonAnvilBlock::new)
+        .initialProperties(() -> Blocks.ANVIL)
+        .properties(properties -> properties.noOcclusion())
+        .blockstate((ctx, provider) -> provider.getVariantBuilder(ctx.getEntry()).forAllStates(state ->
+            ConfiguredModel.builder()
+                .modelFile(provider.models().getExistingFile(ResourceLocation.fromNamespaceAndPath(
+                    AnvilCraftPigeonPlus.MOD_ID,
+                    "block/pigeon_anvil"
+                )))
+                .rotationY(anvilRotationY(state.getValue(PigeonAnvilBlock.FACING)))
+                .build()))
+        .item(BlockItem::new)
+            .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
+                ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/pigeon_anvil")))
+            .build()
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+        .register();
+
     public static final BlockEntry<MixedBiomassCauldronBlock> MIXED_BIOMASS_CAULDRON = REGISTRUM
         .block("mixed_biomass_cauldron", MixedBiomassCauldronBlock::new)
         .initialProperties(() -> Blocks.CAULDRON)
@@ -161,6 +181,15 @@ public class AddonBlocks {
             case NORTH -> 180;
             case EAST -> 270;
             default -> 0;
+        };
+    }
+
+    private static int anvilRotationY(Direction direction) {
+        return switch (direction) {
+            case EAST -> 270;
+            case SOUTH -> 0;
+            case WEST -> 90;
+            default -> 180;
         };
     }
 

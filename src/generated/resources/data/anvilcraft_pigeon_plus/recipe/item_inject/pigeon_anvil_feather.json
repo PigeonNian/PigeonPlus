@@ -1,0 +1,17 @@
+{
+  "type": "anvilcraft:item_inject",
+  "block_ingredient": {
+    "blocks": "anvilcraft_pigeon_plus:pigeon_anvil"
+  },
+  "ingredients": [
+    {
+      "items": "minecraft:white_wool"
+    }
+  ],
+  "results": [
+    {
+      "count": 3,
+      "id": "minecraft:feather"
+    }
+  ]
+}

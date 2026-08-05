@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "anvilcraft_pigeon_plus:block/pigeon_anvil",
+      "y": 270
+    },
+    "facing=north": {
+      "model": "anvilcraft_pigeon_plus:block/pigeon_anvil",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "anvilcraft_pigeon_plus:block/pigeon_anvil"
+    },
+    "facing=west": {
+      "model": "anvilcraft_pigeon_plus:block/pigeon_anvil",
+      "y": 90
+    }
+  }
+}

@@ -1,6 +1,6 @@
 {
   "advancements.anvilcraft_pigeon_plus.nozzle_ignition.description": "ʇǝɾ sɐᵷ pǝʇɔǝɹᴉp ɐ oʇuᴉ uoɹpꞁnɐɔ ǝᵷɹɐꞁ ǝɥʇ uᴉ uoᴉʇsnqɯoɔ pǝxᴉɯ ʇɹǝʌuoɔ oʇ ǝꞁzzou ɐ ǝʇɐʌᴉʇɔⱯ",
-  "advancements.anvilcraft_pigeon_plus.nozzle_ignition.title": "pɐd ɥɔunɐꞁ ǝɥʇ sᴉ puɐʇs ʇsǝʇ ǝɥ⟘",
+  "advancements.anvilcraft_pigeon_plus.nozzle_ignition.title": "¡pɐd ɥɔunɐꞁ sᴉ pɐd ʇsǝʇ ǝɥ⟘",
   "advancements.anvilcraft_pigeon_plus.root.description": "uoppɐ snꞁԀ uoǝᵷᴉԀ ǝɥʇ oʇ ǝɯoɔꞁǝM",
   "advancements.anvilcraft_pigeon_plus.root.title": "snꞁԀ uoǝᵷᴉԀ :ʇɟɐɹƆꞁᴉʌuⱯ",
   "block.anvilcraft_pigeon_plus.anvil_pump": "dɯnԀ ꞁᴉʌuⱯ",
@@ -13,6 +13,7 @@
   "block.anvilcraft_pigeon_plus.mixed_biomass": "ssɐɯoᴉᗺ pǝxᴉW",
   "block.anvilcraft_pigeon_plus.mixed_biomass_cauldron": "uoɹpꞁnɐƆ ssɐɯoᴉᗺ pǝxᴉW",
   "block.anvilcraft_pigeon_plus.nozzle": "ǝꞁzzoN",
+  "block.anvilcraft_pigeon_plus.pigeon_anvil": "ꞁᴉʌuⱯ uoǝᵷᴉԀ",
   "block.anvilcraft_pigeon_plus.stasis_beacon": "uoɔɐǝᗺ sᴉsɐʇS",
   "death.attack.nozzleExhaust": "ʇɐǝs ʇɔnp ǝɥʇ uᴉ ʇɐs %1$s",
   "gui.anvilcraft_pigeon_plus.category.blending": "ᵷuᴉpuǝꞁᗺ",

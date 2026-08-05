@@ -1,6 +1,6 @@
 {
   "advancements.anvilcraft_pigeon_plus.nozzle_ignition.description": "Activate a nozzle to convert mixed combustion in the large cauldron into a directed gas jet",
-  "advancements.anvilcraft_pigeon_plus.nozzle_ignition.title": "The test stand is the launch pad",
+  "advancements.anvilcraft_pigeon_plus.nozzle_ignition.title": "The test pad is launch pad!",
   "advancements.anvilcraft_pigeon_plus.root.description": "Welcome to the Pigeon Plus addon",
   "advancements.anvilcraft_pigeon_plus.root.title": "AnvilCraft: Pigeon Plus",
   "block.anvilcraft_pigeon_plus.anvil_pump": "Anvil Pump",
@@ -13,6 +13,7 @@
   "block.anvilcraft_pigeon_plus.mixed_biomass": "Mixed Biomass",
   "block.anvilcraft_pigeon_plus.mixed_biomass_cauldron": "Mixed Biomass Cauldron",
   "block.anvilcraft_pigeon_plus.nozzle": "Nozzle",
+  "block.anvilcraft_pigeon_plus.pigeon_anvil": "Pigeon Anvil",
   "block.anvilcraft_pigeon_plus.stasis_beacon": "Stasis Beacon",
   "death.attack.nozzleExhaust": "%1$s sat in the duct seat",
   "gui.anvilcraft_pigeon_plus.category.blending": "Blending",
