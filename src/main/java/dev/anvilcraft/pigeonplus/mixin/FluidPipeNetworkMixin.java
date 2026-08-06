@@ -135,6 +135,66 @@ public abstract class FluidPipeNetworkMixin {
             .toList();
         for (FluidEndpoint source : sources) {
             pigeonplus$spreadFromPressureSource(source, gas);
+            // 渲染：只在无方向约束（网络里没有止逆阀/泵/控制阀）时才点亮玻璃管
+            pigeonplus$renderGasFromSource(source, gas);
+        }
+    }
+
+    /**
+     * 渲染气体源可达的玻璃管道。
+     * 只在 {@code directionalConstraints == false}（网络中没有止逆阀/泵/控制阀）时执行——
+     * 一旦存在方向约束（如止逆阀），整个网络的气体都不做管道渲染，避免错误显示。
+     */
+    @Unique
+    private void pigeonplus$renderGasFromSource(FluidEndpoint source, GasFluid gas) {
+        if (directionalConstraints || level.isClientSide() || glassPipePositions.isEmpty()) {
+            return;
+        }
+        FluidStack gasStack = new FluidStack(gas, 1);
+        Map<BlockPos, BlockPos> cameFrom = new HashMap<>();
+        Deque<BlockPos> queue = new ArrayDeque<>();
+        cameFrom.put(source.fromPipePos(), null);
+        queue.add(source.fromPipePos());
+        while (!queue.isEmpty()) {
+            BlockPos cur = queue.poll();
+            for (BlockPos next : adjacency.getOrDefault(cur, List.of())) {
+                if (cameFrom.containsKey(next)) {
+                    continue;
+                }
+                cameFrom.put(next, cur);
+                queue.add(next);
+            }
+        }
+        if (cameFrom.size() <= 1) {
+            return;
+        }
+        Map<BlockPos, EnumSet<Direction>> dirs = new HashMap<>();
+        for (Map.Entry<BlockPos, BlockPos> entry : cameFrom.entrySet()) {
+            BlockPos pos = entry.getKey();
+            BlockPos parent = entry.getValue();
+            if (parent == null) {
+                continue;
+            }
+            Direction d = Direction.fromDelta(
+                pos.getX() - parent.getX(),
+                pos.getY() - parent.getY(),
+                pos.getZ() - parent.getZ()
+            );
+            if (d == null) {
+                continue;
+            }
+            dirs.computeIfAbsent(parent, k -> EnumSet.noneOf(Direction.class)).add(d);
+            dirs.computeIfAbsent(pos, k -> EnumSet.noneOf(Direction.class)).add(d.getOpposite());
+        }
+        pigeonplus$addEndpointDisplayDirection(dirs, source);
+        for (BlockPos pos : cameFrom.keySet()) {
+            if (!glassPipePositions.contains(pos)) {
+                continue;
+            }
+            if (!(level.getBlockEntity(pos) instanceof GlassPipeBlockEntity pipe)) {
+                continue;
+            }
+            showFluidOnPipe(pipe, pos, gasStack, dirs.getOrDefault(pos, EnumSet.noneOf(Direction.class)));
         }
     }
 
@@ -162,13 +222,11 @@ public abstract class FluidPipeNetworkMixin {
             }
             int amount = pigeonplus$pressureTransferAmount(source, target, gas);
             if (amount <= 0) {
-                pigeonplus$showGasBlockedAt(source, target, gasStack);
                 continue;
             }
             List<ValveState> valvePath = pathValves.get(target.fromPipePos());
             amount = Math.min(amount, Math.min(budget, pigeonplus$minValveRemaining(valvePath)));
             if (amount <= 0) {
-                pigeonplus$showGasBlockedAt(source, target, gasStack);
                 continue;
             }
             int moved = pigeonplus$moveGas(source, target, gas, amount);
@@ -177,142 +235,8 @@ public abstract class FluidPipeNetworkMixin {
             }
             budget -= moved;
             pigeonplus$deductValves(valvePath, moved);
-            pigeonplus$showGasOnPath(gasStack, source, target, reach);
             onTransferred(source);
         }
-    }
-
-    /**
-     * 气体被阀门挡住、无法到达目标时，复用本体的“被挡显示”机制，把气体亮到被挡位置为止。
-     */
-    @Unique
-    private void pigeonplus$showGasBlockedAt(FluidEndpoint source, FluidEndpoint target, FluidStack gas) {
-        if (level.isClientSide() || glassPipePositions.isEmpty()) {
-            return;
-        }
-        if (pigeonplus$sameNetworkArea(source, target)) {
-            showFluidToBlockedPart(gas, source, 0);
-        }
-    }
-
-    /**
-     * 粗略判断两个端点是否在同一网络（避免对跨网络端点错误触发被挡显示）。
-     */
-    @Unique
-    private boolean pigeonplus$sameNetworkArea(FluidEndpoint source, FluidEndpoint target) {
-        return source.fromPipePos().equals(target.fromPipePos())
-            || adjacency.getOrDefault(source.fromPipePos(), List.of()).contains(target.fromPipePos())
-            || pigeonplus$undirectedConnected(source.fromPipePos(), target.fromPipePos());
-    }
-
-    @Unique
-    private boolean pigeonplus$undirectedConnected(BlockPos from, BlockPos to) {
-        Set<BlockPos> seen = new HashSet<>();
-        Deque<BlockPos> stack = new ArrayDeque<>();
-        seen.add(from);
-        stack.push(from);
-        while (!stack.isEmpty()) {
-            BlockPos cur = stack.pop();
-            if (cur.equals(to)) {
-                return true;
-            }
-            for (BlockPos next : adjacency.getOrDefault(cur, List.of())) {
-                if (seen.add(next)) {
-                    stack.push(next);
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 气体在管道中移动时，把气体显示到路径上的玻璃管道（与本体液体显示机制一致）。
-     * 路径复用传输时已经算好的可达性结果，保证渲染与实际流动、阀门约束完全一致。
-     */
-    @Unique
-    private void pigeonplus$showGasOnPath(FluidStack gas, FluidEndpoint source, FluidEndpoint target, PigeonPlus_Reachability reach) {
-        if (level.isClientSide() || glassPipePositions.isEmpty()) {
-            return;
-        }
-        List<BlockPos> path;
-        if (directionalConstraints && reach != null) {
-            Map<BlockPos, BlockPos> cameFrom = reach.cameFrom();
-            if (!cameFrom.containsKey(target.fromPipePos())) {
-                return;
-            }
-            path = new ArrayList<>();
-            BlockPos cur = target.fromPipePos();
-            while (cur != null) {
-                path.add(cur);
-                cur = cameFrom.get(cur);
-            }
-            Collections.reverse(path);
-        } else {
-            path = pigeonplus$undirectedPipePath(source.fromPipePos(), target.fromPipePos());
-        }
-        if (path == null || path.size() < 2) {
-            return;
-        }
-        Map<BlockPos, EnumSet<Direction>> directions = new HashMap<>();
-        for (int i = 1; i < path.size(); i++) {
-            pigeonplus$addPipePathDirections(directions, path.get(i - 1), path.get(i));
-        }
-        pigeonplus$addEndpointDisplayDirection(directions, source);
-        pigeonplus$addEndpointDisplayDirection(directions, target);
-        for (BlockPos pos : path) {
-            if (!glassPipePositions.contains(pos)) {
-                continue;
-            }
-            if (!(level.getBlockEntity(pos) instanceof GlassPipeBlockEntity pipe)) {
-                continue;
-            }
-            showFluidOnPipe(pipe, pos, gas, directions.getOrDefault(pos, EnumSet.noneOf(Direction.class)));
-        }
-    }
-
-    @Unique
-    private List<BlockPos> pigeonplus$undirectedPipePath(BlockPos from, BlockPos to) {
-        if (from.equals(to)) {
-            return null;
-        }
-        Map<BlockPos, BlockPos> cameFrom = new HashMap<>();
-        Deque<BlockPos> queue = new ArrayDeque<>();
-        cameFrom.put(from, null);
-        queue.add(from);
-        while (!queue.isEmpty()) {
-            BlockPos cur = queue.poll();
-            if (cur.equals(to)) {
-                break;
-            }
-            for (BlockPos next : adjacency.getOrDefault(cur, List.of())) {
-                if (cameFrom.containsKey(next)) {
-                    continue;
-                }
-                cameFrom.put(next, cur);
-                queue.add(next);
-            }
-        }
-        if (!cameFrom.containsKey(to)) {
-            return null;
-        }
-        List<BlockPos> path = new ArrayList<>();
-        BlockPos cur = to;
-        while (cur != null) {
-            path.add(cur);
-            cur = cameFrom.get(cur);
-        }
-        Collections.reverse(path);
-        return path;
-    }
-
-    @Unique
-    private static void pigeonplus$addPipePathDirections(Map<BlockPos, EnumSet<Direction>> dirs, BlockPos from, BlockPos to) {
-        Direction direction = Direction.fromDelta(to.getX() - from.getX(), to.getY() - from.getY(), to.getZ() - from.getZ());
-        if (direction == null) {
-            return;
-        }
-        dirs.computeIfAbsent(from, k -> EnumSet.noneOf(Direction.class)).add(direction);
-        dirs.computeIfAbsent(to, k -> EnumSet.noneOf(Direction.class)).add(direction.getOpposite());
     }
 
     @Unique
