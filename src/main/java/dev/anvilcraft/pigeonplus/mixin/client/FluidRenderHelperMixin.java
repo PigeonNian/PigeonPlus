@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(FluidRenderHelper.class)
 public class FluidRenderHelperMixin {
     @Redirect(
-        method = "renderFluidBox(Lnet/neoforged/neoforge/fluids/FluidStack;FFFFFFLcom/mojang/blaze3d/vertex/VertexConsumer;Lcom/mojang/blaze3d/vertex/PoseStack;IZZLnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V",
+        method = "renderFluidBox(Lnet/neoforged/neoforge/fluids/FluidStack;FFFFFFLcom/mojang/blaze3d/vertex/VertexConsumer;Lcom/mojang/blaze3d/vertex/PoseStack;ILjava/util/Set;ZLnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V",
         at = @At(
             value = "INVOKE",
             target = "Lnet/neoforged/neoforge/client/extensions/common/IClientFluidTypeExtensions;getTintColor(Lnet/neoforged/neoforge/fluids/FluidStack;)I"

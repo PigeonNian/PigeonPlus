@@ -6,11 +6,10 @@ import dev.dubhe.anvilcraft.api.fluid.network.FluidEndpoint;
 import dev.dubhe.anvilcraft.api.fluid.network.FluidNetworkScanner;
 import dev.dubhe.anvilcraft.api.fluid.network.FluidPipeNetwork;
 import dev.dubhe.anvilcraft.api.fluid.network.ValveState;
+import dev.dubhe.anvilcraft.block.entity.fluid.AbstractPipeCheckValveBlockEntity;
 import dev.dubhe.anvilcraft.block.entity.fluid.ControlValveBlockEntity;
-import dev.dubhe.anvilcraft.block.entity.fluid.PipeCheckValveBlockEntity;
 import dev.dubhe.anvilcraft.block.fluid.ControlValveBlock;
 import dev.dubhe.anvilcraft.block.fluid.PipeBlock;
-import dev.dubhe.anvilcraft.block.fluid.PipeNodeBlock;
 import dev.dubhe.anvilcraft.block.fluid.PumpBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -18,10 +17,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayDeque;
@@ -85,26 +85,42 @@ public abstract class FluidNetworkScannerMixin {
         return 0;
     }
 
-    @Overwrite
-    public static boolean isPipePart(BlockState state) {
-        return state.getBlock() instanceof PipeBlock
-            || state.getBlock() instanceof PumpBlock
-            || state.getBlock() instanceof AnvilPumpBlock
-            || state.getBlock() instanceof ControlValveBlock;
-    }
-
-    @Overwrite
-    private static boolean isConnectablePump(BlockState state, Direction faceToPump) {
+    @Inject(method = "isPipePart", at = @At("HEAD"), cancellable = true)
+    private static void pigeonplus$anvilPumpIsPipePart(BlockState state, CallbackInfoReturnable<Boolean> cir) {
         if (state.getBlock() instanceof AnvilPumpBlock) {
-            return AnvilPumpBlock.isConnectableFace(state, faceToPump);
+            cir.setReturnValue(true);
         }
-        return state.getBlock() instanceof PumpBlock && PumpBlock.isConnectableFace(state, faceToPump);
     }
 
-    @Overwrite
-    public static FluidPipeNetwork scan(Level level, BlockPos seed) {
+    @Shadow
+    private static boolean isPipePart(BlockState state) {
+        return false;
+    }
+
+    @Inject(method = "isConnectablePump", at = @At("HEAD"), cancellable = true)
+    private static void pigeonplus$anvilPumpConnectable(
+        BlockState state,
+        Direction faceToPump,
+        CallbackInfoReturnable<Boolean> cir
+    ) {
+        if (state.getBlock() instanceof AnvilPumpBlock) {
+            cir.setReturnValue(AnvilPumpBlock.isConnectableFace(state, faceToPump));
+        }
+    }
+
+    /**
+     * 以注入方式完整接管扫描：复制本体的扫描流程，额外收集玻璃管位置、识别铁砧泵，
+     * 其余（控制阀、止回阀、泵扬程）全部走本体的 expand 方法，避免破坏性 Overwrite。
+     */
+    @Inject(method = "scan", at = @At("HEAD"), cancellable = true)
+    private static void pigeonplus$scanWithAnvilPumpAndGlass(
+        Level level,
+        BlockPos seed,
+        CallbackInfoReturnable<FluidPipeNetwork> cir
+    ) {
         if (!isPipePart(level.getBlockState(seed))) {
-            return null;
+            cir.setReturnValue(null);
+            return;
         }
 
         Map<BlockPos, Integer> potential = new HashMap<>();
@@ -113,6 +129,7 @@ public abstract class FluidNetworkScannerMixin {
         Map<BlockPos, Direction> diodes = new HashMap<>();
         Map<BlockPos, Map<Direction, Direction>> faceFlow = new HashMap<>();
         Map<BlockPos, FluidEndpoint> endpoints = new LinkedHashMap<>();
+        Set<BlockPos> glassPipes = new HashSet<>();
         Set<IFluidHandler> seenHandlers = new HashSet<>();
         Deque<BlockPos> queue = new ArrayDeque<>();
 
@@ -135,9 +152,12 @@ public abstract class FluidNetworkScannerMixin {
             } else if (state.getBlock() instanceof AnvilPumpBlock) {
                 diodes.put(pos.immutable(), AnvilPumpBlock.getOutputDirection(state));
                 expandPump(level, pos, state, phi, potential, adjacency, queue, endpoints, seenHandlers);
-            } else if (state.getBlock() instanceof PipeBlock) {
+            } else if (state.getBlock() instanceof PipeBlock pipe) {
+                if (pipe.isGlassPipe()) {
+                    glassPipes.add(pos.immutable());
+                }
                 if (state.getValue(PipeBlock.HAS_CHECK_VALVE)
-                    && level.getBlockEntity(pos) instanceof PipeCheckValveBlockEntity cv
+                    && level.getBlockEntity(pos) instanceof AbstractPipeCheckValveBlockEntity cv
                     && !cv.isEmpty()) {
                     faceFlow.put(pos.immutable(), new EnumMap<>(cv.effectiveFlows()));
                 }
@@ -145,11 +165,14 @@ public abstract class FluidNetworkScannerMixin {
             }
         }
 
-        return new FluidPipeNetwork(
-            level, potential.keySet(), adjacency, valves, diodes, faceFlow, new ArrayList<>(endpoints.values()));
+        cir.setReturnValue(new FluidPipeNetwork(
+            level, potential.keySet(), adjacency, valves, diodes, faceFlow, glassPipes, new ArrayList<>(endpoints.values())));
     }
 
-    @Overwrite
+    /**
+     * 展开泵的进出口两侧（铁砧泵与普通泵一致）：沿输出方向取扬程、沿反方向减扬程。
+     */
+    @Unique
     private static void expandPump(
         Level level,
         BlockPos pos,
@@ -169,39 +192,6 @@ public abstract class FluidNetworkScannerMixin {
             int neighborPhi = phi + (side == outputDir ? lift : -lift);
             visitNeighborWithPhi(level, pos, side, neighborPhi, potential, adjacency, queue, endpoints, seenHandlers);
         }
-    }
-
-    @Overwrite
-    private static void enqueuePump(
-        Level level,
-        BlockPos pumpPos,
-        BlockState pumpState,
-        BlockPos fromPos,
-        Map<BlockPos, Integer> potential,
-        Deque<BlockPos> queue
-    ) {
-        Direction outputDir = pumpState.getBlock() instanceof AnvilPumpBlock
-            ? AnvilPumpBlock.getOutputDirection(pumpState)
-            : pumpState.getValue(PumpBlock.ORIENTATION).getDirection();
-        int fromPhi = potential.get(fromPos);
-        int lift = pumpHalfLift(level, pumpPos);
-        int pumpPhi;
-        if (fromPos.equals(pumpPos.relative(outputDir))) {
-            pumpPhi = fromPhi - lift;
-        } else if (fromPos.equals(pumpPos.relative(outputDir.getOpposite()))) {
-            pumpPhi = fromPhi + lift;
-        } else {
-            return;
-        }
-        Integer old = potential.get(pumpPos);
-        if (old != null) {
-            if (pumpPhi < old) {
-                potential.put(pumpPos.immutable(), pumpPhi);
-            }
-            return;
-        }
-        potential.put(pumpPos.immutable(), pumpPhi);
-        queue.add(pumpPos.immutable());
     }
 
     @Inject(method = "pumpHalfLift", at = @At("HEAD"), cancellable = true)

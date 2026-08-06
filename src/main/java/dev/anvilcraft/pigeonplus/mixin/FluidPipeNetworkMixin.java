@@ -8,6 +8,7 @@ import dev.dubhe.anvilcraft.api.fluid.network.FluidEndpoint;
 import dev.dubhe.anvilcraft.api.fluid.network.FluidPipeNetwork;
 import dev.dubhe.anvilcraft.api.fluid.network.ValveState;
 import dev.dubhe.anvilcraft.block.entity.LargeFluidTankBlockEntity;
+import dev.dubhe.anvilcraft.block.entity.fluid.GlassPipeBlockEntity;
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -17,7 +18,6 @@ import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.Nullable;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -30,8 +30,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -67,20 +69,29 @@ public abstract class FluidPipeNetworkMixin {
 
     @Shadow
     @Final
+    private Set<BlockPos> glassPipePositions;
+
+    @Shadow
+    @Final
     private boolean directionalConstraints;
 
     @Shadow
     private void onTransferred(FluidEndpoint source) {
     }
 
-    @Inject(
-        method = "tick",
-        at = @At(
-            value = "FIELD",
-            target = "Ldev/dubhe/anvilcraft/api/fluid/network/FluidPipeNetwork;sourcesByHeightDesc:Ljava/util/List;",
-            opcode = Opcodes.GETFIELD
-        )
-    )
+    @Shadow
+    private void showFluidOnPipe(GlassPipeBlockEntity pipe, BlockPos pos, FluidStack fluid, Set<Direction> directions) {
+    }
+
+    @Shadow
+    private void showFluidBlockedAtSource(FluidEndpoint source) {
+    }
+
+    @Shadow
+    private void showFluidToBlockedPart(FluidStack fluid, FluidEndpoint source, int tankIdx) {
+    }
+
+    @Inject(method = "tick", at = @At("HEAD"))
     private void pigeonplus$equalizeGasPressure(CallbackInfo ci) {
         Set<GasFluid> gases = pigeonplus$collectGases();
         for (GasFluid gas : gases) {
@@ -151,11 +162,13 @@ public abstract class FluidPipeNetworkMixin {
             }
             int amount = pigeonplus$pressureTransferAmount(source, target, gas);
             if (amount <= 0) {
+                pigeonplus$showGasBlockedAt(source, target, gasStack);
                 continue;
             }
             List<ValveState> valvePath = pathValves.get(target.fromPipePos());
             amount = Math.min(amount, Math.min(budget, pigeonplus$minValveRemaining(valvePath)));
             if (amount <= 0) {
+                pigeonplus$showGasBlockedAt(source, target, gasStack);
                 continue;
             }
             int moved = pigeonplus$moveGas(source, target, gas, amount);
@@ -164,8 +177,151 @@ public abstract class FluidPipeNetworkMixin {
             }
             budget -= moved;
             pigeonplus$deductValves(valvePath, moved);
+            pigeonplus$showGasOnPath(gasStack, source, target, reach);
             onTransferred(source);
         }
+    }
+
+    /**
+     * 气体被阀门挡住、无法到达目标时，复用本体的“被挡显示”机制，把气体亮到被挡位置为止。
+     */
+    @Unique
+    private void pigeonplus$showGasBlockedAt(FluidEndpoint source, FluidEndpoint target, FluidStack gas) {
+        if (level.isClientSide() || glassPipePositions.isEmpty()) {
+            return;
+        }
+        if (pigeonplus$sameNetworkArea(source, target)) {
+            showFluidToBlockedPart(gas, source, 0);
+        }
+    }
+
+    /**
+     * 粗略判断两个端点是否在同一网络（避免对跨网络端点错误触发被挡显示）。
+     */
+    @Unique
+    private boolean pigeonplus$sameNetworkArea(FluidEndpoint source, FluidEndpoint target) {
+        return source.fromPipePos().equals(target.fromPipePos())
+            || adjacency.getOrDefault(source.fromPipePos(), List.of()).contains(target.fromPipePos())
+            || pigeonplus$undirectedConnected(source.fromPipePos(), target.fromPipePos());
+    }
+
+    @Unique
+    private boolean pigeonplus$undirectedConnected(BlockPos from, BlockPos to) {
+        Set<BlockPos> seen = new HashSet<>();
+        Deque<BlockPos> stack = new ArrayDeque<>();
+        seen.add(from);
+        stack.push(from);
+        while (!stack.isEmpty()) {
+            BlockPos cur = stack.pop();
+            if (cur.equals(to)) {
+                return true;
+            }
+            for (BlockPos next : adjacency.getOrDefault(cur, List.of())) {
+                if (seen.add(next)) {
+                    stack.push(next);
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 气体在管道中移动时，把气体显示到路径上的玻璃管道（与本体液体显示机制一致）。
+     * 路径复用传输时已经算好的可达性结果，保证渲染与实际流动、阀门约束完全一致。
+     */
+    @Unique
+    private void pigeonplus$showGasOnPath(FluidStack gas, FluidEndpoint source, FluidEndpoint target, PigeonPlus_Reachability reach) {
+        if (level.isClientSide() || glassPipePositions.isEmpty()) {
+            return;
+        }
+        List<BlockPos> path;
+        if (directionalConstraints && reach != null) {
+            Map<BlockPos, BlockPos> cameFrom = reach.cameFrom();
+            if (!cameFrom.containsKey(target.fromPipePos())) {
+                return;
+            }
+            path = new ArrayList<>();
+            BlockPos cur = target.fromPipePos();
+            while (cur != null) {
+                path.add(cur);
+                cur = cameFrom.get(cur);
+            }
+            Collections.reverse(path);
+        } else {
+            path = pigeonplus$undirectedPipePath(source.fromPipePos(), target.fromPipePos());
+        }
+        if (path == null || path.size() < 2) {
+            return;
+        }
+        Map<BlockPos, EnumSet<Direction>> directions = new HashMap<>();
+        for (int i = 1; i < path.size(); i++) {
+            pigeonplus$addPipePathDirections(directions, path.get(i - 1), path.get(i));
+        }
+        pigeonplus$addEndpointDisplayDirection(directions, source);
+        pigeonplus$addEndpointDisplayDirection(directions, target);
+        for (BlockPos pos : path) {
+            if (!glassPipePositions.contains(pos)) {
+                continue;
+            }
+            if (!(level.getBlockEntity(pos) instanceof GlassPipeBlockEntity pipe)) {
+                continue;
+            }
+            showFluidOnPipe(pipe, pos, gas, directions.getOrDefault(pos, EnumSet.noneOf(Direction.class)));
+        }
+    }
+
+    @Unique
+    private List<BlockPos> pigeonplus$undirectedPipePath(BlockPos from, BlockPos to) {
+        if (from.equals(to)) {
+            return null;
+        }
+        Map<BlockPos, BlockPos> cameFrom = new HashMap<>();
+        Deque<BlockPos> queue = new ArrayDeque<>();
+        cameFrom.put(from, null);
+        queue.add(from);
+        while (!queue.isEmpty()) {
+            BlockPos cur = queue.poll();
+            if (cur.equals(to)) {
+                break;
+            }
+            for (BlockPos next : adjacency.getOrDefault(cur, List.of())) {
+                if (cameFrom.containsKey(next)) {
+                    continue;
+                }
+                cameFrom.put(next, cur);
+                queue.add(next);
+            }
+        }
+        if (!cameFrom.containsKey(to)) {
+            return null;
+        }
+        List<BlockPos> path = new ArrayList<>();
+        BlockPos cur = to;
+        while (cur != null) {
+            path.add(cur);
+            cur = cameFrom.get(cur);
+        }
+        Collections.reverse(path);
+        return path;
+    }
+
+    @Unique
+    private static void pigeonplus$addPipePathDirections(Map<BlockPos, EnumSet<Direction>> dirs, BlockPos from, BlockPos to) {
+        Direction direction = Direction.fromDelta(to.getX() - from.getX(), to.getY() - from.getY(), to.getZ() - from.getZ());
+        if (direction == null) {
+            return;
+        }
+        dirs.computeIfAbsent(from, k -> EnumSet.noneOf(Direction.class)).add(direction);
+        dirs.computeIfAbsent(to, k -> EnumSet.noneOf(Direction.class)).add(direction.getOpposite());
+    }
+
+    @Unique
+    private static void pigeonplus$addEndpointDisplayDirection(Map<BlockPos, EnumSet<Direction>> dirs, FluidEndpoint endpoint) {
+        if (endpoint.sideToPipe() == null) {
+            return;
+        }
+        dirs.computeIfAbsent(endpoint.fromPipePos(), k -> EnumSet.noneOf(Direction.class))
+            .add(endpoint.sideToPipe().getOpposite());
     }
 
     @Unique
@@ -196,6 +352,9 @@ public abstract class FluidPipeNetworkMixin {
         }
         int targetAmount = pigeonplus$gasAmount(target, gas);
         long numerator = (long) sourceAmount * targetCapacity - (long) targetAmount * sourceCapacity;
+        if (pigeonplus$isAirSource(source)) {
+            numerator += (long) sourceCapacity * targetCapacity;
+        }
         int pumpPressureDiff = pigeonplus$pumpPressureDiff(source, target);
         if (source.handler() instanceof CompressedAirDrainFluidHandler
             && gas.isSame(AddonFluids.COMPRESSED_AIR.get())
@@ -211,6 +370,11 @@ public abstract class FluidPipeNetworkMixin {
         long denominator = (long) sourceCapacity + targetCapacity;
         int equalizingAmount = (int) Math.max(1L, numerator / denominator);
         return Math.min(equalizingAmount, FluidPipeNetwork.MAX_SPEED);
+    }
+
+    @Unique
+    private static boolean pigeonplus$isAirSource(FluidEndpoint source) {
+        return source.handler() instanceof CompressedAirDrainFluidHandler;
     }
 
     @Unique
@@ -477,7 +641,12 @@ public abstract class FluidPipeNetworkMixin {
         if (capacity <= 0) {
             return 0.0;
         }
-        return (double) pigeonplus$gasAmount(endpoint, gas) / capacity;
+        double pressure = (double) pigeonplus$gasAmount(endpoint, gas) / capacity;
+        if (endpoint.handler() instanceof CompressedAirDrainFluidHandler
+            && gas.isSame(AddonFluids.COMPRESSED_AIR.get())) {
+            return pressure + 10.0;
+        }
+        return pressure;
     }
 
     @Unique
