@@ -28,6 +28,8 @@ This guide records the machines, fluids, and large structure behavior added by t
 - [Mixed Biomass and Biogas](fluids/biogas)
 - [Liquid Oxygen and Compressed Air](fluids/oxygen)
 - [Exhaust and Fuel](fluids/propellants)
+- [Gases in Pipes](fluids/gas_diffusion)
+- [Gas Escape](fluids/gas_escape)
 
 ::: tip
 Hover a bound item and hold Ageratum's more-info key to jump to its guide page.

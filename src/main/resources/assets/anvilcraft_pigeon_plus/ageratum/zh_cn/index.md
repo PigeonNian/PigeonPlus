@@ -28,6 +28,8 @@ items:
 - [混合生物质与沼气](fluids/biogas)
 - [液氧与压缩空气](fluids/oxygen)
 - [燃气与燃料](fluids/propellants)
+- [气体与管道](fluids/gas_diffusion)
+- [气体逸散](fluids/gas_escape)
 
 ::: tip
 把鼠标悬停在已绑定的物品上，并按住 Ageratum 的更多信息按键，可以直接跳转到对应页面。
