@@ -30,7 +30,6 @@ public class PigeonAnvilBlock extends FallingBlock implements Fallable {
     public static final MapCodec<PigeonAnvilBlock> CODEC = simpleCodec(PigeonAnvilBlock::new);
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 
-    // 碰撞箱照搬皇家铁砧（RoyalAnvilBlock）：每轴一条腿 + 顶板，与原版铁砧（两段腿+踏板）不同
     protected static final VoxelShape BASE = Block.box(2.0, 0.0, 2.0, 14.0, 4.0, 14.0);
     protected static final VoxelShape X_LEG1 = Block.box(4.0, 4.0, 5.0, 12.0, 10.0, 11.0);
     protected static final VoxelShape X_TOP = Block.box(0.0, 10.0, 3.0, 16.0, 16.0, 13.0);
@@ -56,7 +55,6 @@ public class PigeonAnvilBlock extends FallingBlock implements Fallable {
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        // 与原版/皇家铁砧一致：FACING = 玩家朝向顺时针旋转 90°
         return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getClockWise());
     }
 
@@ -72,7 +70,6 @@ public class PigeonAnvilBlock extends FallingBlock implements Fallable {
 
     @Override
     protected void falling(FallingBlockEntity entity) {
-        // 温柔降落：鸽子铁砧不砸伤实体（皇家铁砧为 2.0F / 80）
         entity.setHurtsEntities(0.0F, 0);
     }
 
@@ -112,7 +109,6 @@ public class PigeonAnvilBlock extends FallingBlock implements Fallable {
                 0.03
             );
         }
-        // 接入 AnvilCraft 铁砧加工（只跑加工，不砸人）
         AnvilEvent.OnLand event = new AnvilEvent.OnLand(level, pos, fallingEntity, fallingEntity.fallDistance);
         event.setAnvilDamage(false);
         NeoForge.EVENT_BUS.post(event);
