@@ -128,7 +128,7 @@ public class AddonBlocks {
     public static final BlockEntry<PigeonAnvilBlock> PIGEON_ANVIL = REGISTRUM
         .block("pigeon_anvil", PigeonAnvilBlock::new)
         .initialProperties(() -> Blocks.ANVIL)
-        .properties(properties -> properties.noOcclusion())
+        .properties(properties -> properties.noOcclusion().sound(SoundType.WOOL))
         .blockstate((ctx, provider) -> provider.getVariantBuilder(ctx.getEntry()).forAllStates(state ->
             ConfiguredModel.builder()
                 .modelFile(provider.models().getExistingFile(ResourceLocation.fromNamespaceAndPath(
@@ -141,7 +141,7 @@ public class AddonBlocks {
             .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
                 ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/pigeon_anvil")))
             .build()
-        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.ANVIL)
         .register();
 
     public static final BlockEntry<MixedBiomassCauldronBlock> MIXED_BIOMASS_CAULDRON = REGISTRUM

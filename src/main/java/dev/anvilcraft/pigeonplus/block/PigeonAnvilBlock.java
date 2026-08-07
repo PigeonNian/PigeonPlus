@@ -1,35 +1,37 @@
 package dev.anvilcraft.pigeonplus.block;
 
-import com.mojang.serialization.MapCodec;
-import dev.dubhe.anvilcraft.api.event.AnvilEvent;
+import dev.dubhe.anvilcraft.block.better.BetterAnvilBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.FallingBlockEntity;
-import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Fallable;
-import net.minecraft.world.level.block.FallingBlock;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.common.NeoForge;
 
-public class PigeonAnvilBlock extends FallingBlock implements Fallable {
-    public static final MapCodec<PigeonAnvilBlock> CODEC = simpleCodec(PigeonAnvilBlock::new);
-    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
-
+/**
+ * 鸽子铁砧：按普通铁砧（{@link net.minecraft.world.level.block.AnvilBlock}）实现，
+ * 碰撞箱沿用皇家铁砧。
+ * <ul>
+ *     <li>继承 {@link BetterAnvilBlock}（本体的 neoforge 铁砧 / 皇家铁砧都继承它），
+ *     从而获得铁砧的朝向、修理界面，以及 {@code #minecraft:anvil} 标签接入的
+ *     巨型铁砧撼地弹飞、AnvilCraft 铁砧加工等全部行为。</li>
+ *     <li>鸽砧模型与皇家铁砧一致，碰撞箱重写为皇家铁砧（每轴单腿 + 顶板），
+ *     与原版铁砧（两段腿 + 踏板）不同。</li>
+ *     <li>温柔降落：坠落不砸伤实体。</li>
+ *     <li>落地保留铁砧音效/粒子，并叠加鸽子咕咕叫 + 羽毛粒子。</li>
+ * </ul>
+ */
+public class PigeonAnvilBlock extends BetterAnvilBlock {
+    // 皇家铁砧碰撞箱：每轴一条贯通腿 + 顶板
     protected static final VoxelShape BASE = Block.box(2.0, 0.0, 2.0, 14.0, 4.0, 14.0);
     protected static final VoxelShape X_LEG1 = Block.box(4.0, 4.0, 5.0, 12.0, 10.0, 11.0);
     protected static final VoxelShape X_TOP = Block.box(0.0, 10.0, 3.0, 16.0, 16.0, 13.0);
@@ -38,24 +40,8 @@ public class PigeonAnvilBlock extends FallingBlock implements Fallable {
     protected static final VoxelShape X_AXIS_AABB = Shapes.or(BASE, X_LEG1, X_TOP);
     protected static final VoxelShape Z_AXIS_AABB = Shapes.or(BASE, Z_LEG1, Z_TOP);
 
-    public PigeonAnvilBlock(Properties properties) {
+    public PigeonAnvilBlock(BlockBehaviour.Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
-    }
-
-    @Override
-    protected MapCodec<? extends FallingBlock> codec() {
-        return CODEC;
-    }
-
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING);
-    }
-
-    @Override
-    public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getClockWise());
     }
 
     @Override
@@ -64,18 +50,9 @@ public class PigeonAnvilBlock extends FallingBlock implements Fallable {
     }
 
     @Override
-    public int getDustColor(BlockState state, BlockGetter level, BlockPos pos) {
-        return 0x9A9A9A;
-    }
-
-    @Override
-    protected void falling(FallingBlockEntity entity) {
+    public void falling(FallingBlockEntity entity) {
+        // 温柔降落：鸽子铁砧不砸伤实体（皇家铁砧为 2.0F / 80）
         entity.setHurtsEntities(0.0F, 0);
-    }
-
-    @Override
-    public DamageSource getFallDamageSource(Entity entity) {
-        return entity.damageSources().fall();
     }
 
     @Override
@@ -86,10 +63,8 @@ public class PigeonAnvilBlock extends FallingBlock implements Fallable {
         BlockState replacedState,
         FallingBlockEntity fallingEntity
     ) {
-        // 铁砧落地音效与粒子（原版 AnvilBlock.onLand 的行为）
-        if (!fallingEntity.isSilent()) {
-            level.levelEvent(1031, pos, 0);
-        }
+        // 保留普通铁砧的落地音效与粒子（levelEvent 1031）
+        super.onLand(level, pos, state, replacedState, fallingEntity);
         if (level.isClientSide) {
             return;
         }
@@ -109,8 +84,5 @@ public class PigeonAnvilBlock extends FallingBlock implements Fallable {
                 0.03
             );
         }
-        AnvilEvent.OnLand event = new AnvilEvent.OnLand(level, pos, fallingEntity, fallingEntity.fallDistance);
-        event.setAnvilDamage(false);
-        NeoForge.EVENT_BUS.post(event);
     }
 }
