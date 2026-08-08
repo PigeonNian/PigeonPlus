@@ -30,6 +30,75 @@ public class AddonBlocks {
         REGISTRUM.defaultCreativeTab(AddonItemGroups.ADDON_ITEMS.getKey());
     }
 
+    public static final BlockEntry<PigeonAnvilBlock> PIGEON_ANVIL = REGISTRUM
+        .block("pigeon_anvil", PigeonAnvilBlock::new)
+        .initialProperties(() -> Blocks.ANVIL)
+        .properties(properties -> properties.noOcclusion().sound(SoundType.WOOL))
+        .blockstate((ctx, provider) -> provider.getVariantBuilder(ctx.getEntry()).forAllStates(state ->
+            ConfiguredModel.builder()
+                .modelFile(provider.models().getExistingFile(ResourceLocation.fromNamespaceAndPath(
+                    AnvilCraftPigeonPlus.MOD_ID,
+                    "block/pigeon_anvil"
+                )))
+                .rotationY(anvilRotationY(state.getValue(PigeonAnvilBlock.FACING)))
+                .build()))
+        .item(BlockItem::new)
+        .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
+            ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/pigeon_anvil")))
+        .build()
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.ANVIL)
+        .register();
+
+    public static final BlockEntry<BlenderBlock> BLENDER = REGISTRUM
+        .block("blender", BlenderBlock::new)
+        .blockstate((ctx, prov) -> prov.getVariantBuilder(ctx.getEntry()).forAllStates(state ->
+            ConfiguredModel.builder()
+                .modelFile(prov.models().getExistingFile(
+                    ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/blender_bottom")))
+                .rotationY(rotationY(state.getValue(BlenderBlock.FACING)))
+                .build()))
+        .item(BlockItem::new)
+        .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
+            ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/blender")))
+        .build()
+        .register();
+
+    public static final BlockEntry<AnvilPumpBlock> ANVIL_PUMP = REGISTRUM
+        .block("anvil_pump", AnvilPumpBlock::new)
+        .initialProperties(() -> Blocks.IRON_BLOCK)
+        .properties(properties -> properties.noOcclusion().sound(SoundType.METAL))
+        .blockstate((ctx, provider) -> provider.getVariantBuilder(ctx.getEntry()).forAllStates(state -> ConfiguredModel.builder()
+            .modelFile(provider.models().getExistingFile(ResourceLocation.fromNamespaceAndPath(
+                AnvilCraftPigeonPlus.MOD_ID,
+                "block/anvil_pump"
+            )))
+            .rotationY(pumpRotationY(state.getValue(AnvilPumpBlock.FACING)))
+            .build()))
+        .item(BlockItem::new)
+        .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
+            ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/anvil_pump_full")))
+        .build()
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+        .register();
+
+    public static final BlockEntry<FeedSpreaderBlock> FEED_SPREADER = REGISTRUM
+        .block("feed_spreader", FeedSpreaderBlock::new)
+        .initialProperties(() -> Blocks.IRON_BLOCK)
+        .properties(properties -> properties.noOcclusion().sound(SoundType.METAL))
+        .blockstate((ctx, provider) -> provider.simpleBlock(
+            ctx.getEntry(),
+            provider.models().getExistingFile(ResourceLocation.fromNamespaceAndPath(
+                AnvilCraftPigeonPlus.MOD_ID,
+                "block/feed_spreader_bottom"
+            ))
+        ))
+        .item(BlockItem::new)
+        .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
+            ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/feed_spreader_full")))
+        .build()
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+        .register();
+
     public static final BlockEntry<NozzleBlock> NOZZLE = REGISTRUM
         .block("nozzle", NozzleBlock::new)
         .initialProperties(() -> Blocks.IRON_BLOCK)
@@ -57,20 +126,6 @@ public class AddonBlocks {
         .tag(BlockTags.MINEABLE_WITH_PICKAXE)
         .register();
 
-    public static final BlockEntry<BlenderBlock> BLENDER = REGISTRUM
-        .block("blender", BlenderBlock::new)
-        .blockstate((ctx, prov) -> prov.getVariantBuilder(ctx.getEntry()).forAllStates(state ->
-            ConfiguredModel.builder()
-                .modelFile(prov.models().getExistingFile(
-                    ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/blender_bottom")))
-                .rotationY(rotationY(state.getValue(BlenderBlock.FACING)))
-                .build()))
-        .item(BlockItem::new)
-        .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
-            ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/blender")))
-        .build()
-        .register();
-
     public static final BlockEntry<StasisBeaconBlock> STASIS_BEACON = REGISTRUM
         .block("stasis_beacon", StasisBeaconBlock::new)
         .initialProperties(() -> Blocks.BEACON)
@@ -87,61 +142,6 @@ public class AddonBlocks {
                 ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/stasis_beacon")))
             .build()
         .tag(BlockTags.MINEABLE_WITH_PICKAXE)
-        .register();
-
-    public static final BlockEntry<AnvilPumpBlock> ANVIL_PUMP = REGISTRUM
-        .block("anvil_pump", AnvilPumpBlock::new)
-        .initialProperties(() -> Blocks.IRON_BLOCK)
-        .properties(properties -> properties.noOcclusion().sound(SoundType.METAL))
-        .blockstate((ctx, provider) -> provider.getVariantBuilder(ctx.getEntry()).forAllStates(state -> ConfiguredModel.builder()
-            .modelFile(provider.models().getExistingFile(ResourceLocation.fromNamespaceAndPath(
-                AnvilCraftPigeonPlus.MOD_ID,
-                "block/anvil_pump"
-            )))
-            .rotationY(pumpRotationY(state.getValue(AnvilPumpBlock.FACING)))
-            .build()))
-        .item(BlockItem::new)
-            .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
-                ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/anvil_pump_full")))
-            .build()
-        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
-        .register();
-
-    public static final BlockEntry<FeedSpreaderBlock> FEED_SPREADER = REGISTRUM
-        .block("feed_spreader", FeedSpreaderBlock::new)
-        .initialProperties(() -> Blocks.IRON_BLOCK)
-        .properties(properties -> properties.noOcclusion().sound(SoundType.METAL))
-        .blockstate((ctx, provider) -> provider.simpleBlock(
-            ctx.getEntry(),
-            provider.models().getExistingFile(ResourceLocation.fromNamespaceAndPath(
-                AnvilCraftPigeonPlus.MOD_ID,
-                "block/feed_spreader_bottom"
-            ))
-        ))
-        .item(BlockItem::new)
-            .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
-                ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/feed_spreader_full")))
-            .build()
-        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
-        .register();
-
-    public static final BlockEntry<PigeonAnvilBlock> PIGEON_ANVIL = REGISTRUM
-        .block("pigeon_anvil", PigeonAnvilBlock::new)
-        .initialProperties(() -> Blocks.ANVIL)
-        .properties(properties -> properties.noOcclusion().sound(SoundType.WOOL))
-        .blockstate((ctx, provider) -> provider.getVariantBuilder(ctx.getEntry()).forAllStates(state ->
-            ConfiguredModel.builder()
-                .modelFile(provider.models().getExistingFile(ResourceLocation.fromNamespaceAndPath(
-                    AnvilCraftPigeonPlus.MOD_ID,
-                    "block/pigeon_anvil"
-                )))
-                .rotationY(anvilRotationY(state.getValue(PigeonAnvilBlock.FACING)))
-                .build()))
-        .item(BlockItem::new)
-            .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
-                ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/pigeon_anvil")))
-            .build()
-        .tag(BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.ANVIL)
         .register();
 
     public static final BlockEntry<MixedBiomassCauldronBlock> MIXED_BIOMASS_CAULDRON = REGISTRUM
