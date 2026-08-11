@@ -1,6 +1,7 @@
 package dev.anvilcraft.pigeonplus.data.advancement;
 
 import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
+import dev.anvilcraft.pigeonplus.advancement.criterion.NozzleExplosionTrigger;
 import dev.anvilcraft.pigeonplus.advancement.criterion.NozzleGasActivatedTrigger;
 import dev.anvilcraft.pigeonplus.init.AddonBlocks;
 import dev.anvilcraft.pigeonplus.init.AddonItems;
@@ -14,11 +15,12 @@ import net.minecraft.resources.ResourceLocation;
 public class AddonAdvancements {
     public static final AdvancementHolder ROOT;
     public static final AdvancementHolder IGNITE_NOZZLE;
+    public static final AdvancementHolder NOZZLE_EXPLOSION;
 
     static {
         ROOT = Advancement.Builder.advancement()
             .display(
-                AddonItems.LIQUEFIED_BIOGAS_BUCKET.get(),
+                AddonBlocks.PIGEON_ANVIL.get(),
                 Component.translatable("advancements.anvilcraft_pigeon_plus.root.title"),
                 Component.translatable("advancements.anvilcraft_pigeon_plus.root.description"),
                 ResourceLocation.fromNamespaceAndPath("anvilcraft", "textures/gui/misc/background/advancement.png"),
@@ -43,6 +45,20 @@ public class AddonAdvancements {
             )
             .addCriterion("activate_nozzle_gas", NozzleGasActivatedTrigger.TriggerInstance.activate())
             .build(AnvilCraftPigeonPlus.of("nozzle_ignition"));
+        NOZZLE_EXPLOSION = Advancement.Builder.advancement()
+            .parent(IGNITE_NOZZLE)
+            .display(
+                AddonBlocks.NOZZLE.asItem(),
+                Component.translatable("advancements.anvilcraft_pigeon_plus.nozzle_explosion.title"),
+                Component.translatable("advancements.anvilcraft_pigeon_plus.nozzle_explosion.description"),
+                null,
+                AdvancementType.GOAL,
+                true,
+                true,
+                true
+            )
+            .addCriterion("nozzle_explosion", NozzleExplosionTrigger.TriggerInstance.exploded())
+            .build(AnvilCraftPigeonPlus.of("nozzle_explosion"));
     }
 
     private AddonAdvancements() {

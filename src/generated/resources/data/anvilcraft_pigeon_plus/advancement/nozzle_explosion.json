@@ -1,0 +1,28 @@
+{
+  "parent": "anvilcraft_pigeon_plus:nozzle_ignition",
+  "criteria": {
+    "nozzle_explosion": {
+      "trigger": "anvilcraft_pigeon_plus:nozzle_explosion"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.anvilcraft_pigeon_plus.nozzle_explosion.description"
+    },
+    "frame": "goal",
+    "hidden": true,
+    "icon": {
+      "count": 1,
+      "id": "anvilcraft_pigeon_plus:nozzle"
+    },
+    "title": {
+      "translate": "advancements.anvilcraft_pigeon_plus.nozzle_explosion.title"
+    }
+  },
+  "requirements": [
+    [
+      "nozzle_explosion"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

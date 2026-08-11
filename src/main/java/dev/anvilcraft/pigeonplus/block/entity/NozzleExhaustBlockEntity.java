@@ -1,6 +1,7 @@
 package dev.anvilcraft.pigeonplus.block.entity;
 
 import com.mojang.datafixers.util.Pair;
+import dev.anvilcraft.pigeonplus.block.NozzleBlock;
 import dev.anvilcraft.pigeonplus.init.AddonDamageTypes;
 import dev.anvilcraft.pigeonplus.init.AddonHeaterInfos;
 import dev.anvilcraft.pigeonplus.init.AddonParticles;
@@ -49,9 +50,13 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
     private static final double METHANE_ACCELERATION_PER_TICK = 192.0 / StasisTimeFreezeManager.MAX_FREEZE_TICKS;
     private static final int CENTER_HEAT_INTERVAL_TICKS = 10;
     private static final int CENTER_HEAT_DURATION_TICKS = 20 * 20;
+    public static final int BLOCKED_EXPLODE_TICKS = 200;
+    private static final float NOZZLE_EXPLOSION_RADIUS = 2.5F;
     private static final String EXHAUST_TICKS_TAG = "ExhaustTicks";
+    private static final String BLOCKED_TICKS_TAG = "BlockedTicks";
 
     private int duration;
+    private int blockedTicks;
 
     public NozzleExhaustBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.NOZZLE_EXHAUST.get(), pos, state);
@@ -91,6 +96,17 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
             && !NozzleExhaustUtil.consumeTopFuelOnce(cauldron, propellant)) {
             this.stopExhaust();
             return;
+        }
+
+        if (NozzleExhaustUtil.isOutletAreaFullyBlocked(level, outletPos, facing)) {
+            this.blockedTicks++;
+            if (this.blockedTicks >= BLOCKED_EXPLODE_TICKS) {
+                this.explodeNozzle(level, outletPos);
+                return;
+            }
+        } else if (this.blockedTicks != 0) {
+            this.blockedTicks = 0;
+            this.setChanged();
         }
 
         HeaterManager.addProducer(this.worldPosition, level, AddonHeaterInfos.NO_MAGNET_NOZZLE_EXHAUST);
@@ -145,11 +161,37 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
     }
 
     private void stopExhaust() {
-        if (this.duration == 0) {
+        if (this.duration == 0 && this.blockedTicks == 0) {
             return;
         }
         this.duration = 0;
+        this.blockedTicks = 0;
         this.syncToClient();
+    }
+
+    private void explodeNozzle(ServerLevel level, BlockPos outletPos) {
+        this.grantNozzleExplosion(level);
+        BlockState state = this.getBlockState();
+        if (state.getBlock() instanceof NozzleBlock nozzle && nozzle.isMainPart(state)) {
+            nozzle.forEachPart(level, this.worldPosition, partPos -> {
+                BlockState oldState = level.getBlockState(partPos);
+                BlockState newState = oldState.getFluidState().createLegacyBlock();
+                level.setBlockAndUpdate(partPos, newState);
+            });
+        }
+        Vec3 center = Vec3.atCenterOf(outletPos);
+        level.explode(null, center.x, center.y, center.z, NOZZLE_EXPLOSION_RADIUS, Level.ExplosionInteraction.BLOCK);
+    }
+
+    private void grantNozzleExplosion(ServerLevel level) {
+        Vec3 center = Vec3.atCenterOf(this.worldPosition);
+        double radiusSqr = NOZZLE_ACTIVATION_RADIUS * NOZZLE_ACTIVATION_RADIUS;
+        for (ServerPlayer player : level.players()) {
+            if (player.isSpectator() || player.distanceToSqr(center) > radiusSqr) {
+                continue;
+            }
+            ModCriterionTriggers.NOZZLE_EXPLOSION.get().trigger(player);
+        }
     }
 
     private void grantNozzleActivation(ServerLevel level) {
@@ -479,6 +521,7 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putInt(EXHAUST_TICKS_TAG, this.duration);
+        tag.putInt(BLOCKED_TICKS_TAG, this.blockedTicks);
     }
 
     @Override
@@ -486,6 +529,9 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
         super.loadAdditional(tag, registries);
         if (tag.contains(EXHAUST_TICKS_TAG)) {
             this.duration = Math.max(0, tag.getInt(EXHAUST_TICKS_TAG));
+        }
+        if (tag.contains(BLOCKED_TICKS_TAG)) {
+            this.blockedTicks = Math.max(0, tag.getInt(BLOCKED_TICKS_TAG));
         }
     }
 

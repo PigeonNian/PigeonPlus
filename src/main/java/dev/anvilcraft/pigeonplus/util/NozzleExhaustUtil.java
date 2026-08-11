@@ -233,6 +233,23 @@ public final class NozzleExhaustUtil {
         return null;
     }
 
+    public static boolean isOutletAreaFullyBlocked(Level level, BlockPos outletPos, Direction facing) {
+        BlockPos center = outletPos;
+        Direction[] plane = getPlaneDirections(facing);
+        Direction first = plane[0];
+        Direction second = plane[1];
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                BlockPos pos = center.relative(first, i).relative(second, j);
+                BlockState state = level.getBlockState(pos);
+                if (state.getCollisionShape(level, pos).isEmpty()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     public static boolean isInJetCenterLine(Entity entity, BlockPos jetPos, Direction facing) {
         Vec3 center = entity.getBoundingBox().getCenter();
         double x = jetPos.getX() + 0.5;

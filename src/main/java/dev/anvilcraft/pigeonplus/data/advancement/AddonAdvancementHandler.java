@@ -6,5 +6,6 @@ public class AddonAdvancementHandler {
     public static void init(RegistrumAdvancementProvider provider) {
         provider.accept(AddonAdvancements.ROOT);
         provider.accept(AddonAdvancements.IGNITE_NOZZLE);
+        provider.accept(AddonAdvancements.NOZZLE_EXPLOSION);
     }
 }

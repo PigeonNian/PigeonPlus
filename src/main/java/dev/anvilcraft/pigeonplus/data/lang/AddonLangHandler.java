@@ -24,6 +24,11 @@ public class AddonLangHandler {
             "advancements.anvilcraft_pigeon_plus.nozzle_ignition.description",
             "Activate a nozzle to convert mixed combustion in the large cauldron into a directed gas jet"
         );
+        provider.add("advancements.anvilcraft_pigeon_plus.nozzle_explosion.title", "Rich Engine Combustion");
+        provider.add(
+            "advancements.anvilcraft_pigeon_plus.nozzle_explosion.description",
+            "Seal a firing nozzle completely and let it blow itself up"
+        );
         provider.add("block.anvilcraft_pigeon_plus.gaseous_biogas", "Gaseous Biogas");
         provider.add("block.anvilcraft_pigeon_plus.liquefied_biogas", "Liquefied Biogas");
         provider.add("block.anvilcraft_pigeon_plus.compressed_air", "Compressed Air");

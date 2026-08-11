@@ -1,6 +1,8 @@
 {
   "advancements.anvilcraft_pigeon_plus.nozzle_ignition.description": "激活喷管，将大型炼药锅内的混合燃烧转化为定向燃气",
   "advancements.anvilcraft_pigeon_plus.nozzle_ignition.title": "上试车台就是上发射台！",
+  "advancements.anvilcraft_pigeon_plus.nozzle_explosion.description": "用方块完全堵死喷射中的喷管，等待它自爆",
+  "advancements.anvilcraft_pigeon_plus.nozzle_explosion.title": "富发动机燃烧",
   "advancements.anvilcraft_pigeon_plus.root.description": "欢迎来到鸽+",
   "advancements.anvilcraft_pigeon_plus.root.title": "铁砧工艺：鸽+",
   "block.anvilcraft_pigeon_plus.anvil_pump": "铁砧泵",
