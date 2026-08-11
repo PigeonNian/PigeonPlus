@@ -54,13 +54,9 @@ public class StasisBeaconBlockEntityRenderer implements BlockEntityRenderer<Stas
         new Vec3(-0.35, -0.22, -1.0)
     };
     private static final float[] CHAIN_LENGTHS = {4.1f, 3.7f, 3.5f, 4.0f, 3.2f, 3.4f};
-    private static final List<BeamRenderData> DEFERRED_BEAMS = new ArrayList<>();
     private static final List<ChainRenderData> DEFERRED_CHAINS = new ArrayList<>();
     private static final Set<Integer> ACTIVE_STASIS_EFFECT_ENTITY_IDS = new HashSet<>();
     private static final Set<Integer> NEXT_STASIS_EFFECT_ENTITY_IDS = new HashSet<>();
-
-    private record BeamRenderData(BlockPos pos, int beamTopY) {
-    }
 
     private record ChainRenderData(Vec3 entityCenter, float entityWidth, float tickTime) {
     }
@@ -87,8 +83,11 @@ public class StasisBeaconBlockEntityRenderer implements BlockEntityRenderer<Stas
         }
 
         int beamTopY = blockEntity.getBeamHeight();
-        if (beamTopY > blockEntity.getBlockPos().getY() + 1) {
-            DEFERRED_BEAMS.add(new BeamRenderData(blockEntity.getBlockPos(), beamTopY));
+        int posY = blockEntity.getBlockPos().getY();
+        if (beamTopY > posY + 1) {
+            VertexConsumer beamConsumer = bufferSource.getBuffer(ModRenderTypes.CORRUPTED_BEACON_BEAM);
+            float beamHeight = (float) (beamTopY - posY) - BEAM_BASE_Y;
+            renderBeam(beamConsumer, poseStack.last(), 0.5f, BEAM_BASE_Y, 0.5f, beamHeight);
         }
 
         if (level instanceof ClientLevel clientLevel && blockEntity.getFrozenEntityClientId() >= 0) {
@@ -115,35 +114,15 @@ public class StasisBeaconBlockEntityRenderer implements BlockEntityRenderer<Stas
         NEXT_STASIS_EFFECT_ENTITY_IDS.clear();
     }
 
-    public static void renderDeferredBeams(PoseStack poseStack, MultiBufferSource bufferSource, Vec3 camera) {
-        if (DEFERRED_BEAMS.isEmpty()) {
+    public static void renderDeferredChains(PoseStack poseStack, MultiBufferSource bufferSource, Vec3 camera) {
+        if (DEFERRED_CHAINS.isEmpty()) {
             return;
         }
 
-        VertexConsumer vertexConsumer = bufferSource.getBuffer(ModRenderTypes.CORRUPTED_BEACON_BEAM);
-        for (BeamRenderData data : DEFERRED_BEAMS) {
-            poseStack.pushPose();
-            poseStack.translate(
-                data.pos.getX() - camera.x,
-                data.pos.getY() - camera.y,
-                data.pos.getZ() - camera.z
-            );
-
-            float beamHeight = (float) (data.beamTopY - data.pos.getY()) - BEAM_BASE_Y;
-            if (beamHeight > 0.01f) {
-                renderBeam(vertexConsumer, poseStack.last(), 0.5f, BEAM_BASE_Y, 0.5f, beamHeight);
-            }
-
-            poseStack.popPose();
+        for (ChainRenderData data : DEFERRED_CHAINS) {
+            renderStasisChains(poseStack, bufferSource, camera, data);
         }
-        DEFERRED_BEAMS.clear();
-
-        if (!DEFERRED_CHAINS.isEmpty()) {
-            for (ChainRenderData data : DEFERRED_CHAINS) {
-                renderStasisChains(poseStack, bufferSource, camera, data);
-            }
-            DEFERRED_CHAINS.clear();
-        }
+        DEFERRED_CHAINS.clear();
     }
 
     private static void renderStasisChains(

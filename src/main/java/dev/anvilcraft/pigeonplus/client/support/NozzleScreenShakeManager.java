@@ -1,5 +1,6 @@
 package dev.anvilcraft.pigeonplus.client.support;
 
+import dev.anvilcraft.pigeonplus.client.AnvilCraftPigeonPlusClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -33,6 +34,9 @@ public final class NozzleScreenShakeManager {
     }
 
     public void trigger(Vec3 center, float radius) {
+        if (this.amplitudeScale() <= 0.0F) {
+            return;
+        }
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || radius <= 0.0F) {
             return;
@@ -54,6 +58,9 @@ public final class NozzleScreenShakeManager {
     }
 
     public void sustain(Vec3 center, float radius) {
+        if (this.amplitudeScale() <= 0.0F) {
+            return;
+        }
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || radius <= 0.0F) {
             return;
@@ -111,12 +118,13 @@ public final class NozzleScreenShakeManager {
         }
         float seconds = (now - this.startupStartNanos) / 1_000_000_000.0F;
         float phase = this.startupPhaseSeed + seconds * STARTUP_FREQUENCY * Mth.TWO_PI;
+        float amplitude = this.amplitudeScale();
         float yaw = (float) (Math.sin(phase * 1.1F) + 0.55F * Math.sin(phase * 2.6F + 0.7F))
-            * STARTUP_YAW_PITCH_AMPLITUDE * falloff;
+            * STARTUP_YAW_PITCH_AMPLITUDE * falloff * amplitude;
         float pitch = (float) (Math.sin(phase * 1.3F + 1.4F) + 0.5F * Math.sin(phase * 3.0F))
-            * STARTUP_YAW_PITCH_AMPLITUDE * falloff;
+            * STARTUP_YAW_PITCH_AMPLITUDE * falloff * amplitude;
         float roll = (float) (Math.sin(phase * 0.9F + 0.3F) + 0.45F * Math.sin(phase * 2.2F + 2.1F))
-            * STARTUP_ROLL_AMPLITUDE * falloff;
+            * STARTUP_ROLL_AMPLITUDE * falloff * amplitude;
         return new float[] {yaw, pitch, roll};
     }
 
@@ -131,13 +139,18 @@ public final class NozzleScreenShakeManager {
         }
         float seconds = now / 1_000_000_000.0F;
         float phase = this.continuousPhaseSeed + seconds * CONTINUOUS_FREQUENCY * Mth.TWO_PI;
+        float amplitude = this.amplitudeScale();
         float yaw = (float) (Math.sin(phase * 1.8F) + 0.35F * Math.sin(phase * 4.1F))
-            * CONTINUOUS_YAW_PITCH_AMPLITUDE * falloff;
+            * CONTINUOUS_YAW_PITCH_AMPLITUDE * falloff * amplitude;
         float pitch = (float) (Math.sin(phase * 1.6F + 1.2F) + 0.30F * Math.sin(phase * 3.7F + 0.4F))
-            * CONTINUOUS_YAW_PITCH_AMPLITUDE * falloff;
+            * CONTINUOUS_YAW_PITCH_AMPLITUDE * falloff * amplitude;
         float roll = (float) (Math.sin(phase * 1.2F + 2.3F) + 0.35F * Math.sin(phase * 3.4F + 1.1F))
-            * CONTINUOUS_ROLL_AMPLITUDE * falloff;
+            * CONTINUOUS_ROLL_AMPLITUDE * falloff * amplitude;
         return new float[] {yaw, pitch, roll};
+    }
+
+    private float amplitudeScale() {
+        return AnvilCraftPigeonPlusClient.CLIENT_CONFIG.nozzleShakeAmplitude;
     }
 
     private boolean isStartupActive(long now) {

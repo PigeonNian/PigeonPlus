@@ -1,5 +1,6 @@
 package dev.anvilcraft.pigeonplus.client.sound;
 
+import dev.anvilcraft.pigeonplus.client.AnvilCraftPigeonPlusClient;
 import dev.anvilcraft.pigeonplus.client.particle.NozzleStartupParticleUtil;
 import dev.anvilcraft.pigeonplus.client.support.NozzleScreenShakeManager;
 import dev.anvilcraft.pigeonplus.block.entity.NozzleExhaustBlockEntity;
@@ -30,7 +31,7 @@ public final class NozzleSoundController {
     private static final long NANOS_PER_MILLI = 1_000_000L;
     private static final int DISCOVERY_INTERVAL_TICKS = 10;
     private static final int DISCOVERY_RADIUS = 96;
-    private static final float CONTINUOUS_SHAKE_RADIUS = 12.0F;
+
     public static final int FLAME_DELAY_TICKS = 10;
     public static final int FLAME_GROWTH_TICKS = 8;
     public static final int FLAME_SHUTDOWN_TICKS = 12;
@@ -131,6 +132,10 @@ public final class NozzleSoundController {
     private NozzleSoundController() {
     }
 
+    private static float shakeRange() {
+        return AnvilCraftPigeonPlusClient.CLIENT_CONFIG.nozzleShakeRange;
+    }
+
     public static void registerActive(BlockPos pos) {
         ACTIVE_HINTS.add(pos.immutable());
     }
@@ -186,7 +191,7 @@ public final class NozzleSoundController {
         if (outletPos == null) {
             return;
         }
-        NozzleScreenShakeManager.getInstance().sustain(Vec3.atCenterOf(outletPos), CONTINUOUS_SHAKE_RADIUS);
+        NozzleScreenShakeManager.getInstance().sustain(Vec3.atCenterOf(outletPos), shakeRange());
 
         SoundState state = SOUND_STATES.get(pos);
         if (state == null) {

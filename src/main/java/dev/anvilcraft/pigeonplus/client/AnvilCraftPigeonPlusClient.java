@@ -1,6 +1,8 @@
 package dev.anvilcraft.pigeonplus.client;
 
+import dev.anvilcraft.pigeonplus.AddonClientConfig;
 import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
+import dev.anvilcraft.lib.v2.config.ConfigManager;
 import dev.anvilcraft.pigeonplus.block.entity.ModBlockEntities;
 import dev.anvilcraft.pigeonplus.client.particle.RollingPlasmaParticle;
 import dev.anvilcraft.pigeonplus.client.renderer.block.AnvilPumpBlockEntityRenderer;
@@ -38,6 +40,8 @@ import dev.dubhe.anvilcraft.api.tooltip.HudTooltipManager;
 
 @Mod(value = AnvilCraftPigeonPlus.MOD_ID, dist = Dist.CLIENT)
 public class AnvilCraftPigeonPlusClient {
+    public static final AddonClientConfig CLIENT_CONFIG = ConfigManager.register(AnvilCraftPigeonPlus.MOD_ID, AddonClientConfig::new);
+
     public AnvilCraftPigeonPlusClient(IEventBus modBus, ModContainer container) {
         modBus.addListener(this::onRegisterAdditionalModels);
         modBus.addListener(this::onRegisterBER);

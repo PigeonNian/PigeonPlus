@@ -32,7 +32,7 @@ public class StasisBeaconRenderEventListener {
         Vec3 camera = event.getCamera().getPosition();
         poseStack.pushPose();
         poseStack.last().pose().mul(event.getModelViewMatrix());
-        StasisBeaconBlockEntityRenderer.renderDeferredBeams(poseStack, bufferSource, camera);
+        StasisBeaconBlockEntityRenderer.renderDeferredChains(poseStack, bufferSource, camera);
         bufferSource.endBatch();
         StasisBeaconBlockEntityRenderer.publishStasisEffectEntities();
         poseStack.popPose();
