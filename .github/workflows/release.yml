@@ -44,10 +44,16 @@ jobs:
           MESSAGE=$(ls build/libs/* | grep sources.jar -v | grep shadow.jar -v | grep slim.jar -v | awk -F '${{ steps.properties.outputs.mod_id }}-neoforge-|.jar' '{print $2}')
           echo "version=$MESSAGE" >> $GITHUB_OUTPUT
 
+      - name: Get Artifact Name
+        id: artifact_name
+        run: |
+          NAME=$(echo "${{ steps.properties.outputs.mod_name }} ${{ steps.version.outputs.version }}" | sed 's/["\\:<>|*?\/]//g')
+          echo "name=$NAME" >> $GITHUB_OUTPUT
+
       - name: capture build artifacts
         uses: actions/upload-artifact@v4.3.3
         with:
-          name: "${{ steps.properties.outputs.mod_name }} ${{ steps.version.outputs.version }}"
+          name: "${{ steps.artifact_name.outputs.name }}"
           path: build/libs/${{ steps.properties.outputs.mod_id }}-neoforge-${{ steps.version.outputs.version }}.jar
 
       - name: Publish to maven
