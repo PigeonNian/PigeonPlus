@@ -1,10 +1,7 @@
 package dev.anvilcraft.pigeonplus.util;
 
-import dev.anvilcraft.pigeonplus.block.AnvilPumpBlock;
 import dev.anvilcraft.pigeonplus.init.AddonFluids;
 import dev.dubhe.anvilcraft.block.entity.fluid.DrainBlockEntity;
-import dev.dubhe.anvilcraft.block.fluid.PipeBlock;
-import dev.dubhe.anvilcraft.block.fluid.PumpBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -31,7 +28,16 @@ public class CompressedAirDrainFluidHandler implements IFluidHandler {
     }
 
     public boolean canExtractAir() {
-        return isDrainAirExposed(this.level, this.pos);
+        return this.isInternalTankEmpty() && isDrainAirExposed(this.level, this.pos);
+    }
+
+    private boolean isInternalTankEmpty() {
+        for (int i = 0; i < this.delegate.getTanks(); i++) {
+            if (!this.delegate.getFluidInTank(i).isEmpty()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -132,19 +138,10 @@ public class CompressedAirDrainFluidHandler implements IFluidHandler {
                 continue;
             }
             BlockState state = level.getBlockState(checkPos);
-            if (isIgnoredAirExposureBlock(state)) {
-                return true;
-            }
             if (state.isAir() && state.getFluidState().isEmpty()) {
                 return true;
             }
         }
         return false;
-    }
-
-    private static boolean isIgnoredAirExposureBlock(BlockState state) {
-        return state.getBlock() instanceof PipeBlock
-            || state.getBlock() instanceof PumpBlock
-            || state.getBlock() instanceof AnvilPumpBlock;
     }
 }
