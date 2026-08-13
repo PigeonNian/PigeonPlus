@@ -31,7 +31,7 @@ Like liquids, pumps can be chained in series to increase the thrust applied to g
 
 ## Extracting Compressed Air
 
-Compressed air can only be drawn from a drain with **at least one face exposed to  air**. Air enters the fluid network through the pump and diffuses onward to tanks and other containers.
+Compressed air can only be drawn from a drain with **at least one face exposed to open air**. Air enters the fluid network through the pump and diffuses onward to tanks and other containers.
 
 ## Liquefaction
 
