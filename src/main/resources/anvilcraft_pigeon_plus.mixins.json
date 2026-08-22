@@ -17,8 +17,7 @@
   ],
   "client": [
     "client.EntityClientMixin",
-    "client.FishTankBlockEntityRendererMixin",
-    "client.FluidMixingCategoryMixin",
+    "client.FishTankBlockEntityRendererMixin",
     "client.FluidRenderHelperMixin",
     "client.FluidTankRenderUtilMixin",
     "client.LargeCauldronBlockEntityRendererMixin",

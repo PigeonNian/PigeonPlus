@@ -8,7 +8,6 @@ import dev.anvilcraft.lib.v2.util.predicate.ItemIngredientPredicate;
 import dev.anvilcraft.pigeonplus.block.BlenderBlock;
 import dev.anvilcraft.pigeonplus.init.AddonBlocks;
 import dev.anvilcraft.pigeonplus.init.AddonRecipeTypes;
-import dev.dubhe.anvilcraft.recipe.anvil.predicate.block.HasCauldron;
 import dev.dubhe.anvilcraft.recipe.anvil.util.WrapUtils;
 import dev.dubhe.anvilcraft.recipe.anvil.wrap.AbstractProcessRecipe;
 import dev.dubhe.anvilcraft.recipe.component.HasCauldronSimple;
@@ -17,6 +16,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
@@ -61,12 +61,12 @@ public class BlendingRecipe extends AbstractProcessRecipe<BlendingRecipe> {
 
     public boolean isConsumeFluid() {
         HasCauldronSimple hasCauldron = this.getHasCauldron();
-        return HasCauldron.isNotEmpty(hasCauldron.fluid()) && hasCauldron.consume() > 0;
+        return hasCauldron.hasFluid() && hasCauldron.consume() > 0;
     }
 
     public boolean isProduceFluid() {
         HasCauldronSimple hasCauldron = this.getHasCauldron();
-        return HasCauldron.isNotEmpty(hasCauldron.transform()) && hasCauldron.produce() > 0;
+        return !hasCauldron.transforms().isEmpty() && hasCauldron.produce() > 0;
     }
 
     public static class Serializer implements RecipeSerializer<BlendingRecipe> {
@@ -104,30 +104,27 @@ public class BlendingRecipe extends AbstractProcessRecipe<BlendingRecipe> {
         private final HasCauldronSimple.Builder hasCauldron = HasCauldronSimple.empty();
 
         public Builder fluid(ResourceLocation fluid) {
-            this.hasCauldron.fluid(fluid);
+            this.hasCauldron.fluid(BuiltInRegistries.FLUID.get(fluid));
             return this;
         }
 
         public Builder fluid(Block cauldron) {
-            return this.fluid(WrapUtils.cauldron2Fluid(cauldron));
+            this.hasCauldron.fluid(BuiltInRegistries.FLUID.get(WrapUtils.cauldron2Fluid(cauldron)));
+            return this;
         }
 
         public Builder transform(ResourceLocation transform) {
-            this.hasCauldron.transform(transform);
+            this.hasCauldron.transform(BuiltInRegistries.FLUID.get(transform), 1000);
             return this;
         }
 
         public Builder transform(Block cauldron) {
-            return this.transform(WrapUtils.cauldron2Fluid(cauldron));
+            this.hasCauldron.transform(BuiltInRegistries.FLUID.get(WrapUtils.cauldron2Fluid(cauldron)), 1000);
+            return this;
         }
 
         public Builder consume(int consume) {
             this.hasCauldron.consume(consume);
-            return this;
-        }
-
-        public Builder produce(int produce) {
-            this.hasCauldron.produce(produce);
             return this;
         }
 
@@ -141,10 +138,6 @@ public class BlendingRecipe extends AbstractProcessRecipe<BlendingRecipe> {
             return this;
         }
 
-        public Builder fluidTag(ResourceLocation fluidTag) {
-            this.hasCauldron.fluidTag(fluidTag);
-            return this;
-        }
 
         @Override
         protected BlendingRecipe of(List<ItemIngredientPredicate> itemIngredients, List<ChanceItemStack> results) {

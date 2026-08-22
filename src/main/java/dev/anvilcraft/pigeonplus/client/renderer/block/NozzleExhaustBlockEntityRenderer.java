@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import dev.anvilcraft.pigeonplus.block.entity.NozzleExhaustBlockEntity;
 import dev.anvilcraft.pigeonplus.client.renderer.NozzleExhaustRenderer;
 import dev.anvilcraft.pigeonplus.client.sound.NozzleSoundController;
-import dev.anvilcraft.pigeonplus.init.AddonVaporizationSources;
 import dev.anvilcraft.pigeonplus.util.NozzleExhaustUtil;
 import dev.dubhe.anvilcraft.block.entity.LargeCauldronBlockEntity;
 import net.minecraft.client.Minecraft;
@@ -59,7 +58,7 @@ public class NozzleExhaustBlockEntityRenderer implements BlockEntityRenderer<Noz
         if (flameProgress <= 0.0F) {
             return;
         }
-        AddonVaporizationSources.JetPropellant propellant = NozzleExhaustUtil.getJetPropellant(blockEntity.getLevel(), cauldron);
+        NozzleExhaustUtil.JetPropellant propellant = NozzleExhaustUtil.getJetPropellant(blockEntity.getLevel(), cauldron);
         poseStack.pushPose();
         poseStack.translate(
             outletPos.getX() - blockEntity.getBlockPos().getX(),
@@ -72,7 +71,7 @@ public class NozzleExhaustBlockEntityRenderer implements BlockEntityRenderer<Noz
             blockEntity.getLevel().getGameTime() + partialTick,
             blockEntity.getBlockPos(),
             facing,
-            propellant == AddonVaporizationSources.JetPropellant.METHANE
+            propellant == NozzleExhaustUtil.JetPropellant.METHANE
                 ? NozzleExhaustRenderer.Propellant.METHANE
                 : NozzleExhaustRenderer.Propellant.KEROSENE,
             NozzleExhaustUtil.getVisibleJetRenderLength(

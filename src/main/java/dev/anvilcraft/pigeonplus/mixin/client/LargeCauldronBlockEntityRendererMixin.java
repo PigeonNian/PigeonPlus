@@ -4,9 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
 import dev.anvilcraft.pigeonplus.block.NozzleBlock;
-import dev.anvilcraft.pigeonplus.init.AddonVaporizationSources;
-import dev.anvilcraft.pigeonplus.client.renderer.GasContainerRenderUtil;
 import dev.anvilcraft.pigeonplus.util.NozzleExhaustUtil;
+import dev.anvilcraft.pigeonplus.client.renderer.GasContainerRenderUtil;
 import dev.dubhe.anvilcraft.api.fluid.LargeCauldronFluidHandler;
 import dev.dubhe.anvilcraft.block.entity.LargeCauldronBlockEntity;
 import dev.dubhe.anvilcraft.client.renderer.blockentity.LargeCauldronBlockEntityRenderer;
@@ -197,7 +196,7 @@ import java.util.List;
         int light,
         int renderOverlay
     ) {
-        if (AddonVaporizationSources.hasAnyPropellant(cauldron)) {
+        if (NozzleExhaustUtil.hasAnyPropellant(cauldron)) {
             return;
         }
         this.drawFire(pose, buffers, overlay, surfaceY);

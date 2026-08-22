@@ -5,7 +5,6 @@ import dev.anvilcraft.pigeonplus.block.NozzleBlock;
 import dev.anvilcraft.pigeonplus.init.AddonDamageTypes;
 import dev.anvilcraft.pigeonplus.init.AddonHeaterInfos;
 import dev.anvilcraft.pigeonplus.init.AddonParticles;
-import dev.anvilcraft.pigeonplus.init.AddonVaporizationSources;
 import dev.anvilcraft.pigeonplus.init.ModCriterionTriggers;
 import dev.anvilcraft.pigeonplus.util.NozzleExhaustUtil;
 import dev.anvilcraft.pigeonplus.util.StasisTimeFreezeManager;
@@ -86,7 +85,7 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
             this.stopExhaust();
             return;
         }
-        AddonVaporizationSources.JetPropellant propellant = NozzleExhaustUtil.getJetPropellant(level, cauldron);
+        NozzleExhaustUtil.JetPropellant propellant = NozzleExhaustUtil.getJetPropellant(level, cauldron);
         if (propellant == null || !NozzleExhaustUtil.canSustainJet(level, cauldron)) {
             this.stopExhaust();
             return;
@@ -306,7 +305,7 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
         ServerLevel level,
         BlockPos startPos,
         Direction facing,
-        AddonVaporizationSources.JetPropellant propellant
+        NozzleExhaustUtil.JetPropellant propellant
     ) {
         int effectiveHeight = NozzleExhaustUtil.getEffectiveJetLength(
             level,
@@ -341,8 +340,8 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
         }
     }
 
-    private static double accelerationPerTick(AddonVaporizationSources.JetPropellant propellant) {
-        return propellant == AddonVaporizationSources.JetPropellant.METHANE
+    private static double accelerationPerTick(NozzleExhaustUtil.JetPropellant propellant) {
+        return propellant == NozzleExhaustUtil.JetPropellant.METHANE
             ? METHANE_ACCELERATION_PER_TICK
             : KEROSENE_ACCELERATION_PER_TICK;
     }
@@ -355,10 +354,10 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
             return;
         }
         LargeCauldronBlockEntity cauldron = NozzleExhaustUtil.getStructuralCauldron(level, this.worldPosition);
-        AddonVaporizationSources.JetPropellant propellant = cauldron == null
-            ? AddonVaporizationSources.JetPropellant.KEROSENE
+        NozzleExhaustUtil.JetPropellant propellant = cauldron == null
+            ? NozzleExhaustUtil.JetPropellant.KEROSENE
             : NozzleExhaustUtil.getJetPropellant(level, cauldron);
-        boolean methane = propellant == AddonVaporizationSources.JetPropellant.METHANE;
+        boolean methane = propellant == NozzleExhaustUtil.JetPropellant.METHANE;
         var rollingParticle = methane ? AddonParticles.ROLLING_METHANE_PLASMA.get() : AddonParticles.ROLLING_PLASMA.get();
         double baseAxis = -0.92;
 

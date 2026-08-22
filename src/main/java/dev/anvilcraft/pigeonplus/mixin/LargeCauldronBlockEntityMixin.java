@@ -1,7 +1,7 @@
 package dev.anvilcraft.pigeonplus.mixin;
 
 import dev.anvilcraft.pigeonplus.init.AddonFluids;
-import dev.anvilcraft.pigeonplus.init.AddonVaporizationSources;
+import dev.anvilcraft.pigeonplus.util.NozzleExhaustUtil;
 import dev.anvilcraft.pigeonplus.util.GasEscapeUtil;
 import dev.dubhe.anvilcraft.block.BurningHeaterBlock;
 import dev.dubhe.anvilcraft.block.HeaterBlock;
@@ -42,7 +42,7 @@ public class LargeCauldronBlockEntityMixin {
     @Inject(method = "canIgniteTopFluid", at = @At("RETURN"), cancellable = true)
     private void pigeonplus$allowMixedPropellantIgnition(CallbackInfoReturnable<Boolean> cir) {
         if (!cir.getReturnValueZ()
-            && AddonVaporizationSources.hasAnyPropellant((LargeCauldronBlockEntity) (Object) this)) {
+            && NozzleExhaustUtil.hasAnyPropellant((LargeCauldronBlockEntity) (Object) this)) {
             cir.setReturnValue(true);
         }
     }

@@ -1,7 +1,6 @@
 package dev.anvilcraft.pigeonplus.util;
 
 import com.mojang.datafixers.util.Pair;
-import dev.anvilcraft.pigeonplus.init.AddonVaporizationSources;
 import dev.anvilcraft.pigeonplus.block.NozzleBlock;
 import dev.anvilcraft.pigeonplus.init.AddonFluids;
 import dev.dubhe.anvilcraft.api.fluid.LargeCauldronFluidHandler;
@@ -21,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.function.Predicate;
 import java.util.Set;
 
 public final class NozzleExhaustUtil {
@@ -35,6 +35,60 @@ public final class NozzleExhaustUtil {
     public static final int PLASMA_CONSUME_INTERVAL = 20;
 
     private NozzleExhaustUtil() {
+    }
+
+    public enum JetPropellant {
+        KEROSENE,
+        METHANE
+    }
+
+    public static boolean hasMixedPropellant(LargeCauldronBlockEntity cauldron) {
+        return findMatchingFluid(cauldron, stack -> stack.is(ModFluidTags.OIL)) != null
+            && hasLiquidOxygen(cauldron);
+    }
+
+    public static boolean hasMethanePropellant(LargeCauldronBlockEntity cauldron) {
+        return findMatchingFluid(cauldron, stack -> stack.getFluid().isSame(AddonFluids.LIQUEFIED_BIOGAS.get())) != null
+            && hasLiquidOxygen(cauldron);
+    }
+
+    public static boolean hasAnyPropellant(LargeCauldronBlockEntity cauldron) {
+        return hasMixedPropellant(cauldron) || hasMethanePropellant(cauldron);
+    }
+
+    public static @Nullable JetPropellant getAvailableJetPropellant(LargeCauldronBlockEntity cauldron) {
+        if (hasMethanePropellant(cauldron)) {
+            return JetPropellant.METHANE;
+        }
+        if (hasMixedPropellant(cauldron)) {
+            return JetPropellant.KEROSENE;
+        }
+        return null;
+    }
+
+    private static boolean hasLiquidOxygen(LargeCauldronBlockEntity cauldron) {
+        return findMatchingFluid(cauldron, stack -> stack.getFluid().isSame(AddonFluids.LIQUID_OXYGEN.get())) != null;
+    }
+
+    private static @Nullable MatchingFluid findMatchingFluid(
+        LargeCauldronBlockEntity cauldron,
+        Predicate<FluidStack> predicate
+    ) {
+        FluidStack selected = FluidStack.EMPTY;
+        int maxAmount = 0;
+        for (FluidStack stack : cauldron.getFluids().copyFluids()) {
+            if (stack.isEmpty() || !predicate.test(stack)) {
+                continue;
+            }
+            if (stack.getAmount() > maxAmount) {
+                selected = stack.copy();
+                maxAmount = stack.getAmount();
+            }
+        }
+        return maxAmount > 0 ? new MatchingFluid(selected, maxAmount) : null;
+    }
+
+    private record MatchingFluid(FluidStack stack, int amount) {
     }
 
     public static BlockPos getJetOutletPos(BlockPos cauldronMainPos, Direction facing) {
@@ -52,18 +106,11 @@ public final class NozzleExhaustUtil {
             && getJetPropellant(level, cauldron) != null;
     }
 
-    public static @Nullable AddonVaporizationSources.JetPropellant getJetPropellant(
+    public static @Nullable JetPropellant getJetPropellant(
         Level level,
         LargeCauldronBlockEntity cauldron
     ) {
-        AddonVaporizationSources.JetPropellant recent = AddonVaporizationSources.getRecentJetPropellant(
-            level,
-            cauldron.getBlockPos()
-        );
-        if (recent != null) {
-            return recent;
-        }
-        return AddonVaporizationSources.getAvailableJetPropellant(cauldron);
+        return getAvailableJetPropellant(cauldron);
     }
 
     public static LargeCauldronBlockEntity getStructuralCauldron(Level level, BlockPos nozzlePos) {
@@ -298,7 +345,7 @@ public final class NozzleExhaustUtil {
 
     public static boolean consumeTopFuelOnce(
         LargeCauldronBlockEntity cauldron,
-        AddonVaporizationSources.JetPropellant propellant
+        JetPropellant propellant
     ) {
         LargeCauldronFluidHandler handler = cauldron.getFluids();
         java.util.List<FluidStack> fluids = handler.copyFluids();
@@ -322,7 +369,7 @@ public final class NozzleExhaustUtil {
         return false;
     }
 
-    private static boolean matchesFuel(FluidStack stack, AddonVaporizationSources.JetPropellant propellant) {
+    private static boolean matchesFuel(FluidStack stack, JetPropellant propellant) {
         return switch (propellant) {
             case KEROSENE -> stack.is(ModFluidTags.OIL);
             case METHANE -> stack.getFluid().isSame(AddonFluids.LIQUEFIED_BIOGAS.get());
@@ -331,11 +378,11 @@ public final class NozzleExhaustUtil {
 
     private static boolean hasPropellant(
         LargeCauldronBlockEntity cauldron,
-        AddonVaporizationSources.JetPropellant propellant
+        JetPropellant propellant
     ) {
         return switch (propellant) {
-            case KEROSENE -> AddonVaporizationSources.hasMixedPropellant(cauldron);
-            case METHANE -> AddonVaporizationSources.hasMethanePropellant(cauldron);
+            case KEROSENE -> hasMixedPropellant(cauldron);
+            case METHANE -> hasMethanePropellant(cauldron);
         };
     }
 

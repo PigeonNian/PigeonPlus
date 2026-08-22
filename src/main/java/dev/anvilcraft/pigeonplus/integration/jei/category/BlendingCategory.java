@@ -18,6 +18,7 @@ import dev.dubhe.anvilcraft.integration.jei.util.JeiSlotUtil;
 import dev.dubhe.anvilcraft.recipe.anvil.predicate.block.HasCauldron;
 import dev.dubhe.anvilcraft.recipe.component.HasCauldronSimple;
 import dev.dubhe.anvilcraft.util.CauldronUtil;
+import dev.dubhe.anvilcraft.util.FluidStackPredicate;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -89,9 +90,9 @@ public class BlendingCategory extends AbstractProgressCategory<BlendingRecipe> {
         }
         if (hasOutputFluid) {
             if (outputMixed) {
-                JeiFluidUtil.addFluidOutputSlot(builder, OUTPUT_FLUID, 16, 16, cauldron);
+                JeiFluidUtil.addFluidOutputSlots(builder, OUTPUT_FLUID, 16, 16, cauldron);
             } else {
-                JeiFluidUtil.addDefaultOutputSlot(builder, OUTPUT_FLUID, 16, 16, cauldron);
+                JeiFluidUtil.addDefaultOutputSlots(builder, OUTPUT_FLUID, 16, 16, cauldron);
             }
         }
     }
@@ -213,15 +214,21 @@ public class BlendingCategory extends AbstractProgressCategory<BlendingRecipe> {
         if (recipe.isProduceFluid() && !recipe.isConsumeFluid()) {
             return Blocks.CAULDRON.defaultBlockState();
         }
-        return CauldronUtil.fullState(recipe.getHasCauldron().getFluidCauldron());
+        FluidStackPredicate predicate = recipe.getHasCauldron().fluid();
+        if (predicate.fluids().isPresent() && predicate.fluids().get().size() > 0) {
+            return CauldronUtil.fullState(
+                HasCauldron.getDefaultCauldron(predicate.fluids().get().stream().findFirst().orElseThrow().value())
+            );
+        }
+        return Blocks.CAULDRON.defaultBlockState();
     }
 
     private static boolean hasInputFluid(HasCauldronSimple cauldron) {
-        return cauldron.fluidTag() != null || HasCauldron.isNotEmpty(cauldron.fluid());
+        return cauldron.hasFluid();
     }
 
     private static boolean hasOutputFluid(HasCauldronSimple cauldron) {
-        return HasCauldron.isNotEmpty(cauldron.transform());
+        return !cauldron.transforms().isEmpty();
     }
 
     public static void registerRecipes(IRecipeRegistration registration) {
