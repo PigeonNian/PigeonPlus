@@ -68,9 +68,11 @@ public class LargeCauldronBlockMixin {
         }
         BlockPos mainPos = ((LargeCauldronBlock) (Object) this).getMainPartPos(pos, state);
         VoxelShape attachmentShape = Shapes.empty();
-        if (part.getOffsetY() == 2 && pigeonplus$hasHorizontalNozzle(realLevel, mainPos)) {
+        boolean hasBottomNozzle = pigeonplus$hasBottomNozzle(realLevel, mainPos);
+        boolean hasHorizontalNozzle = pigeonplus$hasHorizontalNozzle(realLevel, mainPos);
+        if (part.getOffsetY() == 2 && (hasHorizontalNozzle || hasBottomNozzle)) {
             attachmentShape = pigeonplus$getLidShape(part);
-        } else if (part.getOffsetY() == 0 && pigeonplus$hasBottomNozzle(realLevel, mainPos)) {
+        } else if (part.getOffsetY() == 0 && hasBottomNozzle) {
             attachmentShape = pigeonplus$getBottomShape(part);
         }
         if (attachmentShape.isEmpty()) {
