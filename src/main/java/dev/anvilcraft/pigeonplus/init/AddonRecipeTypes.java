@@ -1,6 +1,7 @@
 package dev.anvilcraft.pigeonplus.init;
 
 import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
+import dev.anvilcraft.pigeonplus.recipe.GasLiquefactionRecipe;
 import dev.anvilcraft.pigeonplus.recipe.anvil.wrap.BlendingRecipe;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.crafting.Recipe;
@@ -20,6 +21,10 @@ public class AddonRecipeTypes {
         registerType("blending");
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<BlendingRecipe>> BLENDING_SERIALIZER =
         RECIPE_SERIALIZERS.register("blending", BlendingRecipe.Serializer::new);
+    public static final DeferredHolder<RecipeType<?>, RecipeType<GasLiquefactionRecipe>> GAS_LIQUEFACTION_TYPE =
+        registerType("gas_liquefaction");
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<GasLiquefactionRecipe>> GAS_LIQUEFACTION_SERIALIZER =
+        RECIPE_SERIALIZERS.register("gas_liquefaction", GasLiquefactionRecipe.Serializer::new);
 
     private static <T extends Recipe<?>> DeferredHolder<RecipeType<?>, RecipeType<T>> registerType(String name) {
         return RECIPE_TYPES.register(

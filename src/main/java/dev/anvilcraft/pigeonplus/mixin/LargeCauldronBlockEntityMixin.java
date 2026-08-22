@@ -34,8 +34,14 @@ public class LargeCauldronBlockEntityMixin {
         LargeCauldronBlockEntity entity,
         CallbackInfo ci
     ) {
-        if (entity.isMainPart()) {
+        if (level instanceof ServerLevel serverLevel && entity.isMainPart()) {
             GasEscapeUtil.escapeLargeCauldronGas(level, pos, entity.getFluids());
+            if (entity.isIgnited()) {
+                NozzleExhaustUtil.JetPropellant propellant = NozzleExhaustUtil.getAvailableJetPropellant(entity);
+                if (propellant != null) {
+                    NozzleExhaustUtil.spawnPropellantParticles(serverLevel, pos, propellant);
+                }
+            }
         }
     }
 

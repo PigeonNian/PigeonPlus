@@ -3,7 +3,7 @@ package dev.anvilcraft.pigeonplus.integration.jei;
 import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
 import dev.anvilcraft.pigeonplus.integration.jei.category.BlendingCategory;
 import dev.anvilcraft.pigeonplus.integration.jei.category.GasLiquefactionCategory;
-import dev.anvilcraft.pigeonplus.integration.jei.recipe.GasLiquefactionJeiRecipe;
+import dev.anvilcraft.pigeonplus.recipe.GasLiquefactionRecipe;
 import dev.anvilcraft.pigeonplus.recipe.anvil.wrap.BlendingRecipe;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -21,8 +21,8 @@ import org.jetbrains.annotations.NotNull;
 public class AnvilCraftPigeonPlusJeiPlugin implements IModPlugin {
     public static final RecipeType<RecipeHolder<BlendingRecipe>> BLENDING =
         RecipeType.createRecipeHolderType(AnvilCraftPigeonPlus.of("blending"));
-    public static final RecipeType<GasLiquefactionJeiRecipe> GAS_LIQUEFACTION =
-        RecipeType.create(AnvilCraftPigeonPlus.MOD_ID, "gas_liquefaction", GasLiquefactionJeiRecipe.class);
+    public static final RecipeType<RecipeHolder<GasLiquefactionRecipe>> GAS_LIQUEFACTION =
+        RecipeType.createRecipeHolderType(AnvilCraftPigeonPlus.of("gas_liquefaction"));
 
     @Override
     public @NotNull ResourceLocation getPluginUid() {

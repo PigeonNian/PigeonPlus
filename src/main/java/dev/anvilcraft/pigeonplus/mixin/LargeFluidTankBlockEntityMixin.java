@@ -1,6 +1,7 @@
 package dev.anvilcraft.pigeonplus.mixin;
 
-import dev.anvilcraft.pigeonplus.init.AddonFluids;
+import dev.anvilcraft.pigeonplus.init.AddonRecipeTypes;
+import dev.anvilcraft.pigeonplus.recipe.GasLiquefactionRecipe;
 import dev.anvilcraft.pigeonplus.util.GasLiquefactionTracker;
 import dev.dubhe.anvilcraft.block.LargeFluidTankBlock;
 import dev.dubhe.anvilcraft.block.entity.LargeFluidTankBlockEntity;
@@ -34,11 +35,11 @@ public abstract class LargeFluidTankBlockEntityMixin {
         IFluidHandler handler = self.getFluidHandler();
         BlockPos pos = self.getBlockPos();
 
-        Fluid gas = pigeonplus$findLiquefiableGas(handler);
-        if (gas == null) {
-            pigeonplus$clearProgress(level, pos);
+        GasLiquefactionRecipe recipe = pigeonplus$findRecipe(level, handler);
+        if (recipe == null) {
             return;
         }
+        Fluid gas = recipe.input().getFluid();
         int totalCapacity = pigeonplus$totalCapacity(handler);
         int totalAmount = pigeonplus$totalAmount(handler);
         int gasAmount = pigeonplus$gasAmount(handler, gas);
@@ -56,27 +57,29 @@ public abstract class LargeFluidTankBlockEntityMixin {
             pos,
             gas,
             drained.getAmount(),
-            pigeonplus$liquefactionRatio(gas)
+            recipe.ratio()
         );
         if (liquidAmount > 0) {
-            pigeonplus$replaceGasWithLiquid(handler, gas, liquidAmount);
+            pigeonplus$replaceGasWithLiquid(handler, recipe, liquidAmount);
         }
     }
 
     @Unique
-    private static void pigeonplus$clearProgress(Level level, BlockPos pos) {
-        GasLiquefactionTracker.clear(level, pos, AddonFluids.COMPRESSED_AIR.get());
-        GasLiquefactionTracker.clear(level, pos, AddonFluids.GASEOUS_BIOGAS.get());
-    }
-
-    @Unique
-    private static Fluid pigeonplus$findLiquefiableGas(IFluidHandler handler) {
+    private static GasLiquefactionRecipe pigeonplus$findRecipe(Level level, IFluidHandler handler) {
+        var server = level.getServer();
+        if (server == null) {
+            return null;
+        }
         for (int i = 0; i < handler.getTanks(); i++) {
             FluidStack stack = handler.getFluidInTank(i);
-            Fluid fluid = stack.getFluid();
-            if (stack.getAmount() > 0
-                && (fluid.isSame(AddonFluids.COMPRESSED_AIR.get()) || fluid.isSame(AddonFluids.GASEOUS_BIOGAS.get()))) {
-                return fluid;
+            if (stack.isEmpty()) {
+                continue;
+            }
+            for (var holder : server.getRecipeManager().getAllRecipesFor(
+                    AddonRecipeTypes.GAS_LIQUEFACTION_TYPE.get())) {
+                if (holder.value().input().getFluid().isSame(stack.getFluid())) {
+                    return holder.value();
+                }
             }
         }
         return null;
@@ -113,41 +116,26 @@ public abstract class LargeFluidTankBlockEntityMixin {
     }
 
     @Unique
-    private static int pigeonplus$liquefactionRatio(Fluid gas) {
-        if (gas.isSame(AddonFluids.COMPRESSED_AIR.get())) {
-            return GasLiquefactionTracker.COMPRESSED_AIR_TO_LIQUID_OXYGEN_RATIO;
-        }
-        if (gas.isSame(AddonFluids.GASEOUS_BIOGAS.get())) {
-            return GasLiquefactionTracker.BIOGAS_TO_LIQUEFIED_BIOGAS_RATIO;
-        }
-        return 0;
-    }
-
-    @Unique
-    private static void pigeonplus$replaceGasWithLiquid(IFluidHandler handler, Fluid gas, int liquidAmount) {
-        Fluid liquefied = pigeonplus$liquefiedFluid(gas);
-        if (liquefied == null || liquidAmount <= 0) {
+    private static void pigeonplus$replaceGasWithLiquid(
+        IFluidHandler handler,
+        GasLiquefactionRecipe recipe,
+        int liquidAmount
+    ) {
+        if (liquidAmount <= 0) {
             return;
         }
-        FluidStack drainedGas = handler.drain(new FluidStack(gas, liquidAmount), IFluidHandler.FluidAction.EXECUTE);
+        FluidStack outputTemplate = recipe.output();
+        FluidStack drainedGas = handler.drain(
+            new FluidStack(recipe.input().getFluid(), liquidAmount),
+            IFluidHandler.FluidAction.EXECUTE
+        );
         int actualAmount = drainedGas.getAmount();
         if (actualAmount <= 0) {
             return;
         }
-        int filled = handler.fill(new FluidStack(liquefied, actualAmount), IFluidHandler.FluidAction.EXECUTE);
+        int filled = handler.fill(outputTemplate.copyWithAmount(actualAmount), IFluidHandler.FluidAction.EXECUTE);
         if (filled < actualAmount) {
             handler.fill(drainedGas.copyWithAmount(actualAmount - filled), IFluidHandler.FluidAction.EXECUTE);
         }
-    }
-
-    @Unique
-    private static Fluid pigeonplus$liquefiedFluid(Fluid gas) {
-        if (gas.isSame(AddonFluids.COMPRESSED_AIR.get())) {
-            return AddonFluids.LIQUID_OXYGEN.get();
-        }
-        if (gas.isSame(AddonFluids.GASEOUS_BIOGAS.get())) {
-            return AddonFluids.LIQUEFIED_BIOGAS.get();
-        }
-        return null;
     }
 }

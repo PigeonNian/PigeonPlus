@@ -21,7 +21,7 @@ public class AddonItems {
         .tag(Tags.Items.BUCKETS)
         .lang("Gaseous Biogas Bucket")
         .properties(properties -> properties.stacksTo(1).craftRemainder(Items.BUCKET))
-        .model(ModelProviderUtil::bucket)
+        .model(ModelProviderUtil::bucketGassy)
         .register();
 
     public static final ItemEntry<BucketItem> LIQUEFIED_BIOGAS_BUCKET = REGISTRUM.item(
@@ -41,7 +41,7 @@ public class AddonItems {
         .tag(Tags.Items.BUCKETS)
         .lang("Compressed Air Bucket")
         .properties(properties -> properties.stacksTo(1).craftRemainder(Items.BUCKET))
-        .model(ModelProviderUtil::bucket)
+        .model(ModelProviderUtil::bucketGassy)
         .register();
 
     public static final ItemEntry<BucketItem> MIXED_BIOMASS_BUCKET = REGISTRUM.item(

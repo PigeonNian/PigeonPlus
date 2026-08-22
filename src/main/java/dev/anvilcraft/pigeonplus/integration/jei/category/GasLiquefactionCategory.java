@@ -4,7 +4,8 @@ import dev.anvilcraft.pigeonplus.init.AddonBlocks;
 import dev.anvilcraft.pigeonplus.init.AddonFluids;
 import dev.anvilcraft.pigeonplus.init.AddonItems;
 import dev.anvilcraft.pigeonplus.integration.jei.AnvilCraftPigeonPlusJeiPlugin;
-import dev.anvilcraft.pigeonplus.integration.jei.recipe.GasLiquefactionJeiRecipe;
+import dev.anvilcraft.pigeonplus.init.AddonRecipeTypes;
+import dev.anvilcraft.pigeonplus.recipe.GasLiquefactionRecipe;
 import dev.dubhe.anvilcraft.init.block.ModBlocks;
 import dev.dubhe.anvilcraft.integration.jei.util.JeiRenderHelper;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
@@ -21,11 +22,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.material.Fluid;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class GasLiquefactionCategory implements IRecipeCategory<GasLiquefactionJeiRecipe> {
+public class GasLiquefactionCategory implements IRecipeCategory<RecipeHolder<GasLiquefactionRecipe>> {
     private static final int WIDTH = 162;
     private static final int HEIGHT = 72;
     private static final int GAS_X = 8;
@@ -51,7 +54,7 @@ public class GasLiquefactionCategory implements IRecipeCategory<GasLiquefactionJ
 
     @Override
     @NotNull
-    public  RecipeType<GasLiquefactionJeiRecipe> getRecipeType() {
+    public  RecipeType<RecipeHolder<GasLiquefactionRecipe>> getRecipeType() {
         return AnvilCraftPigeonPlusJeiPlugin.GAS_LIQUEFACTION;
     }
 
@@ -77,20 +80,21 @@ public class GasLiquefactionCategory implements IRecipeCategory<GasLiquefactionJ
 
     @Override
     @NotNull
-    public void setRecipe(IRecipeLayoutBuilder builder, GasLiquefactionJeiRecipe recipe, @NotNull IFocusGroup focuses) {
+    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<GasLiquefactionRecipe> holder, @NotNull IFocusGroup focuses) {
+        GasLiquefactionRecipe recipe = holder.value();
         builder.addSlot(RecipeIngredientRole.INPUT, GAS_X, FLUID_Y)
-            .setFluidRenderer(recipe.gasAmount(), false, 16, 16)
-            .addFluidStack(recipe.gas(), recipe.gasAmount());
+            .setFluidRenderer(recipe.input().getAmount(), false, 16, 16)
+            .addFluidStack(recipe.input().getFluid(), recipe.input().getAmount());
         builder.addSlot(RecipeIngredientRole.OUTPUT, LIQUID_X, FLUID_Y)
-            .setFluidRenderer(recipe.liquidAmount(), false, 16, 16)
-            .addFluidStack(recipe.liquid(), recipe.liquidAmount());
+            .setFluidRenderer(recipe.output().getAmount(), false, 16, 16)
+            .addFluidStack(recipe.output().getFluid(), recipe.output().getAmount());
         builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT)
-            .addItemStack(bucketFor(recipe.liquid()));
+            .addItemStack(bucketFor(recipe.output().getFluid()));
     }
 
     @Override
     public void draw(
-        GasLiquefactionJeiRecipe recipe,
+        RecipeHolder<GasLiquefactionRecipe> recipe,
         IRecipeSlotsView recipeSlotsView,
         GuiGraphics guiGraphics,
         double mouseX,
@@ -133,7 +137,11 @@ public class GasLiquefactionCategory implements IRecipeCategory<GasLiquefactionJ
     }
 
     public static void registerRecipes(IRecipeRegistration registration) {
-        registration.addRecipes(AnvilCraftPigeonPlusJeiPlugin.GAS_LIQUEFACTION, GasLiquefactionJeiRecipe.recipes());
+        var recipeManager = Minecraft.getInstance().getConnection().getRecipeManager();
+        List<RecipeHolder<GasLiquefactionRecipe>> recipes = recipeManager.getAllRecipesFor(
+            AddonRecipeTypes.GAS_LIQUEFACTION_TYPE.get()
+        );
+        registration.addRecipes(AnvilCraftPigeonPlusJeiPlugin.GAS_LIQUEFACTION, recipes);
     }
 
     public static void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {

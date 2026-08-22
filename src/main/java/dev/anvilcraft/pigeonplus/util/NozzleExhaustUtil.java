@@ -9,6 +9,9 @@ import dev.dubhe.anvilcraft.init.block.ModBlockTags;
 import dev.dubhe.anvilcraft.init.block.ModFluidTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -54,6 +57,95 @@ public final class NozzleExhaustUtil {
 
     public static boolean hasAnyPropellant(LargeCauldronBlockEntity cauldron) {
         return hasMixedPropellant(cauldron) || hasMethanePropellant(cauldron);
+    }
+
+    public static void spawnPropellantParticles(
+        ServerLevel level,
+        BlockPos cauldronPos,
+        JetPropellant propellant
+    ) {
+        if (propellant == JetPropellant.METHANE) {
+            spawnMethaneParticles(level, cauldronPos);
+        } else {
+            spawnKeroseneParticles(level, cauldronPos);
+        }
+    }
+
+    private static void spawnKeroseneParticles(ServerLevel level, BlockPos cauldronPos) {
+        RandomSource random = level.getRandom();
+        double centerX = cauldronPos.getX() + 0.5;
+        double centerZ = cauldronPos.getZ() + 0.5;
+        double baseY = cauldronPos.getY() + 0.22;
+        double upperY = cauldronPos.getY() + 0.78;
+        double innerRadius = 1.02;
+
+        for (int i = 0; i < 8; i++) {
+            double angle = random.nextDouble() * Math.PI * 2.0;
+            double radius = random.nextDouble() * innerRadius;
+            double x = centerX + Math.cos(angle) * radius;
+            double z = centerZ + Math.sin(angle) * radius;
+            double y = baseY + random.nextDouble() * 0.38;
+            level.sendParticles(ParticleTypes.FLAME, x, y, z, 0,
+                (random.nextDouble() - 0.5) * 0.010, 0.016 + random.nextDouble() * 0.020,
+                (random.nextDouble() - 0.5) * 0.010, 1.0);
+        }
+
+        for (int i = 0; i < 3; i++) {
+            double angle = random.nextDouble() * Math.PI * 2.0;
+            double radius = 0.34 + random.nextDouble() * 0.42;
+            double x = centerX + Math.cos(angle) * radius;
+            double z = centerZ + Math.sin(angle) * radius;
+            double y = upperY + random.nextDouble() * 0.18;
+            level.sendParticles(ParticleTypes.FLAME, x, y, z, 0,
+                (random.nextDouble() - 0.5) * 0.008, 0.014 + random.nextDouble() * 0.016,
+                (random.nextDouble() - 0.5) * 0.008, 1.0);
+        }
+
+        for (int i = 0; i < 2; i++) {
+            double angle = random.nextDouble() * Math.PI * 2.0;
+            double radius = 0.24 + random.nextDouble() * 0.28;
+            double x = centerX + Math.cos(angle) * radius;
+            double z = centerZ + Math.sin(angle) * radius;
+            double y = cauldronPos.getY() + 0.30 + random.nextDouble() * 0.24;
+            level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, x, y, z, 0,
+                (random.nextDouble() - 0.5) * 0.006, 0.010 + random.nextDouble() * 0.012,
+                (random.nextDouble() - 0.5) * 0.006, 1.0);
+        }
+
+        level.sendParticles(ParticleTypes.SMOKE, centerX, cauldronPos.getY() + 0.68, centerZ, 2, 0.16, 0.08, 0.16, 0.010);
+        level.sendParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, centerX, cauldronPos.getY() + 0.84, centerZ, 1, 0.12, 0.06, 0.12, 0.006);
+        level.sendParticles(ParticleTypes.CLOUD, centerX, cauldronPos.getY() + 0.62, centerZ, 1, 0.14, 0.06, 0.14, 0.006);
+    }
+
+    private static void spawnMethaneParticles(ServerLevel level, BlockPos cauldronPos) {
+        RandomSource random = level.getRandom();
+        double centerX = cauldronPos.getX() + 0.5;
+        double centerZ = cauldronPos.getZ() + 0.5;
+        double baseY = cauldronPos.getY() + 0.18;
+
+        for (int i = 0; i < 30; i++) {
+            double angle = random.nextDouble() * Math.PI * 2.0;
+            double radius = random.nextDouble() * 1.08;
+            double x = centerX + Math.cos(angle) * radius;
+            double z = centerZ + Math.sin(angle) * radius;
+            double y = baseY + random.nextDouble() * 0.55;
+            level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, x, y, z, 0,
+                (random.nextDouble() - 0.5) * 0.012, 0.020 + random.nextDouble() * 0.020,
+                (random.nextDouble() - 0.5) * 0.012, 1.0);
+        }
+
+        for (int i = 0; i < 8; i++) {
+            double angle = random.nextDouble() * Math.PI * 2.0;
+            double radius = 0.25 + random.nextDouble() * 0.72;
+            double x = centerX + Math.cos(angle) * radius;
+            double z = centerZ + Math.sin(angle) * radius;
+            double y = cauldronPos.getY() + 0.38 + random.nextDouble() * 0.42;
+            level.sendParticles(ParticleTypes.END_ROD, x, y, z, 0,
+                (random.nextDouble() - 0.5) * 0.010, 0.010 + random.nextDouble() * 0.014,
+                (random.nextDouble() - 0.5) * 0.010, 1.0);
+        }
+
+        level.sendParticles(ParticleTypes.CLOUD, centerX, cauldronPos.getY() + 0.62, centerZ, 3, 0.32, 0.12, 0.32, 0.010);
     }
 
     public static @Nullable JetPropellant getAvailableJetPropellant(LargeCauldronBlockEntity cauldron) {

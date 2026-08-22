@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class GasLiquefactionTracker {
-    public static final int BIOGAS_TO_LIQUEFIED_BIOGAS_RATIO = 512;
-    public static final int COMPRESSED_AIR_TO_LIQUID_OXYGEN_RATIO = 415;
     private static final Map<Key, Integer> PROGRESS = new HashMap<>();
 
     private GasLiquefactionTracker() {
