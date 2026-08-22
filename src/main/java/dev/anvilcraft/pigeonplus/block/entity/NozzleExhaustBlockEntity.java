@@ -47,15 +47,19 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
     public static final double NOZZLE_ACTIVATION_RADIUS = 8.0;
     private static final double KEROSENE_ACCELERATION_PER_TICK = 320.0 / StasisTimeFreezeManager.MAX_FREEZE_TICKS;
     private static final double METHANE_ACCELERATION_PER_TICK = 192.0 / StasisTimeFreezeManager.MAX_FREEZE_TICKS;
+    private static final double HYDROGEN_ACCELERATION_PER_TICK = 160.0 / StasisTimeFreezeManager.MAX_FREEZE_TICKS;
     private static final int CENTER_HEAT_INTERVAL_TICKS = 10;
     private static final int CENTER_HEAT_DURATION_TICKS = 20 * 20;
     public static final int BLOCKED_EXPLODE_TICKS = 200;
     private static final float NOZZLE_EXPLOSION_RADIUS = 2.5F;
     private static final String EXHAUST_TICKS_TAG = "ExhaustTicks";
     private static final String BLOCKED_TICKS_TAG = "BlockedTicks";
+    private static final String ACTIVE_PROPELLANT_TAG = "ActivePropellant";
 
     private int duration;
     private int blockedTicks;
+    private NozzleExhaustUtil.JetPropellant activePropellant =
+        NozzleExhaustUtil.JetPropellant.KEROSENE;
 
     public NozzleExhaustBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.NOZZLE_EXHAUST.get(), pos, state);
@@ -90,6 +94,7 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
             this.stopExhaust();
             return;
         }
+        this.activePropellant = propellant;
 
         if (level.getGameTime() % NozzleExhaustUtil.PLASMA_CONSUME_INTERVAL == 0
             && !NozzleExhaustUtil.consumeTopFuelOnce(cauldron, propellant)) {
@@ -147,6 +152,10 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
 
     public boolean isExhaustFiring() {
         return this.getExhaustPhase() == ExhaustPhase.FIRING;
+    }
+
+    public NozzleExhaustUtil.JetPropellant getActivePropellant() {
+        return this.activePropellant;
     }
 
     private void tickExhaust() {
@@ -341,9 +350,14 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
     }
 
     private static double accelerationPerTick(NozzleExhaustUtil.JetPropellant propellant) {
-        return propellant == NozzleExhaustUtil.JetPropellant.METHANE
-            ? METHANE_ACCELERATION_PER_TICK
-            : KEROSENE_ACCELERATION_PER_TICK;
+        if (propellant == null) {
+            return KEROSENE_ACCELERATION_PER_TICK;
+        }
+        return switch (propellant) {
+            case METHANE -> METHANE_ACCELERATION_PER_TICK;
+            case HYDROGEN -> HYDROGEN_ACCELERATION_PER_TICK;
+            default -> KEROSENE_ACCELERATION_PER_TICK;
+        };
     }
 
     private void spawnParticles(Level level) {
@@ -353,12 +367,13 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
         if (facing == null || outletPos == null) {
             return;
         }
-        LargeCauldronBlockEntity cauldron = NozzleExhaustUtil.getStructuralCauldron(level, this.worldPosition);
-        NozzleExhaustUtil.JetPropellant propellant = cauldron == null
-            ? NozzleExhaustUtil.JetPropellant.KEROSENE
-            : NozzleExhaustUtil.getJetPropellant(level, cauldron);
+        NozzleExhaustUtil.JetPropellant propellant = this.activePropellant;
         boolean methane = propellant == NozzleExhaustUtil.JetPropellant.METHANE;
-        var rollingParticle = methane ? AddonParticles.ROLLING_METHANE_PLASMA.get() : AddonParticles.ROLLING_PLASMA.get();
+        var rollingParticle = switch (propellant) {
+            case METHANE -> AddonParticles.ROLLING_METHANE_PLASMA.get();
+            case HYDROGEN -> AddonParticles.ROLLING_HYDROGEN_PLASMA.get();
+            default -> AddonParticles.ROLLING_PLASMA.get();
+        };
         double baseAxis = -0.92;
 
         for (int i = 0; i < 6; i++) {
@@ -521,6 +536,7 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
         super.saveAdditional(tag, registries);
         tag.putInt(EXHAUST_TICKS_TAG, this.duration);
         tag.putInt(BLOCKED_TICKS_TAG, this.blockedTicks);
+        tag.putString(ACTIVE_PROPELLANT_TAG, this.activePropellant.name());
     }
 
     @Override
@@ -532,6 +548,16 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
         if (tag.contains(BLOCKED_TICKS_TAG)) {
             this.blockedTicks = Math.max(0, tag.getInt(BLOCKED_TICKS_TAG));
         }
+        this.activePropellant = parsePropellant(tag.getString(ACTIVE_PROPELLANT_TAG));
+    }
+
+    private static NozzleExhaustUtil.JetPropellant parsePropellant(String name) {
+        for (NozzleExhaustUtil.JetPropellant propellant : NozzleExhaustUtil.JetPropellant.values()) {
+            if (propellant.name().equals(name)) {
+                return propellant;
+            }
+        }
+        return NozzleExhaustUtil.JetPropellant.KEROSENE;
     }
 
     public ClientboundBlockEntityDataPacket getUpdatePacket() {

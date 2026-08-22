@@ -34,6 +34,7 @@ public class AddonLangHandler {
         provider.add("block.anvilcraft_pigeon_plus.compressed_air", "Compressed Air");
         provider.add("block.anvilcraft_pigeon_plus.mixed_biomass", "Mixed Biomass");
         provider.add("block.anvilcraft_pigeon_plus.liquid_oxygen", "Liquid Oxygen");
+        provider.add("block.anvilcraft_pigeon_plus.liquid_hydrogen", "Liquid Hydrogen");
         provider.add("subtitles.anvilcraft_pigeon_plus.engine_on", "Nozzle engine starts");
         provider.add("subtitles.anvilcraft_pigeon_plus.engine_fire", "Nozzle engine roars");
         provider.add("death.attack.nozzleExhaust", "%1$s sat in the duct seat");

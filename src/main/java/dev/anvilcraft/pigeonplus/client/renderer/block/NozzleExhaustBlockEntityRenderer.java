@@ -58,7 +58,6 @@ public class NozzleExhaustBlockEntityRenderer implements BlockEntityRenderer<Noz
         if (flameProgress <= 0.0F) {
             return;
         }
-        NozzleExhaustUtil.JetPropellant propellant = NozzleExhaustUtil.getJetPropellant(blockEntity.getLevel(), cauldron);
         poseStack.pushPose();
         poseStack.translate(
             outletPos.getX() - blockEntity.getBlockPos().getX(),
@@ -71,9 +70,11 @@ public class NozzleExhaustBlockEntityRenderer implements BlockEntityRenderer<Noz
             blockEntity.getLevel().getGameTime() + partialTick,
             blockEntity.getBlockPos(),
             facing,
-            propellant == NozzleExhaustUtil.JetPropellant.METHANE
-                ? NozzleExhaustRenderer.Propellant.METHANE
-                : NozzleExhaustRenderer.Propellant.KEROSENE,
+            switch (blockEntity.getActivePropellant()) {
+                case METHANE -> NozzleExhaustRenderer.Propellant.METHANE;
+                case HYDROGEN -> NozzleExhaustRenderer.Propellant.HYDROGEN;
+                default -> NozzleExhaustRenderer.Propellant.KEROSENE;
+            },
             NozzleExhaustUtil.getVisibleJetRenderLength(
                 blockEntity.getLevel(),
                 outletPos,

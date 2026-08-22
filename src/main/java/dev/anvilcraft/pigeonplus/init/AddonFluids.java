@@ -170,6 +170,40 @@ public class AddonFluids {
             new Vector3f(0.85f, 0.95f, 1.0f))
     );
 
+    public static final DeferredHolder<FluidType, FluidType> LIQUID_HYDROGEN_TYPE = FLUID_TYPES.register(
+        "liquid_hydrogen",
+        () -> new FluidType(FluidType.Properties.create()
+            .descriptionId("block.%s.liquid_hydrogen".formatted(AnvilCraftPigeonPlus.MOD_ID))
+            .density(70)
+            .viscosity(50)
+            .temperature(20)
+            .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL)
+            .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY))
+    );
+
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> LIQUID_HYDROGEN = FLUIDS.register(
+        "liquid_hydrogen",
+        () -> new BaseFlowingFluid.Source(liquidHydrogenProperties())
+    );
+
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> LIQUID_HYDROGEN_FLOWING = FLUIDS.register(
+        "flowing_liquid_hydrogen",
+        () -> new BaseFlowingFluid.Flowing(liquidHydrogenProperties())
+    );
+
+    public static final DeferredHolder<Block, LiquidBlock> LIQUID_HYDROGEN_BLOCK = BLOCKS.register(
+        "liquid_hydrogen",
+        () -> new EvaporatingLiquidBlock(LIQUID_HYDROGEN.get(), BlockBehaviour.Properties.of()
+            .replaceable()
+            .noCollission()
+            .strength(100.0f)
+            .pushReaction(PushReaction.DESTROY)
+            .noLootTable()
+            .liquid()
+            .randomTicks(),
+            new Vector3f(0.78f, 0.92f, 1.0f))
+    );
+
     private static BaseFlowingFluid.Properties mixedBiomassProperties() {
         return new BaseFlowingFluid.Properties(MIXED_BIOMASS_TYPE, MIXED_BIOMASS, MIXED_BIOMASS_FLOWING)
             .bucket(AddonItems.MIXED_BIOMASS_BUCKET)
@@ -194,6 +228,16 @@ public class AddonFluids {
         return new BaseFlowingFluid.Properties(LIQUID_OXYGEN_TYPE, LIQUID_OXYGEN, LIQUID_OXYGEN_FLOWING)
             .bucket(AddonItems.LIQUID_OXYGEN_BUCKET)
             .block(LIQUID_OXYGEN_BLOCK)
+            .slopeFindDistance(4)
+            .levelDecreasePerBlock(1)
+            .tickRate(5)
+            .explosionResistance(100.0f);
+    }
+
+    private static BaseFlowingFluid.Properties liquidHydrogenProperties() {
+        return new BaseFlowingFluid.Properties(LIQUID_HYDROGEN_TYPE, LIQUID_HYDROGEN, LIQUID_HYDROGEN_FLOWING)
+            .bucket(AddonItems.LIQUID_HYDROGEN_BUCKET)
+            .block(LIQUID_HYDROGEN_BLOCK)
             .slopeFindDistance(4)
             .levelDecreasePerBlock(1)
             .tickRate(5)

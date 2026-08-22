@@ -101,6 +101,8 @@ public class AnvilCraftPigeonPlusClient {
             ItemBlockRenderTypes.setRenderLayer(AddonFluids.LIQUEFIED_BIOGAS_FLOWING.get(), RenderType.translucent());
             ItemBlockRenderTypes.setRenderLayer(AddonFluids.LIQUID_OXYGEN.get(), RenderType.translucent());
             ItemBlockRenderTypes.setRenderLayer(AddonFluids.LIQUID_OXYGEN_FLOWING.get(), RenderType.translucent());
+            ItemBlockRenderTypes.setRenderLayer(AddonFluids.LIQUID_HYDROGEN.get(), RenderType.translucent());
+            ItemBlockRenderTypes.setRenderLayer(AddonFluids.LIQUID_HYDROGEN_FLOWING.get(), RenderType.translucent());
         });
     }
 
@@ -160,6 +162,17 @@ public class AnvilCraftPigeonPlusClient {
             ),
             AddonFluids.LIQUID_OXYGEN_TYPE
         );
+        event.registerFluidType(
+            new ModClientFluidTypeExtensionImpl(
+                ResourceLocation.withDefaultNamespace("block/water_still"),
+                ResourceLocation.withDefaultNamespace("block/water_flow"),
+                0xB8E2F4,
+                8.0f,
+                0x70B8E2F4,
+                false
+            ),
+            AddonFluids.LIQUID_HYDROGEN_TYPE
+        );
     }
 
     private void onRegisterItemColors(RegisterColorHandlersEvent.Item event) {
@@ -190,5 +203,6 @@ public class AnvilCraftPigeonPlusClient {
     private void onRegisterParticleProviders(RegisterParticleProvidersEvent event) {
         event.registerSpriteSet(AddonParticles.ROLLING_PLASMA.get(), RollingPlasmaParticle.Provider::new);
         event.registerSpriteSet(AddonParticles.ROLLING_METHANE_PLASMA.get(), RollingPlasmaParticle.MethaneProvider::new);
+        event.registerSpriteSet(AddonParticles.ROLLING_HYDROGEN_PLASMA.get(), RollingPlasmaParticle.HydrogenProvider::new);
     }
 }

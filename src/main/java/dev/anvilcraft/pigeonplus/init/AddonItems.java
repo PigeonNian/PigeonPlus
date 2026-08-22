@@ -3,7 +3,6 @@ package dev.anvilcraft.pigeonplus.init;
 import dev.anvilcraft.lib.v2.registrum.util.entry.ItemEntry;
 import dev.dubhe.anvilcraft.util.registrater.ModelProviderUtil;
 import net.minecraft.world.item.BucketItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.common.Tags;
 
@@ -60,6 +59,16 @@ public class AddonItems {
         )
         .tag(Tags.Items.BUCKETS)
         .lang("Liquid Oxygen Bucket")
+        .properties(properties -> properties.stacksTo(1).craftRemainder(Items.BUCKET))
+        .model(ModelProviderUtil::bucket)
+        .register();
+
+    public static final ItemEntry<BucketItem> LIQUID_HYDROGEN_BUCKET = REGISTRUM.item(
+            "liquid_hydrogen_bucket",
+            properties -> new BucketItem(AddonFluids.LIQUID_HYDROGEN.get(), properties)
+        )
+        .tag(Tags.Items.BUCKETS)
+        .lang("Liquid Hydrogen Bucket")
         .properties(properties -> properties.stacksTo(1).craftRemainder(Items.BUCKET))
         .model(ModelProviderUtil::bucket)
         .register();

@@ -4,6 +4,7 @@
     "anvilcraft_pigeon_plus:liquefied_biogas_bucket",
     "anvilcraft_pigeon_plus:compressed_air_bucket",
     "anvilcraft_pigeon_plus:mixed_biomass_bucket",
-    "anvilcraft_pigeon_plus:liquid_oxygen_bucket"
+    "anvilcraft_pigeon_plus:liquid_oxygen_bucket",
+    "anvilcraft_pigeon_plus:liquid_hydrogen_bucket"
   ]
 }

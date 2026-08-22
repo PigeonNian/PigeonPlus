@@ -42,7 +42,8 @@ public final class NozzleExhaustUtil {
 
     public enum JetPropellant {
         KEROSENE,
-        METHANE
+        METHANE,
+        HYDROGEN
     }
 
     public static boolean hasMixedPropellant(LargeCauldronBlockEntity cauldron) {
@@ -55,8 +56,13 @@ public final class NozzleExhaustUtil {
             && hasLiquidOxygen(cauldron);
     }
 
+    public static boolean hasHydrogenPropellant(LargeCauldronBlockEntity cauldron) {
+        return findMatchingFluid(cauldron, stack -> stack.getFluid().isSame(AddonFluids.LIQUID_HYDROGEN.get())) != null
+            && hasLiquidOxygen(cauldron);
+    }
+
     public static boolean hasAnyPropellant(LargeCauldronBlockEntity cauldron) {
-        return hasMixedPropellant(cauldron) || hasMethanePropellant(cauldron);
+        return hasMixedPropellant(cauldron) || hasMethanePropellant(cauldron) || hasHydrogenPropellant(cauldron);
     }
 
     public static void spawnPropellantParticles(
@@ -66,6 +72,8 @@ public final class NozzleExhaustUtil {
     ) {
         if (propellant == JetPropellant.METHANE) {
             spawnMethaneParticles(level, cauldronPos);
+        } else if (propellant == JetPropellant.HYDROGEN) {
+            spawnHydrogenParticles(level, cauldronPos);
         } else {
             spawnKeroseneParticles(level, cauldronPos);
         }
@@ -152,10 +160,45 @@ public final class NozzleExhaustUtil {
         if (hasMethanePropellant(cauldron)) {
             return JetPropellant.METHANE;
         }
+        if (hasHydrogenPropellant(cauldron)) {
+            return JetPropellant.HYDROGEN;
+        }
         if (hasMixedPropellant(cauldron)) {
             return JetPropellant.KEROSENE;
         }
         return null;
+    }
+
+
+    private static void spawnHydrogenParticles(ServerLevel level, BlockPos cauldronPos) {
+        RandomSource random = level.getRandom();
+        double centerX = cauldronPos.getX() + 0.5;
+        double centerZ = cauldronPos.getZ() + 0.5;
+        double baseY = cauldronPos.getY() + 0.20;
+
+        for (int i = 0; i < 20; i++) {
+            double angle = random.nextDouble() * Math.PI * 2.0;
+            double radius = random.nextDouble() * 1.02;
+            double x = centerX + Math.cos(angle) * radius;
+            double z = centerZ + Math.sin(angle) * radius;
+            double y = baseY + random.nextDouble() * 0.50;
+            level.sendParticles(ParticleTypes.END_ROD, x, y, z, 0,
+                (random.nextDouble() - 0.5) * 0.006, 0.018 + random.nextDouble() * 0.014,
+                (random.nextDouble() - 0.5) * 0.006, 1.0);
+        }
+
+        for (int i = 0; i < 10; i++) {
+            double angle = random.nextDouble() * Math.PI * 2.0;
+            double radius = 0.30 + random.nextDouble() * 0.60;
+            double x = centerX + Math.cos(angle) * radius;
+            double z = centerZ + Math.sin(angle) * radius;
+            double y = cauldronPos.getY() + 0.35 + random.nextDouble() * 0.40;
+            level.sendParticles(ParticleTypes.ELECTRIC_SPARK, x, y, z, 0,
+                (random.nextDouble() - 0.5) * 0.008, 0.014 + random.nextDouble() * 0.016,
+                (random.nextDouble() - 0.5) * 0.008, 1.0);
+        }
+
+        level.sendParticles(ParticleTypes.CLOUD, centerX, cauldronPos.getY() + 0.62, centerZ, 3, 0.28, 0.10, 0.28, 0.010);
     }
 
     private static boolean hasLiquidOxygen(LargeCauldronBlockEntity cauldron) {
@@ -465,6 +508,7 @@ public final class NozzleExhaustUtil {
         return switch (propellant) {
             case KEROSENE -> stack.is(ModFluidTags.OIL);
             case METHANE -> stack.getFluid().isSame(AddonFluids.LIQUEFIED_BIOGAS.get());
+            case HYDROGEN -> stack.getFluid().isSame(AddonFluids.LIQUID_HYDROGEN.get());
         };
     }
 
@@ -475,6 +519,7 @@ public final class NozzleExhaustUtil {
         return switch (propellant) {
             case KEROSENE -> hasMixedPropellant(cauldron);
             case METHANE -> hasMethanePropellant(cauldron);
+            case HYDROGEN -> hasHydrogenPropellant(cauldron);
         };
     }
 

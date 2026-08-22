@@ -17,6 +17,8 @@ public final class AddonParticles {
         PARTICLES.register("rolling_plasma", () -> new SimpleParticleType(false));
     public static final Supplier<SimpleParticleType> ROLLING_METHANE_PLASMA =
         PARTICLES.register("rolling_methane_plasma", () -> new SimpleParticleType(false));
+    public static final Supplier<SimpleParticleType> ROLLING_HYDROGEN_PLASMA =
+        PARTICLES.register("rolling_hydrogen_plasma", () -> new SimpleParticleType(false));
 
     private AddonParticles() {
     }

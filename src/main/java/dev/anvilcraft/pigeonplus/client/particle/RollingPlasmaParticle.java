@@ -40,7 +40,7 @@ public class RollingPlasmaParticle extends TextureSheetParticle {
         this.rCol = 1.0F;
         this.gCol = 1.0F;
         this.bCol = 1.0F;
-        this.alpha = 0.9F;
+        this.alpha = colorProfile.maxAlpha();
         this.hasPhysics = false;
         this.setSpriteFromAge(sprites);
         this.pigeonplus$setColorFromAge(0, this.lifetime);
@@ -55,7 +55,7 @@ public class RollingPlasmaParticle extends TextureSheetParticle {
         this.xd *= 0.96D;
         this.yd = this.yd * 0.94D + 0.002D;
         this.zd *= 0.96D;
-        this.setAlpha(0.9F * (1.0F - (float) this.age / this.lifetime));
+        this.setAlpha(this.colorProfile.maxAlpha() * (1.0F - (float) this.age / this.lifetime));
         this.pigeonplus$setColorFromAge(this.age, this.lifetime);
         this.setSpriteFromAge(this.sprites);
     }
@@ -134,6 +134,29 @@ public class RollingPlasmaParticle extends TextureSheetParticle {
         }
     }
 
+    @OnlyIn(Dist.CLIENT)
+    public static class HydrogenProvider implements ParticleProvider<SimpleParticleType> {
+        private final SpriteSet sprites;
+
+        public HydrogenProvider(SpriteSet sprites) {
+            this.sprites = sprites;
+        }
+
+        @Override
+        public @Nullable Particle createParticle(
+            SimpleParticleType type,
+            ClientLevel level,
+            double x,
+            double y,
+            double z,
+            double xSpeed,
+            double ySpeed,
+            double zSpeed
+        ) {
+            return new RollingPlasmaParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, this.sprites, ColorProfile.HYDROGEN);
+        }
+    }
+
     private record ColorProfile(
         float startR,
         float startG,
@@ -143,12 +166,20 @@ public class RollingPlasmaParticle extends TextureSheetParticle {
         float midB,
         float endR,
         float endG,
-        float endB
+        float endB,
+        float maxAlpha
     ) {
         private static final ColorProfile AIR = new ColorProfile(
             1.00F, 1.00F, 1.00F,
             0.92F, 0.96F, 1.00F,
-            0.78F, 0.82F, 0.86F
+            0.78F, 0.82F, 0.86F,
+            0.90F
+        );
+        private static final ColorProfile HYDROGEN = new ColorProfile(
+            1.00F, 0.98F, 0.93F,
+            1.00F, 0.90F, 0.72F,
+            0.99F, 0.79F, 0.50F,
+            0.42F
         );
     }
 }

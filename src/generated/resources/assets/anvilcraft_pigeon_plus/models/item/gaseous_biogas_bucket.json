@@ -1,5 +1,6 @@
 {
   "parent": "neoforge:item/bucket_drip",
+  "flip_gas": true,
   "fluid": "anvilcraft_pigeon_plus:gaseous_biogas",
   "loader": "neoforge:fluid_container"
 }

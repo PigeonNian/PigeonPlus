@@ -1,1 +1,11 @@
-{"input": {"id": "anvilcraft_pigeon_plus:compressed_air", "amount": 415},"type": "anvilcraft_pigeon_plus:gas_liquefaction","output": {"id": "anvilcraft_pigeon_plus:liquid_oxygen", "amount": 1}}
+{
+  "type": "anvilcraft_pigeon_plus:gas_liquefaction",
+  "input": {
+    "amount": 415,
+    "id": "anvilcraft_pigeon_plus:compressed_air"
+  },
+  "output": {
+    "amount": 1,
+    "id": "anvilcraft_pigeon_plus:liquid_oxygen"
+  }
+}

@@ -400,12 +400,23 @@ public final class NozzleExhaustRenderer {
                 0.11F, 0.94F, 1.00F, 0.76F, 0.36F, 1.00F, 0.98F, 0.88F, 0.84F, 0.76F, 0.60F,
                 0.92F, 0.84F
             );
+            case HYDROGEN -> new RenderProfile(
+                24, 6, 1.06F, 0.26F, 0.40F, 6.8F, 0.26F, 0.16F,
+                1.00F, 0.95F, 0.84F, 0.99F, 0.78F, 0.52F,
+                18, 8, 9.0F, 0.76F, 0.14F, 0.18F, 7.2F, 0.36F, 0.16F,
+                1.00F, 0.98F, 0.94F, 1.00F, 0.89F, 0.72F,
+                3, 0.55F, 0.20F, 0.70F, 0.10F, 0.24F, 0.88F, 0.14F, 0.40F, 0.10F, 0.96F, 0.10F,
+                0.11F, 0.94F,
+                1.00F, 0.97F, 0.90F, 1.00F, 0.91F, 0.74F, 0.99F, 0.80F, 0.54F,
+                0.82F, 0.78F
+            );
         };
     }
 
     public enum Propellant {
         METHANE,
-        KEROSENE
+        KEROSENE,
+        HYDROGEN
     }
 
     private record RenderProfile(
