@@ -90,7 +90,7 @@ public class AddonFluids {
         "compressed_air",
         () -> new FluidType(FluidType.Properties.create()
             .descriptionId("block.%s.compressed_air".formatted(AnvilCraftPigeonPlus.MOD_ID))
-            .density(10)
+            .density(-100)
             .viscosity(50)
             .temperature(300)
             .canDrown(false)

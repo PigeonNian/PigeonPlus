@@ -11,7 +11,7 @@
     "FluidMixingRecipeSerializerMixin",
     "LargeCauldronBlockMixin",
     "FluidNetworkScannerMixin",
-    "FluidPipeNetworkMixin",
+    "LargeFluidTankBlockEntityMixin",
     "LargeCauldronBlockEntityMixin",
     "LivingEntityMixin"
   ],

@@ -1,6 +1,7 @@
 package dev.anvilcraft.pigeonplus.util;
 
 import dev.anvilcraft.pigeonplus.init.AddonFluids;
+import dev.dubhe.anvilcraft.api.fluidtank.InfinityFluidTank;
 import dev.dubhe.anvilcraft.block.entity.fluid.DrainBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -14,7 +15,7 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.NotNull;
 
-public class CompressedAirDrainFluidHandler implements IFluidHandler {
+public class CompressedAirDrainFluidHandler extends InfinityFluidTank {
     private static final int AIR_CAPACITY = DrainBlockEntity.CAPACITY;
 
     private final Level level;
@@ -25,6 +26,19 @@ public class CompressedAirDrainFluidHandler implements IFluidHandler {
         this.level = level;
         this.pos = pos.immutable();
         this.delegate = delegate;
+    }
+
+
+    @Override
+    public FluidStack getFluid() {
+        return this.canExtractAir()
+            ? new FluidStack(AddonFluids.COMPRESSED_AIR.get(), AIR_CAPACITY)
+            : FluidStack.EMPTY;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
     }
 
     public boolean canExtractAir() {

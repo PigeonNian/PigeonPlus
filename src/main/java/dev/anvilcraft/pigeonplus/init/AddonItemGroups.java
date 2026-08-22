@@ -30,7 +30,7 @@ public class AddonItemGroups {
                     "AnvilCraft: Pigeon+"
                 )
             )
-            .withTabsBefore(ModItemGroups.ANVILCRAFT_BUILD_BLOCK.getId())
+            .withTabsBefore(ModItemGroups.ANVILCRAFT_ITEMS.getId())
             .build()
     );
 
