@@ -2,8 +2,8 @@
 minecraft = "1.21.1"
 neoForge = "21.1.248"
 anvillib = "2.0.0+snapshot.518"
-anvilcraft = "1.6.0+snapshot.2230"
-jei = "19.44.0.403"
+anvilcraft = "1.6.0+snapshot.2231"
+jei = "19.50.0.414"
 modDevGradle = "2.0.144"
 lombok = "8.7.1"
 

@@ -114,13 +114,20 @@ public class BlendingRecipe extends AbstractProcessRecipe<BlendingRecipe> {
         }
 
         public Builder transform(ResourceLocation transform) {
-            this.hasCauldron.transform(BuiltInRegistries.FLUID.get(transform), 1000);
+            return this.transform(transform, 1000);
+        }
+
+        public Builder transform(ResourceLocation transform, int produce) {
+            this.hasCauldron.transform(BuiltInRegistries.FLUID.get(transform), produce);
             return this;
         }
 
         public Builder transform(Block cauldron) {
-            this.hasCauldron.transform(BuiltInRegistries.FLUID.get(WrapUtils.cauldron2Fluid(cauldron)), 1000);
-            return this;
+            return this.transform(cauldron, 1000);
+        }
+
+        public Builder transform(Block cauldron, int produce) {
+            return this.transform(WrapUtils.cauldron2Fluid(cauldron), produce);
         }
 
         public Builder consume(int consume) {
@@ -147,6 +154,16 @@ public class BlendingRecipe extends AbstractProcessRecipe<BlendingRecipe> {
         @Override
         public String getType() {
             return "blending";
+        }
+
+        @Override
+        public void validate(ResourceLocation id) {
+            if (this.itemIngredients.isEmpty()) {
+                throw new IllegalArgumentException("Recipe ingredients must not be empty, RecipeId: " + id);
+            }
+            if (this.results.isEmpty() && this.hasCauldron.build().transforms().isEmpty()) {
+                throw new IllegalArgumentException("Recipe must have results or a fluid transform, RecipeId: " + id);
+            }
         }
 
         @Override
