@@ -1,62 +1,32 @@
 {
   "variants": {
-    "facing=east,overload=false,powered=false": {
+    "facing=east,powered=false": {
       "model": "anvilcraft_pigeon_plus:block/anvil_pump",
       "y": 270
     },
-    "facing=east,overload=false,powered=true": {
+    "facing=east,powered=true": {
       "model": "anvilcraft_pigeon_plus:block/anvil_pump",
       "y": 270
     },
-    "facing=east,overload=true,powered=false": {
-      "model": "anvilcraft_pigeon_plus:block/anvil_pump",
-      "y": 270
-    },
-    "facing=east,overload=true,powered=true": {
-      "model": "anvilcraft_pigeon_plus:block/anvil_pump",
-      "y": 270
-    },
-    "facing=north,overload=false,powered=false": {
+    "facing=north,powered=false": {
       "model": "anvilcraft_pigeon_plus:block/anvil_pump",
       "y": 180
     },
-    "facing=north,overload=false,powered=true": {
+    "facing=north,powered=true": {
       "model": "anvilcraft_pigeon_plus:block/anvil_pump",
       "y": 180
     },
-    "facing=north,overload=true,powered=false": {
-      "model": "anvilcraft_pigeon_plus:block/anvil_pump",
-      "y": 180
-    },
-    "facing=north,overload=true,powered=true": {
-      "model": "anvilcraft_pigeon_plus:block/anvil_pump",
-      "y": 180
-    },
-    "facing=south,overload=false,powered=false": {
+    "facing=south,powered=false": {
       "model": "anvilcraft_pigeon_plus:block/anvil_pump"
     },
-    "facing=south,overload=false,powered=true": {
+    "facing=south,powered=true": {
       "model": "anvilcraft_pigeon_plus:block/anvil_pump"
     },
-    "facing=south,overload=true,powered=false": {
-      "model": "anvilcraft_pigeon_plus:block/anvil_pump"
-    },
-    "facing=south,overload=true,powered=true": {
-      "model": "anvilcraft_pigeon_plus:block/anvil_pump"
-    },
-    "facing=west,overload=false,powered=false": {
+    "facing=west,powered=false": {
       "model": "anvilcraft_pigeon_plus:block/anvil_pump",
       "y": 90
     },
-    "facing=west,overload=false,powered=true": {
-      "model": "anvilcraft_pigeon_plus:block/anvil_pump",
-      "y": 90
-    },
-    "facing=west,overload=true,powered=false": {
-      "model": "anvilcraft_pigeon_plus:block/anvil_pump",
-      "y": 90
-    },
-    "facing=west,overload=true,powered=true": {
+    "facing=west,powered=true": {
       "model": "anvilcraft_pigeon_plus:block/anvil_pump",
       "y": 90
     }

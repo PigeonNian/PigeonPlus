@@ -55,8 +55,7 @@ public class AnvilPumpBlock extends BetterBaseEntityBlock
         super(properties);
         this.registerDefaultState(this.stateDefinition.any()
             .setValue(FACING, Direction.SOUTH)
-            .setValue(PumpBlock.POWERED, false)
-            .setValue(PumpBlock.OVERLOAD, false));
+            .setValue(PumpBlock.POWERED, false));
     }
 
     @Override
@@ -66,7 +65,7 @@ public class AnvilPumpBlock extends BetterBaseEntityBlock
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<net.minecraft.world.level.block.Block, BlockState> builder) {
-        builder.add(FACING, PumpBlock.POWERED, PumpBlock.OVERLOAD);
+        builder.add(FACING, PumpBlock.POWERED);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package dev.anvilcraft.pigeonplus.block.entity;
 
 import dev.dubhe.anvilcraft.api.fluid.network.FluidNetworkManager;
-import dev.dubhe.anvilcraft.block.entity.fluid.PumpBlockEntity;
 import dev.dubhe.anvilcraft.block.fluid.PumpBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -9,10 +8,13 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AnvilBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class AnvilPumpBlockEntity extends PumpBlockEntity {
+public class AnvilPumpBlockEntity extends BlockEntity {
     private static final int PUMP_DURATION_TICKS = 20;
+    private static final int PUMP_HEADLIFT = 10;
     private static final float MAX_EFFICIENCY_FALL_DISTANCE = 20.0F;
     private static final float PISTON_PRESS_STEP = 0.4F;
     private static final float PISTON_RELEASE_STEP = 0.25F;
@@ -29,6 +31,11 @@ public class AnvilPumpBlockEntity extends PumpBlockEntity {
     private int pistonReleaseDelay;
     private boolean impactLocked;
     private int impactUnlockTicks;
+    private boolean lastCanPump;
+
+    public AnvilPumpBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        super(type, pos, state);
+    }
 
     public AnvilPumpBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.ANVIL_PUMP.get(), pos, state);
@@ -45,7 +52,7 @@ public class AnvilPumpBlockEntity extends PumpBlockEntity {
         int oldHeadlift = this.headlift;
         int nextHeadlift = Math.max(
             1,
-            Math.round(Math.min(fallDistance / MAX_EFFICIENCY_FALL_DISTANCE, 1.0F) * PumpBlockEntity.PUMP_HEADLIFT)
+            Math.round(Math.min(fallDistance / MAX_EFFICIENCY_FALL_DISTANCE, 1.0F) * PUMP_HEADLIFT)
         );
         this.remainingPumpTicks = PUMP_DURATION_TICKS;
         this.headlift = nextHeadlift;
@@ -81,12 +88,6 @@ public class AnvilPumpBlockEntity extends PumpBlockEntity {
         this.pistonReleaseDelay = PISTON_RELEASE_DELAY_TICKS;
     }
 
-    @Override
-    public int getInputPower() {
-        return 0;
-    }
-
-    @Override
     public boolean canPump() {
         return this.remainingPumpTicks > 0 && !this.getBlockState().getValue(PumpBlock.POWERED);
     }
@@ -104,10 +105,16 @@ public class AnvilPumpBlockEntity extends PumpBlockEntity {
             entity.setChanged();
         }
         entity.tickImpactLock(level, pos);
+        entity.updateNetworkState(level);
+    }
 
-        boolean canPumpNow = entity.canPump();
-        if (canPumpNow != entity.isLastCanPump()) {
-            entity.setLastCanPump(canPumpNow);
+    private void updateNetworkState(Level level) {
+        if (level.isClientSide()) {
+            return;
+        }
+        boolean canPumpNow = this.canPump();
+        if (canPumpNow != this.lastCanPump) {
+            this.lastCanPump = canPumpNow;
             FluidNetworkManager.INSTANCE.markDirty(level);
         }
     }
@@ -176,6 +183,15 @@ public class AnvilPumpBlockEntity extends PumpBlockEntity {
 
     private static boolean hasAnvilOnTop(Level level, BlockPos pos) {
         return level.getBlockState(pos.above()).getBlock() instanceof AnvilBlock;
+    }
+
+    private void sendUpdate() {
+        if (this.level != null) {
+            this.level.sendBlockUpdated(
+                this.worldPosition, this.getBlockState(), this.getBlockState(),
+                net.minecraft.world.level.block.Block.UPDATE_CLIENTS
+            );
+        }
     }
 
     @Override

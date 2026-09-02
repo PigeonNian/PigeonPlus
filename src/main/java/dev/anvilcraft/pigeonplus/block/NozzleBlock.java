@@ -8,7 +8,6 @@ import dev.dubhe.anvilcraft.block.multipart.FlexibleMultiPartBlock;
 import dev.dubhe.anvilcraft.block.state.DirectionCube3x3PartHalf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
@@ -157,7 +156,8 @@ public class NozzleBlock extends FlexibleMultiPartBlock<DirectionCube3x3PartHalf
             NozzleExhaustBlockEntity.tick(tickerLevel, pos, tickerState, (NozzleExhaustBlockEntity) blockEntity);
     }
 
-    private static VoxelShape getPartShape(BlockState state) {
+    @Override
+    public VoxelShape getPartShape(BlockState state) {
         return SHAPES.getOrDefault(state.getValue(FACING), SHAPES.get(Direction.UP))
             .getOrDefault(state.getValue(PART), Shapes.block());
     }
