@@ -144,7 +144,6 @@ public class NozzleBlock extends FlexibleMultiPartBlock<DirectionCube3x3PartHalf
 
     @Nullable
     @Override
-    @SuppressWarnings("unchecked")
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
         Level level,
         BlockState state,
