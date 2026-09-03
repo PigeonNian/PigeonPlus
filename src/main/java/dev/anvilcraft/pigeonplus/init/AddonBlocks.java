@@ -51,6 +51,7 @@ public class AddonBlocks {
 
     public static final BlockEntry<BlenderBlock> BLENDER = REGISTRUM
         .block("blender", BlenderBlock::new)
+        .initialProperties(() -> Blocks.IRON_BLOCK)
         .blockstate((ctx, prov) -> prov.getVariantBuilder(ctx.getEntry()).forAllStates(state ->
             ConfiguredModel.builder()
                 .modelFile(prov.models().getExistingFile(

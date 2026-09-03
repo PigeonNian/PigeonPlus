@@ -1,9 +1,11 @@
 package dev.anvilcraft.pigeonplus.block;
 
 import com.mojang.serialization.MapCodec;
+import dev.dubhe.anvilcraft.api.hammer.IHammerRemovable;
 import dev.anvilcraft.pigeonplus.block.entity.FeedSpreaderBlockEntity;
 import dev.anvilcraft.pigeonplus.block.entity.ModBlockEntities;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -19,13 +21,52 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-public class FeedSpreaderBlock extends BaseEntityBlock {
+public class FeedSpreaderBlock extends BaseEntityBlock implements IHammerRemovable {
     public static final MapCodec<FeedSpreaderBlock> CODEC = simpleCodec(FeedSpreaderBlock::new);
 
     public FeedSpreaderBlock(Properties properties) {
         super(properties);
+    }
+
+    private static final VoxelShape SHAPE = Shapes.or(
+        Block.box(1.0, 0.0, 1.0, 15.0, 3.0, 15.0),
+        Block.box(5.5, 3.0, 5.5, 10.5, 7.0, 10.5),
+        Block.box(6.0, 2.0, 6.0, 10.0, 16.0, 10.0)
+    );
+
+    @Override
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        return SHAPE;
+    }
+
+    @Override
+    public VoxelShape getCollisionShape(
+        BlockState state,
+        BlockGetter level,
+        BlockPos pos,
+        CollisionContext context
+    ) {
+        return SHAPE;
+    }
+
+    @Override
+    public VoxelShape getOcclusionShape(BlockState state, BlockGetter level, BlockPos pos) {
+        return Shapes.empty();
+    }
+
+    @Override
+    protected float getShadeBrightness(BlockState state, BlockGetter level, BlockPos pos) {
+        return 1.0F;
+    }
+
+    @Override
+    protected boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) {
+        return true;
     }
 
     @Override

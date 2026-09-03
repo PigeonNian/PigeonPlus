@@ -1,6 +1,7 @@
 package dev.anvilcraft.pigeonplus.block;
 
 import com.mojang.serialization.MapCodec;
+import dev.dubhe.anvilcraft.api.hammer.IHammerRemovable;
 import dev.anvilcraft.lib.v2.util.ShapeUtil;
 import dev.anvilcraft.pigeonplus.block.entity.ModBlockEntities;
 import dev.anvilcraft.pigeonplus.block.entity.NozzleExhaustBlockEntity;
@@ -34,7 +35,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-public class NozzleBlock extends FlexibleMultiPartBlock<DirectionCube3x3PartHalf, DirectionProperty, Direction> implements EntityBlock {
+public class NozzleBlock extends FlexibleMultiPartBlock<DirectionCube3x3PartHalf, DirectionProperty, Direction> implements EntityBlock, IHammerRemovable {
     public static final MapCodec<NozzleBlock> CODEC = simpleCodec(NozzleBlock::new);
     public static final EnumProperty<DirectionCube3x3PartHalf> PART =
         EnumProperty.create("part", DirectionCube3x3PartHalf.class);

@@ -2,6 +2,7 @@ package dev.anvilcraft.pigeonplus.block;
 
 import com.mojang.serialization.MapCodec;
 import dev.anvilcraft.pigeonplus.block.entity.BlenderBlockEntity;
+import dev.dubhe.anvilcraft.api.hammer.IHammerRemovable;
 import dev.anvilcraft.pigeonplus.block.entity.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -26,7 +27,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-public class BlenderBlock extends BaseEntityBlock {
+public class BlenderBlock extends BaseEntityBlock implements IHammerRemovable {
     public static final MapCodec<BlenderBlock> CODEC = simpleCodec(BlenderBlock::new);
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty WORKING = BooleanProperty.create("working");

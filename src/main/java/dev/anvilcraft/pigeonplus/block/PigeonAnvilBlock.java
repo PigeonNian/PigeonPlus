@@ -1,5 +1,6 @@
 package dev.anvilcraft.pigeonplus.block;
 
+import dev.dubhe.anvilcraft.api.hammer.IHammerRemovable;
 import dev.dubhe.anvilcraft.block.better.BetterAnvilBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -30,7 +31,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  *     <li>落地保留铁砧音效/粒子，并叠加鸽子咕咕叫 + 羽毛粒子。</li>
  * </ul>
  */
-public class PigeonAnvilBlock extends BetterAnvilBlock {
+public class PigeonAnvilBlock extends BetterAnvilBlock implements IHammerRemovable {
     // 皇家铁砧碰撞箱：每轴一条贯通腿 + 顶板
     protected static final VoxelShape BASE = Block.box(2.0, 0.0, 2.0, 14.0, 4.0, 14.0);
     protected static final VoxelShape X_LEG1 = Block.box(4.0, 4.0, 5.0, 12.0, 10.0, 11.0);
