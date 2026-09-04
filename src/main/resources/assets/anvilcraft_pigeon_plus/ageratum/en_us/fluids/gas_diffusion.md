@@ -39,5 +39,6 @@ When a large tank is **already full of gas** and a pump keeps pumping more gas i
 
 - Biogas → liquefied biogas, ratio 512:1.
 - Compressed air → liquid oxygen, ratio 415:1.
+- Compressed air → liquid hydrogen, ratio 830:1.
 
 Liquefaction therefore requires a "full tank + continuous pressure". Both ordinary pumps and piston pumps work.

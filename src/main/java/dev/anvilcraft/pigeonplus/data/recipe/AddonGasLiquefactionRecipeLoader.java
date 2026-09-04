@@ -19,6 +19,15 @@ public class AddonGasLiquefactionRecipeLoader {
         );
 
         provider.accept(
+            AnvilCraftPigeonPlus.of("gas_liquefaction/compressed_air_hydrogen"),
+            new GasLiquefactionRecipe(
+                new FluidStack(AddonFluids.COMPRESSED_AIR.get(), 830),
+                new FluidStack(AddonFluids.LIQUID_HYDROGEN.get(), 1)
+            ),
+            null
+        );
+
+        provider.accept(
             AnvilCraftPigeonPlus.of("gas_liquefaction/gaseous_biogas"),
             new GasLiquefactionRecipe(
                 new FluidStack(AddonFluids.GASEOUS_BIOGAS.get(), 512),

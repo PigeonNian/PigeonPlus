@@ -5,15 +5,19 @@ navigation:
   weight: 10
 items:
   - "anvilcraft_pigeon_plus:compressed_air_bucket"
+  - "anvilcraft_pigeon_plus:liquid_hydrogen_bucket"
   - "anvilcraft_pigeon_plus:liquid_oxygen_bucket"
 ---
 
 # Liquid Oxygen
 
 <item id="anvilcraft_pigeon_plus:compressed_air_bucket"/>
+<item id="anvilcraft_pigeon_plus:liquid_hydrogen_bucket"/>
 <item id="anvilcraft_pigeon_plus:liquid_oxygen_bucket"/>
 
 Liquid oxygen is the oxidizer source for nozzle exhaust.
+
+Liquid hydrogen is the fuel for hydrogen-oxygen nozzle exhaust and can be obtained by liquefying compressed air.
 
 ## Compressed Air
 
@@ -21,6 +25,6 @@ The anvil pump can extract compressed air from the air when the six faces of a d
 
 ## Liquefaction
 
-When compressed air is continuously pumped into a large tank already full of compressed air, liquid oxygen is produced according to the configured ratio.
+When compressed air is continuously pumped into a large tank already full of compressed air, both liquid oxygen and liquid hydrogen are separated out according to the configured ratios.
 
-Liquid oxygen can combust together with oil or liquefied biogas to trigger nozzle exhaust.
+Liquid oxygen can combust with oil or liquefied biogas to trigger nozzle exhaust; together with liquid hydrogen it triggers hydrogen-oxygen exhaust.

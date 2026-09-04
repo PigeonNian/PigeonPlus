@@ -17,6 +17,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Mixin(LargeFluidTankBlockEntity.class)
 public abstract class LargeFluidTankBlockEntityMixin {
     @Unique
@@ -35,11 +38,11 @@ public abstract class LargeFluidTankBlockEntityMixin {
         IFluidHandler handler = self.getFluidHandler();
         BlockPos pos = self.getBlockPos();
 
-        GasLiquefactionRecipe recipe = pigeonplus$findRecipe(level, handler);
-        if (recipe == null) {
+        List<GasLiquefactionRecipe> recipes = pigeonplus$findRecipes(level, handler);
+        if (recipes.isEmpty()) {
             return;
         }
-        Fluid gas = recipe.input().getFluid();
+        Fluid gas = recipes.getFirst().input().getFluid();
         int totalCapacity = pigeonplus$totalCapacity(handler);
         int totalAmount = pigeonplus$totalAmount(handler);
         int gasAmount = pigeonplus$gasAmount(handler, gas);
@@ -52,37 +55,44 @@ public abstract class LargeFluidTankBlockEntityMixin {
         if (drained.isEmpty()) {
             return;
         }
-        int liquidAmount = GasLiquefactionTracker.addGasInput(
-            level,
-            pos,
-            gas,
-            drained.getAmount(),
-            recipe.ratio()
-        );
-        if (liquidAmount > 0) {
-            pigeonplus$replaceGasWithLiquid(handler, recipe, liquidAmount);
+        for (GasLiquefactionRecipe recipe : recipes) {
+            int liquidAmount = GasLiquefactionTracker.addGasInput(
+                level,
+                pos,
+                gas,
+                recipe.output().getFluid(),
+                drained.getAmount(),
+                recipe.ratio()
+            );
+            if (liquidAmount > 0) {
+                pigeonplus$replaceGasWithLiquid(handler, recipe, liquidAmount);
+            }
         }
     }
 
     @Unique
-    private static GasLiquefactionRecipe pigeonplus$findRecipe(Level level, IFluidHandler handler) {
+    private static List<GasLiquefactionRecipe> pigeonplus$findRecipes(Level level, IFluidHandler handler) {
         var server = level.getServer();
         if (server == null) {
-            return null;
+            return List.of();
         }
         for (int i = 0; i < handler.getTanks(); i++) {
             FluidStack stack = handler.getFluidInTank(i);
             if (stack.isEmpty()) {
                 continue;
             }
+            List<GasLiquefactionRecipe> recipes = new ArrayList<>();
             for (var holder : server.getRecipeManager().getAllRecipesFor(
                     AddonRecipeTypes.GAS_LIQUEFACTION_TYPE.get())) {
                 if (holder.value().input().getFluid().isSame(stack.getFluid())) {
-                    return holder.value();
+                    recipes.add(holder.value());
                 }
             }
+            if (!recipes.isEmpty()) {
+                return recipes;
+            }
         }
-        return null;
+        return List.of();
     }
 
     @Unique

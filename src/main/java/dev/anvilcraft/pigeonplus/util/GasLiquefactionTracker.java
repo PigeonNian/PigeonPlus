@@ -14,11 +14,11 @@ public final class GasLiquefactionTracker {
     private GasLiquefactionTracker() {
     }
 
-    public static int addGasInput(Level level, BlockPos pos, Fluid gas, int amount, int ratio) {
+    public static int addGasInput(Level level, BlockPos pos, Fluid gas, Fluid output, int amount, int ratio) {
         if (amount <= 0 || ratio <= 0) {
             return 0;
         }
-        Key key = new Key(level.dimension(), pos.immutable(), gas);
+        Key key = new Key(level.dimension(), pos.immutable(), gas, output);
         int progress = PROGRESS.getOrDefault(key, 0) + amount;
         int liquidAmount = progress / ratio;
         int remainder = progress % ratio;
@@ -31,9 +31,13 @@ public final class GasLiquefactionTracker {
     }
 
     public static void clear(Level level, BlockPos pos, Fluid gas) {
-        PROGRESS.remove(new Key(level.dimension(), pos.immutable(), gas));
+        PROGRESS.keySet().removeIf(
+            key -> key.dimension().equals(level.dimension())
+                && key.pos().equals(pos.immutable())
+                && key.gas().isSame(gas)
+        );
     }
 
-    private record Key(ResourceKey<Level> dimension, BlockPos pos, Fluid gas) {
+    private record Key(ResourceKey<Level> dimension, BlockPos pos, Fluid gas, Fluid output) {
     }
 }

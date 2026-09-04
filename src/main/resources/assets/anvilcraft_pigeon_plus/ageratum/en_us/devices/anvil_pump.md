@@ -19,6 +19,7 @@ When a pump continuously inputs gas into a large tank already filled with the co
 
 - Biogas can become liquefied biogas.
 - Compressed air can become liquid oxygen.
+- Compressed air can also become liquid hydrogen.
 - Both normal pumps and piston pumps can drive liquefaction.
 
 ## Air Intake

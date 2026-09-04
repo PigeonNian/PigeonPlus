@@ -163,6 +163,10 @@ public class GasLiquefactionCategory implements IRecipeCategory<RecipeHolder<Gas
         if (fluid.isSame(AddonFluids.LIQUID_OXYGEN.get())) {
             return new ItemStack(AddonItems.LIQUID_OXYGEN_BUCKET.get());
         }
+        if (fluid.isSame(AddonFluids.LIQUID_HYDROGEN.get())) {
+            return new ItemStack(AddonItems.LIQUID_HYDROGEN_BUCKET.get());
+        }
+
         return ItemStack.EMPTY;
     }
 }

@@ -43,7 +43,7 @@ public final class AddonItemTooltipManager {
         normal(
             AddonItems.COMPRESSED_AIR_BUCKET.asItem(),
                 """
-                Compressed gas, can be liquefied into liquid oxygen
+                Compressed gas, can be liquefied into liquid oxygen and liquid hydrogen
                 Can be obtained by pumping from the drain port exposed to air"""
         );
         normal(
@@ -52,6 +52,7 @@ public final class AddonItemTooltipManager {
                 Can be converted into gaseous biogas in a heated cauldron"""
         );
         normal(AddonItems.LIQUID_OXYGEN_BUCKET.asItem(), "Oxidizer for nozzle propellant reactions");
+        normal(AddonItems.LIQUID_HYDROGEN_BUCKET.asItem(), "Fuel for nozzle propellant reactions");
         shift(
             AddonBlocks.FEED_SPREADER.asItem(),
             """

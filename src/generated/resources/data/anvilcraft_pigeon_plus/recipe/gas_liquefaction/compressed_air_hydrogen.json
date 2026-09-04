@@ -1,0 +1,11 @@
+{
+  "type": "anvilcraft_pigeon_plus:gas_liquefaction",
+  "input": {
+    "amount": 830,
+    "id": "anvilcraft_pigeon_plus:compressed_air"
+  },
+  "output": {
+    "amount": 1,
+    "id": "anvilcraft_pigeon_plus:liquid_hydrogen"
+  }
+}
