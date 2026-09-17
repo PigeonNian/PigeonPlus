@@ -92,7 +92,7 @@ jobs:
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
 
           dependencies: |
-            anvilcraft@1.21.1-1.6.0(required){modrinth:vuISAWPc}{curseforge:986251}
+            anvilcraft@1.21.1-1.6.0+snapshot.2323(required){modrinth:vuISAWPc}{curseforge:986251}
 
           files: |
             build/libs/${{ steps.properties.outputs.mod_id }}-neoforge-${{ steps.version.outputs.version }}.jar
