@@ -26,6 +26,8 @@
   "anvilcraft_pigeon_plus.configuration.section.anvilcraft_pigeon_plus.client.toml.title": "PigeonPlus 客户端配置",
   "anvilcraft_pigeon_plus.configuration.title": "PigeonPlus 客户端配置",
   "death.attack.nozzleExhaust": "%1$s坐上了导流槽雅座",
+  "enchantment.anvilcraft_pigeon_plus.doomfist": "铁拳",
+  "enchantment.anvilcraft_pigeon_plus.doomfist.desc": "将铁砧锤化为纯粹的武器：不再能旋转或拆除方块、开启便携铁砧、火箭跳，也不再作为护目镜",
   "gui.anvilcraft_pigeon_plus.category.blending": "搅拌",
   "gui.anvilcraft_pigeon_plus.category.gas_liquefaction": "气体液化",
   "gui.anvilcraft_pigeon_plus.gas_liquefaction.fill_then": "存满后",

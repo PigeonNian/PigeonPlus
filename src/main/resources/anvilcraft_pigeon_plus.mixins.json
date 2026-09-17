@@ -4,6 +4,7 @@
   "package": "dev.anvilcraft.pigeonplus.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "AnvilHammerItemMixin",
     "DrainBlockEntityMixin",
     "FallingBlockEntityMixin",
     "FishTankBlockEntityMixin",
@@ -17,7 +18,7 @@
   ],
   "client": [
     "client.EntityClientMixin",
-    "client.FishTankBlockEntityRendererMixin",
+    "client.FishTankBlockEntityRendererMixin",
     "client.FluidRenderHelperMixin",
     "client.FluidTankRenderUtilMixin",
     "client.LargeCauldronBlockEntityRendererMixin",

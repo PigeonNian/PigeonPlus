@@ -26,6 +26,8 @@
   "block.anvilcraft_pigeon_plus.pigeon_anvil": "Pigeon Anvil",
   "block.anvilcraft_pigeon_plus.stasis_beacon": "Stasis Beacon",
   "death.attack.nozzleExhaust": "%1$s sat in the duct seat",
+  "enchantment.anvilcraft_pigeon_plus.doomfist": "Doomfist",
+  "enchantment.anvilcraft_pigeon_plus.doomfist.desc": "Turns the Anvil Hammer into a pure weapon: it can no longer rotate or break blocks, open a portable anvil, rocket jump, or act as goggles.",
   "gui.anvilcraft_pigeon_plus.category.blending": "Blending",
   "gui.anvilcraft_pigeon_plus.category.gas_liquefaction": "Gas Liquefaction",
   "gui.anvilcraft_pigeon_plus.gas_liquefaction.fill_then": "After Full",
