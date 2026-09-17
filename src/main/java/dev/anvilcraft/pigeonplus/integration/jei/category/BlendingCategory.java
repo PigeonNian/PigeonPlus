@@ -21,6 +21,7 @@ import dev.dubhe.anvilcraft.util.CauldronUtil;
 import dev.dubhe.anvilcraft.util.FluidStackPredicate;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
+import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -35,6 +36,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.function.IntFunction;
 
 public class BlendingCategory extends AbstractProgressCategory<BlendingRecipe> {
     private static final String INPUT_FLUID = "input_fluid";
@@ -163,16 +166,12 @@ public class BlendingCategory extends AbstractProgressCategory<BlendingRecipe> {
             }
         }
         if (hasOutputItems) {
-            if (JeiRecipeUtil.isChance(recipe.getResultItems())) {
-                if (outputMixed) {
-                    JeiSlotUtil.drawItemOutputSlots(guiGraphics, slotProbability, recipe.getResultItems().size());
-                } else {
-                    JeiSlotUtil.drawDefaultOutputSlots(guiGraphics, slotProbability, recipe.getResultItems().size());
-                }
-            } else if (outputMixed) {
-                JeiSlotUtil.drawItemOutputSlots(guiGraphics, slotDefault, recipe.getResultItems().size());
+            IntFunction<IDrawable> outputSlots =
+                JeiRecipeUtil.outputSlotFor(recipe.getResultItems(), slotDefault, slotProbability);
+            if (outputMixed) {
+                JeiSlotUtil.drawItemOutputSlots(guiGraphics, outputSlots, recipe.getResultItems().size());
             } else {
-                JeiSlotUtil.drawDefaultOutputSlots(guiGraphics, slotDefault, recipe.getResultItems().size());
+                JeiSlotUtil.drawDefaultOutputSlots(guiGraphics, outputSlots, recipe.getResultItems().size());
             }
         }
         if (hasInputFluid) {
