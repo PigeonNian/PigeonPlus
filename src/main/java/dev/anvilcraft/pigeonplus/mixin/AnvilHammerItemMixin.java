@@ -2,6 +2,7 @@ package dev.anvilcraft.pigeonplus.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import dev.anvilcraft.pigeonplus.util.DoomfistEnchantmentUtil;
+import dev.anvilcraft.pigeonplus.util.RocketPunchManager;
 import dev.dubhe.anvilcraft.api.hammer.HammerManager;
 import dev.dubhe.anvilcraft.api.hammer.HammerRotateBehavior;
 import dev.dubhe.anvilcraft.api.hammer.IHammerChangeable;
@@ -79,31 +80,56 @@ public class AnvilHammerItemMixin {
     }
 
     /**
-     * 长按右键：不再打开便携铁砧。
+     * 铁拳状态下开始蓄力前的拦截。
      *
-     * <p>同时把 {@code use} 拦成 PASS，使长按根本不会开始，避免客户端继续绘制那个注定无效的
-     * 便携铁砧进度条（见 {@code AnvilHammerUseHUD}）。
+     * <p>为什么必须要这一层：原版 {@code Minecraft#handleKeybinds} 每 tick 都会检查
+     * “右键按住 + 没有正在使用物品”，满足就再次调用 {@code startUseItem()}。
+     * 蓄满自动释放后 {@code isUsingItem()} 立刻变回 false，而玩家手还按着右键，
+     * 于是客户端马上又起一段新的蓄力——形成“连续冲刺两次”。
+     *
+     * <p>原版冷却拦不住这一下：冷却按设计是<strong>冲刺结束后</strong>才开始计，
+     * 而重新蓄力发生在冲刺进行中。所以这里额外在“冲刺中”时也拒绝起手。
      */
     @Inject(method = "use", at = @At("HEAD"), cancellable = true)
-    private void pigeonplus$stripPortableAnvilStart(
+    private void pigeonplus$blockChargeWhileDashing(
         Level level, Player player, InteractionHand usedHand, CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir
     ) {
         ItemStack stack = player.getItemInHand(usedHand);
-        if (DoomfistEnchantmentUtil.hasDoomfist(stack)) {
-            cir.setReturnValue(InteractionResultHolder.pass(stack));
+        if (!DoomfistEnchantmentUtil.hasDoomfist(stack)) return;
+        if (RocketPunchManager.isDashing(player)
+            || player.getCooldowns().isOnCooldown(stack.getItem())) {
+            cir.setReturnValue(InteractionResultHolder.fail(stack));
         }
     }
 
     /**
-     * 长按右键：不再打开便携铁砧（服务端兜底）。
+     * 附魔状态下，使用时长 = 满蓄力 + 维持时间，超时即自动释放。
      */
-    @Inject(method = "finishUsingItem", at = @At("HEAD"), cancellable = true)
-    private void pigeonplus$stripPortableAnvil(
-        ItemStack stack, Level level, LivingEntity livingEntity, CallbackInfoReturnable<ItemStack> cir
+    @Inject(method = "getUseDuration", at = @At("HEAD"), cancellable = true)
+    private void pigeonplus$rocketPunchUseDuration(
+        ItemStack stack, LivingEntity entity, CallbackInfoReturnable<Integer> cir
     ) {
         if (DoomfistEnchantmentUtil.hasDoomfist(stack)) {
-            cir.setReturnValue(stack);
+            cir.setReturnValue(RocketPunchManager.TOTAL_CHARGE_TICKS);
         }
+    }
+
+    /**
+     * 蓄满后维持结束（自然完成）：释放满蓄力火箭重拳，且不再打开便携铁砧。
+     *
+     * <p>“提前松手”走的是另一条路——{@code AnvilHammerItem} 没有覆写
+     * {@code releaseUsing}，所以那条路径由
+     * {@code RocketPunchEventListener} 监听 {@code LivingEntityUseItemEvent.Stop} 处理。
+     */
+    @Inject(method = "finishUsingItem", at = @At("HEAD"), cancellable = true)
+    private void pigeonplus$finishRocketPunch(
+        ItemStack stack, Level level, LivingEntity livingEntity, CallbackInfoReturnable<ItemStack> cir
+    ) {
+        if (!DoomfistEnchantmentUtil.hasDoomfist(stack)) return;
+        if (livingEntity instanceof ServerPlayer player) {
+            RocketPunchManager.performRocketPunch(player, RocketPunchManager.FULL_CHARGE_TICKS);
+        }
+        cir.setReturnValue(stack);
     }
 
     /**

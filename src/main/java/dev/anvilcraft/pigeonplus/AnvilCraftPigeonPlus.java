@@ -8,6 +8,7 @@ import dev.anvilcraft.pigeonplus.init.AddonFluids;
 import dev.anvilcraft.pigeonplus.init.AddonInteractionMap;
 import dev.anvilcraft.pigeonplus.init.AddonItemGroups;
 import dev.anvilcraft.pigeonplus.init.AddonItems;
+import dev.anvilcraft.pigeonplus.init.AddonMobEffects;
 import dev.anvilcraft.pigeonplus.init.ModCriterionTriggers;
 import dev.anvilcraft.pigeonplus.init.AddonParticles;
 import dev.anvilcraft.pigeonplus.init.AddonRecipeTypes;
@@ -33,6 +34,8 @@ public class AnvilCraftPigeonPlus {
         AddonFluids.register(modEventBus);
         AddonParticles.register(modEventBus);
         AddonSounds.register(modEventBus);
+        AddonMobEffects.register(modEventBus);
+        modEventBus.addListener(AnvilCraftPigeonPlus::registerPayload);
         AddonRecipeTypes.register(modEventBus);
         AddonBlocks.register();
         AddonItems.register();
@@ -43,6 +46,16 @@ public class AnvilCraftPigeonPlus {
 
     public static ResourceLocation of(String path) {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+    }
+
+    /**
+     * 注册本模组的网络包。
+     *
+     * <p>{@code NetworkRegistrar} 会扫描 {@code dev.anvilcraft.pigeonplus.network} 包下所有
+     * 实现 {@code IPacket} 的类，因此新增数据包无需在此逐个登记。
+     */
+    private static void registerPayload(net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent event) {
+        dev.anvilcraft.lib.v2.network.register.NetworkRegistrar.register(event.registrar("1"), MOD_ID);
     }
 
     private static void loadComplete(FMLLoadCompleteEvent event) {

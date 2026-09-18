@@ -17,6 +17,7 @@
     "LivingEntityMixin"
   ],
   "client": [
+    "LivingEntityTravelMixin",
     "client.EntityClientMixin",
     "client.FishTankBlockEntityRendererMixin",
     "client.FluidRenderHelperMixin",

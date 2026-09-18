@@ -4,6 +4,8 @@ import dev.anvilcraft.pigeonplus.AddonClientConfig;
 import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
 import dev.anvilcraft.lib.v2.config.ConfigManager;
 import dev.anvilcraft.pigeonplus.block.entity.ModBlockEntities;
+import dev.anvilcraft.pigeonplus.client.hud.RocketPunchChargeHud;
+import dev.anvilcraft.pigeonplus.client.hud.RocketPunchCooldownHud;
 import dev.anvilcraft.pigeonplus.client.particle.RollingPlasmaParticle;
 import dev.anvilcraft.pigeonplus.client.renderer.block.AnvilPumpBlockEntityRenderer;
 import dev.anvilcraft.pigeonplus.client.renderer.block.BlenderBlockEntityRenderer;
@@ -17,7 +19,9 @@ import dev.anvilcraft.pigeonplus.init.AddonBlocks;
 import dev.anvilcraft.pigeonplus.init.AddonFluids;
 import dev.anvilcraft.pigeonplus.init.AddonItems;
 import dev.anvilcraft.pigeonplus.init.AddonParticles;
+import dev.anvilcraft.pigeonplus.util.DoomfistEnchantmentUtil;
 import dev.dubhe.anvilcraft.util.ModClientFluidTypeExtensionImpl;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.ModelResourceLocation;
@@ -31,6 +35,7 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.model.DynamicFluidContainerModel;
@@ -50,12 +55,14 @@ public class AnvilCraftPigeonPlusClient {
         modBus.addListener(this::onRegisterBlockColors);
         modBus.addListener(this::onRegisterItemColors);
         modBus.addListener(this::onRegisterParticleProviders);
+        modBus.addListener(this::onRegisterGuiLayers);
         NeoForge.EVENT_BUS.addListener(this::onItemTooltip);
         NeoForge.EVENT_BUS.addListener(this::onClientTick);
     }
 
     private void onClientTick(ClientTickEvent.Post event) {
         NozzleSoundController.clientTick();
+        RocketPunchClientState.clientTick();
     }
 
     private void onItemTooltip(ItemTooltipEvent event) {
@@ -204,5 +211,48 @@ public class AnvilCraftPigeonPlusClient {
         event.registerSpriteSet(AddonParticles.ROLLING_PLASMA.get(), RollingPlasmaParticle.Provider::new);
         event.registerSpriteSet(AddonParticles.ROLLING_METHANE_PLASMA.get(), RollingPlasmaParticle.MethaneProvider::new);
         event.registerSpriteSet(AddonParticles.ROLLING_HYDROGEN_PLASMA.get(), RollingPlasmaParticle.HydrogenProvider::new);
+    }
+
+    /**
+     * 注册火箭重拳的界面层。
+     *
+     * <p>同时抑制 AnvilCraft 的 {@code anvil_hammer_use} 层：那个 HUD 会在任何铁砧锤
+     * “正在使用中”时画准心进度条，而铁拳附魔把右键改成了蓄力，于是它会以
+     * {@code PORTABLE_ANVIL_USE_TICKS}(40) 为分母画一条与蓄力（32 tick）不同步的进度条。
+     *
+     * <p>这里用 {@code wrapLayer} 而不是 {@code replaceLayer}：NeoForge 的
+     * {@code wrapLayer} 会拿到原层，我们才能在“非铁拳”情况下继续调用原实现，
+     * 保持其他铁砧锤的便携铁砧进度条不变。
+     *
+     * <p>注意 {@code wrapLayer} 在目标层不存在时会抛 {@code IllegalArgumentException}，
+     * 而模组监听器的执行顺序并不保证 AnvilCraft 先注册，因此这里包一层 try/catch：
+     * 万一顺序不利就放弃抑制，只失去“隐藏原进度条”这一项，不至于让客户端崩溃。
+     */
+    private void onRegisterGuiLayers(RegisterGuiLayersEvent event) {
+        event.registerAboveAll(
+            ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "rocket_punch_charge"),
+            RocketPunchChargeHud::render
+        );
+        event.registerAboveAll(
+            ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "rocket_punch_cooldown"),
+            RocketPunchCooldownHud::render
+        );
+        try {
+            event.wrapLayer(
+                ResourceLocation.fromNamespaceAndPath("anvilcraft", "anvil_hammer_use"),
+                original -> (graphics, deltaTracker) -> {
+                    // 手持带铁拳附魔的铁砧锤蓄力时，改由 RocketPunchChargeHud 绘制
+                    Minecraft minecraft = Minecraft.getInstance();
+                    if (minecraft.player != null
+                        && minecraft.player.isUsingItem()
+                        && DoomfistEnchantmentUtil.hasDoomfist(minecraft.player.getUseItem())) {
+                        return;
+                    }
+                    original.render(graphics, deltaTracker);
+                }
+            );
+        } catch (IllegalArgumentException ignored) {
+            // AnvilCraft 的层尚未注册；放弃抑制，优先保证客户端不崩
+        }
     }
 }
