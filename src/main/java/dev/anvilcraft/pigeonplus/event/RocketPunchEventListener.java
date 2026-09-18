@@ -1,6 +1,7 @@
 package dev.anvilcraft.pigeonplus.event;
 
 import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
+import dev.anvilcraft.pigeonplus.network.RocketPunchChargeSoundPacket;
 import dev.anvilcraft.pigeonplus.util.DoomfistEnchantmentUtil;
 import dev.anvilcraft.pigeonplus.util.RocketPunchManager;
 import dev.anvilcraft.pigeonplus.util.SkillCooldowns;
@@ -19,6 +20,7 @@ import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 @EventBusSubscriber(modid = AnvilCraftPigeonPlus.MOD_ID)
 public class RocketPunchEventListener {
@@ -50,6 +52,28 @@ public class RocketPunchEventListener {
         if (living instanceof Player player) {
             updateChargeSlow(player);
         }
+    }
+
+    /**
+     * 开始蓄力时播放蓄力音效。
+     *
+     * <p>用 {@code Start} 而不是每 tick 检查 {@code isUsingItem()}：
+     * 这个事件正好对应 {@code LivingEntity#startUsingItem}（内部走
+     * {@code EventHooks.onItemUseStart}），因此天然是「刚开始蓄」的那一下，
+     * 不需要自己维护边沿状态。
+     *
+     * <p>声音交给<strong>客户端</strong>播放（见 {@code RocketPunchChargeSoundInstance}）：
+     * 蓄力音效需要在冲刺开始时被主动掐断，而 {@code Level#playSound} 播出的声音没有句柄，
+     * 客户端自己持有实例对象才能可靠地 {@code stop()}。
+     */
+    @SubscribeEvent
+    public static void onUseItemStart(LivingEntityUseItemEvent.Start event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        ItemStack stack = event.getItem();
+        if (!DoomfistEnchantmentUtil.hasDoomfist(stack)) return;
+        // 只让蓄力的玩家自己播：这是「我自己的武器在充能」，
+        // 且停止时机完全由该玩家的客户端掌控，不需要跨端同步停止包
+        PacketDistributor.sendToPlayer(player, new RocketPunchChargeSoundPacket(true));
     }
 
     /**

@@ -13,6 +13,7 @@ import dev.anvilcraft.pigeonplus.client.renderer.block.FeedSpreaderBlockEntityRe
 import dev.anvilcraft.pigeonplus.client.renderer.block.NozzleExhaustBlockEntityRenderer;
 import dev.anvilcraft.pigeonplus.client.renderer.block.StasisBeaconBlockEntityRenderer;
 import dev.anvilcraft.pigeonplus.client.sound.NozzleSoundController;
+import dev.anvilcraft.pigeonplus.client.sound.RocketPunchChargeSoundController;
 import dev.anvilcraft.pigeonplus.client.tooltip.AddonItemTooltipManager;
 import dev.anvilcraft.pigeonplus.client.tooltip.StasisBeaconTooltipProvider;
 import dev.anvilcraft.pigeonplus.init.AddonBlocks;
@@ -78,6 +79,8 @@ public class AnvilCraftPigeonPlusClient {
         UppercutClientState.clientTick();
         // 递减统一的技能冷却镜像（HUD 读它，与服务端放行判断同源）
         SkillCooldowns.clientTick();
+        // 校准蓄力音效实例（自然播完 / 换维度后清理引用）
+        RocketPunchChargeSoundController.clientTick();
     }
 
     private void onItemTooltip(ItemTooltipEvent event) {

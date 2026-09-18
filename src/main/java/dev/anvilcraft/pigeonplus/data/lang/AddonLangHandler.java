@@ -37,6 +37,11 @@ public class AddonLangHandler {
         provider.add("block.anvilcraft_pigeon_plus.liquid_hydrogen", "Liquid Hydrogen");
         provider.add("subtitles.anvilcraft_pigeon_plus.engine_on", "Nozzle engine starts");
         provider.add("subtitles.anvilcraft_pigeon_plus.engine_fire", "Nozzle engine roars");
+        provider.add("subtitles.anvilcraft_pigeon_plus.rocket_punch_cast", "Rocket Punch");
+        provider.add("subtitles.anvilcraft_pigeon_plus.rocket_punch_charge", "Rocket Punch charges");
+        provider.add("subtitles.anvilcraft_pigeon_plus.rocket_punch_hit", "Rocket Punch hits");
+        provider.add("subtitles.anvilcraft_pigeon_plus.rocket_punch_wall_slam", "Slammed into a wall");
+        provider.add("subtitles.anvilcraft_pigeon_plus.uppercut_cast", "Uppercut");
         provider.add("death.attack.nozzleExhaust", "%1$s sat in the duct seat");
         provider.add("death.attack.rocketPunch", "%1$s was punched into next week by %2$s");
         provider.add("death.attack.rocketPunchWallSlam", "%1$s was slammed into a wall by %2$s");

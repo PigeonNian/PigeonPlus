@@ -16,5 +16,50 @@
       }
     ],
     "subtitle": "subtitles.anvilcraft_pigeon_plus.engine_on"
+  },
+  "rocket_punch_cast": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "item.mace.smash_ground_heavy"
+      }
+    ],
+    "subtitle": "subtitles.anvilcraft_pigeon_plus.rocket_punch_cast"
+  },
+  "rocket_punch_charge": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "block.respawn_anchor.charge"
+      }
+    ],
+    "subtitle": "subtitles.anvilcraft_pigeon_plus.rocket_punch_charge"
+  },
+  "rocket_punch_hit": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "item.mace.smash_ground"
+      }
+    ],
+    "subtitle": "subtitles.anvilcraft_pigeon_plus.rocket_punch_hit"
+  },
+  "rocket_punch_wall_slam": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "block.anvil.land"
+      }
+    ],
+    "subtitle": "subtitles.anvilcraft_pigeon_plus.rocket_punch_wall_slam"
+  },
+  "uppercut_cast": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "item.mace.smash_ground"
+      }
+    ],
+    "subtitle": "subtitles.anvilcraft_pigeon_plus.uppercut_cast"
   }
 }

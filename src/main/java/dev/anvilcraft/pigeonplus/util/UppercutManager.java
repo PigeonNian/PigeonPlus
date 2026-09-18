@@ -2,6 +2,7 @@ package dev.anvilcraft.pigeonplus.util;
 
 import dev.anvilcraft.pigeonplus.init.AddonDamageTypes;
 import dev.anvilcraft.pigeonplus.init.AddonMobEffects;
+import dev.anvilcraft.pigeonplus.init.AddonSounds;
 import dev.anvilcraft.pigeonplus.network.UppercutAscentPacket;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -97,7 +98,7 @@ public final class UppercutManager {
 
         level.playSound(
             null, player.getX(), player.getY(), player.getZ(),
-            SoundEvents.MACE_SMASH_GROUND, SoundSource.PLAYERS, 1.0f, 1.4f
+            AddonSounds.UPPERCUT_CAST.get(), SoundSource.PLAYERS, 1.0f, 1.4f
         );
         level.sendParticles(
             ParticleTypes.CLOUD,

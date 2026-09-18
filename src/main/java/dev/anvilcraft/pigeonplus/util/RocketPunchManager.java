@@ -2,6 +2,8 @@ package dev.anvilcraft.pigeonplus.util;
 
 import dev.anvilcraft.pigeonplus.init.AddonDamageTypes;
 import dev.anvilcraft.pigeonplus.init.AddonMobEffects;
+import dev.anvilcraft.pigeonplus.init.AddonSounds;
+import dev.anvilcraft.pigeonplus.network.RocketPunchChargeSoundPacket;
 import dev.anvilcraft.pigeonplus.network.RocketPunchDashPacket;
 import dev.anvilcraft.pigeonplus.network.RocketPunchStopPacket;
 import net.minecraft.core.particles.ParticleTypes;
@@ -121,6 +123,11 @@ public final class RocketPunchManager {
      * @param chargeTicks 已经蓄力的 tick 数
      */
     public static void performRocketPunch(ServerPlayer player, int chargeTicks) {
+        // 无论这次释放是否真的打出去，蓄力都已经结束 → 先把蓄力音效掐掉。
+        // 必须放在所有 return 之前：旁观、冲刺中、冷却中这几条路径都会提前返回，
+        // 若把停止写在后面，这些情况下蓄力音会一直响到音频自然播完。
+        PacketDistributor.sendToPlayer(player, new RocketPunchChargeSoundPacket(false));
+
         if (player.isSpectator()) return;
         ServerLevel level = player.serverLevel();
         // 已经在冲刺中：直接忽略。防止同一次蓄力被两条路径（finishUsingItem 与
@@ -155,7 +162,7 @@ public final class RocketPunchManager {
         );
         level.playSound(
             null, player.getX(), player.getY(), player.getZ(),
-            SoundEvents.MACE_SMASH_GROUND_HEAVY, SoundSource.PLAYERS, 1.0f, 1.0f
+            AddonSounds.ROCKET_PUNCH_CAST.get(), SoundSource.PLAYERS, 1.0f, 1.0f
         );
     }
 
@@ -256,7 +263,7 @@ public final class RocketPunchManager {
 
         level.playSound(
             null, target.getX(), target.getY(), target.getZ(),
-            SoundEvents.MACE_SMASH_GROUND, SoundSource.PLAYERS, 1.0f, 1.2f
+            AddonSounds.ROCKET_PUNCH_HIT.get(), SoundSource.PLAYERS, 1.0f, 1.2f
         );
         level.sendParticles(
             ParticleTypes.EXPLOSION,
@@ -298,7 +305,7 @@ public final class RocketPunchManager {
                 applyStun(target);
                 level.playSound(
                     null, target.getX(), target.getY(), target.getZ(),
-                    SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 1.0f, 0.5f
+                    AddonSounds.ROCKET_PUNCH_WALL_SLAM.get(), SoundSource.PLAYERS, 1.0f, 0.5f
                 );
                 level.sendParticles(
                     ParticleTypes.CRIT,
