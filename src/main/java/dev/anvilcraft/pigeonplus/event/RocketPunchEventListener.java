@@ -3,7 +3,9 @@ package dev.anvilcraft.pigeonplus.event;
 import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
 import dev.anvilcraft.pigeonplus.util.DoomfistEnchantmentUtil;
 import dev.anvilcraft.pigeonplus.util.RocketPunchManager;
+import dev.anvilcraft.pigeonplus.util.SkillCooldowns;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -14,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
@@ -29,6 +32,10 @@ public class RocketPunchEventListener {
     @SubscribeEvent
     public static void onLevelTick(LevelTickEvent.Post event) {
         RocketPunchManager.tick(event.getLevel());
+        // 清理已过期的技能冷却记录，避免静态表无限增长
+        if (event.getLevel() instanceof ServerLevel serverLevel) {
+            SkillCooldowns.prune(serverLevel);
+        }
     }
 
     /**
@@ -59,6 +66,16 @@ public class RocketPunchEventListener {
         if (!DoomfistEnchantmentUtil.hasDoomfist(stack)) return;
         int chargeTicks = RocketPunchManager.TOTAL_CHARGE_TICKS - event.getDuration();
         RocketPunchManager.performRocketPunch(player, chargeTicks);
+    }
+
+    /**
+     * 玩家登出时清理其冷却记录。
+     *
+     * <p>冷却表是静态的，不清理会在反复进出服务器的过程中无限积累。
+     */
+    @SubscribeEvent
+    public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
+        SkillCooldowns.clear(event.getEntity().getUUID());
     }
 
     /**

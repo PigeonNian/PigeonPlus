@@ -3,6 +3,7 @@ package dev.anvilcraft.pigeonplus.mixin;
 import com.llamalad7.mixinextras.sugar.Local;
 import dev.anvilcraft.pigeonplus.util.DoomfistEnchantmentUtil;
 import dev.anvilcraft.pigeonplus.util.RocketPunchManager;
+import dev.anvilcraft.pigeonplus.util.SkillCooldowns;
 import dev.dubhe.anvilcraft.api.hammer.HammerManager;
 import dev.dubhe.anvilcraft.api.hammer.HammerRotateBehavior;
 import dev.dubhe.anvilcraft.api.hammer.IHammerChangeable;
@@ -96,8 +97,10 @@ public class AnvilHammerItemMixin {
     ) {
         ItemStack stack = player.getItemInHand(usedHand);
         if (!DoomfistEnchantmentUtil.hasDoomfist(stack)) return;
+        // 冲刺中拒绝起手（原版冷却拦不住这一下），冷却未走完也拒绝。
+        // 用 SkillCooldowns 的按侧查询：服务端读权威截止时刻，客户端读本地镜像。
         if (RocketPunchManager.isDashing(player)
-            || player.getCooldowns().isOnCooldown(stack.getItem())) {
+            || SkillCooldowns.isOnCooldown(player, SkillCooldowns.Skill.ROCKET_PUNCH)) {
             cir.setReturnValue(InteractionResultHolder.fail(stack));
         }
     }

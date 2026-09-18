@@ -31,6 +31,14 @@ public final class AddonDamageTypes {
         AnvilCraftPigeonPlus.of("rocket_punch_wall_slam")
     );
 
+    /**
+     * 上勾拳造成的伤害。
+     */
+    public static final ResourceKey<DamageType> UPPERCUT = ResourceKey.create(
+        Registries.DAMAGE_TYPE,
+        AnvilCraftPigeonPlus.of("uppercut")
+    );
+
     private AddonDamageTypes() {
     }
 
@@ -44,5 +52,9 @@ public final class AddonDamageTypes {
 
     public static DamageSource rocketPunchWallSlam(Level level, @Nullable Entity attacker) {
         return level.damageSources().source(ROCKET_PUNCH_WALL_SLAM, attacker);
+    }
+
+    public static DamageSource uppercut(Level level, @Nullable Entity attacker) {
+        return level.damageSources().source(UPPERCUT, attacker);
     }
 }

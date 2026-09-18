@@ -22,6 +22,7 @@
     "client.FishTankBlockEntityRendererMixin",
     "client.FluidRenderHelperMixin",
     "client.FluidTankRenderUtilMixin",
+    "client.KeyboardInputMixin",
     "client.LargeCauldronBlockEntityRendererMixin",
     "client.LargeFluidTankBlockEntityRendererMixin",
     "client.MinecraftClientMixin"

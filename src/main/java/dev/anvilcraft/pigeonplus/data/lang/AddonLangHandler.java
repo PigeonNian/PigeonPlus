@@ -40,6 +40,9 @@ public class AddonLangHandler {
         provider.add("death.attack.nozzleExhaust", "%1$s sat in the duct seat");
         provider.add("death.attack.rocketPunch", "%1$s was punched into next week by %2$s");
         provider.add("death.attack.rocketPunchWallSlam", "%1$s was slammed into a wall by %2$s");
+        provider.add("death.attack.uppercut", "%1$s was launched skyward by %2$s");
+        provider.add("skill.anvilcraft_pigeon_plus.rocket_punch", "Rocket Punch");
+        provider.add("skill.anvilcraft_pigeon_plus.uppercut", "Uppercut");
         provider.add("effect.anvilcraft_pigeon_plus.stun", "Stun");
         provider.add("enchantment.anvilcraft_pigeon_plus.doomfist", "Doomfist");
         provider.add(

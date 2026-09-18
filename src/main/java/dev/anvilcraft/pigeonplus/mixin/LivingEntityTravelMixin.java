@@ -1,6 +1,7 @@
 package dev.anvilcraft.pigeonplus.mixin;
 
 import dev.anvilcraft.pigeonplus.util.RocketPunchDashRegistry;
+import dev.anvilcraft.pigeonplus.util.UppercutAscentRegistry;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
@@ -35,16 +36,26 @@ public class LivingEntityTravelMixin {
 
     @Inject(method = "travel", at = @At("HEAD"), cancellable = true)
     private void pigeonplus$rocketPunchDash(Vec3 input, CallbackInfo ci) {
-        // 只在该冲刺的权威侧执行位移。
+        // 只在该位移的权威侧执行。
         //
-        // 这是必须的：位移由客户端权威决定，服务端不该移动玩家；而且
-        // RocketPunchDashRegistry 是 static，单人生存（客户端与集成服务端同 JVM）
-        // 下两端会共享同一条记录——若不限定侧，两端都会套用位移并各自调用 tick()，
-        // 倒数速度翻倍，最终冲刺距离恰好只有设计值的一半。
+        // 这是必须的：位移由客户端权威决定，服务端不该移动玩家；而且这些注册表是 static，
+        // 单人生存（客户端与集成服务端同 JVM）下两端会共享同一条记录——若不限定侧，
+        // 两端都会套用位移并各自调用 tick()，倒数速度翻倍，最终距离只剩设计值的一半。
         //
         // 判定用「是否为客户端玩家类」而不是 isClientSide()/isLocalPlayer()：
         // 集成服务端的 ServerPlayer 两个标志都不满足，无法与主客户端区分。
         if (!((Object) this instanceof LocalPlayer player)) return;
+
+        // 上勾拳上升：垂直位移，同样接管原版逻辑
+        UppercutAscentRegistry.Ascent ascent = UppercutAscentRegistry.get(player.getUUID());
+        if (ascent != null) {
+            player.setDeltaMovement(Vec3.ZERO);
+            player.fallDistance = 0.0f;
+            player.move(MoverType.SELF, UppercutAscentRegistry.ascentVelocity(ascent));
+            UppercutAscentRegistry.tick(player.getUUID());
+            ci.cancel();
+            return;
+        }
 
         RocketPunchDashRegistry.Dash dash = RocketPunchDashRegistry.get(player.getUUID());
         if (dash == null) return;

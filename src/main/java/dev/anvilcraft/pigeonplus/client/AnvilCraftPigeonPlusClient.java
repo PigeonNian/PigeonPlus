@@ -5,7 +5,7 @@ import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
 import dev.anvilcraft.lib.v2.config.ConfigManager;
 import dev.anvilcraft.pigeonplus.block.entity.ModBlockEntities;
 import dev.anvilcraft.pigeonplus.client.hud.RocketPunchChargeHud;
-import dev.anvilcraft.pigeonplus.client.hud.RocketPunchCooldownHud;
+import dev.anvilcraft.pigeonplus.client.hud.SkillCooldownHud;
 import dev.anvilcraft.pigeonplus.client.particle.RollingPlasmaParticle;
 import dev.anvilcraft.pigeonplus.client.renderer.block.AnvilPumpBlockEntityRenderer;
 import dev.anvilcraft.pigeonplus.client.renderer.block.BlenderBlockEntityRenderer;
@@ -20,6 +20,7 @@ import dev.anvilcraft.pigeonplus.init.AddonFluids;
 import dev.anvilcraft.pigeonplus.init.AddonItems;
 import dev.anvilcraft.pigeonplus.init.AddonParticles;
 import dev.anvilcraft.pigeonplus.util.DoomfistEnchantmentUtil;
+import dev.anvilcraft.pigeonplus.util.SkillCooldowns;
 import dev.dubhe.anvilcraft.util.ModClientFluidTypeExtensionImpl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -32,6 +33,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
@@ -58,11 +60,24 @@ public class AnvilCraftPigeonPlusClient {
         modBus.addListener(this::onRegisterGuiLayers);
         NeoForge.EVENT_BUS.addListener(this::onItemTooltip);
         NeoForge.EVENT_BUS.addListener(this::onClientTick);
+        NeoForge.EVENT_BUS.addListener(this::onLoggingOut);
+    }
+
+    /**
+     * 断开连接时清空技能冷却镜像。
+     *
+     * <p>冷却表是静态的，不清会在切换到另一个服务器后残留上一个服务器的冷却时间。
+     */
+    private void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
+        SkillCooldowns.clearClient();
     }
 
     private void onClientTick(ClientTickEvent.Post event) {
         NozzleSoundController.clientTick();
         RocketPunchClientState.clientTick();
+        UppercutClientState.clientTick();
+        // 递减统一的技能冷却镜像（HUD 读它，与服务端放行判断同源）
+        SkillCooldowns.clientTick();
     }
 
     private void onItemTooltip(ItemTooltipEvent event) {
@@ -234,8 +249,8 @@ public class AnvilCraftPigeonPlusClient {
             RocketPunchChargeHud::render
         );
         event.registerAboveAll(
-            ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "rocket_punch_cooldown"),
-            RocketPunchCooldownHud::render
+            ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "skill_cooldown"),
+            SkillCooldownHud::render
         );
         try {
             event.wrapLayer(

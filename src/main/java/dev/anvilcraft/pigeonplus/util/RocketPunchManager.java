@@ -14,7 +14,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -42,8 +41,13 @@ public final class RocketPunchManager {
     public static final int CHARGE_HOLD_TICKS = 12;
     /** 一次完整蓄力的总时长：满蓄力 + 维持。 */
     public static final int TOTAL_CHARGE_TICKS = FULL_CHARGE_TICKS + CHARGE_HOLD_TICKS;
-    /** 冷却（4 秒），从冲刺结束开始计。 */
-    public static final int COOLDOWN_TICKS = 80;
+    /**
+     * 冷却（4 秒），从冲刺结束开始计。
+     *
+     * <p>数值的唯一定义在 {@link SkillCooldowns.Skill#ROCKET_PUNCH}，这里只做转发，
+     * 避免两处各写一份导致不一致。
+     */
+    public static final int COOLDOWN_TICKS = SkillCooldowns.Skill.ROCKET_PUNCH.cooldownTicks();
 
     /** 蓄力期间移动速度倍率（-50%）。 */
     private static final double CHARGE_SLOW_MULTIPLIER = 0.5;
@@ -82,17 +86,13 @@ public final class RocketPunchManager {
     /**
      * 冷却是否已经走完。
      *
-     * <p>用原版 {@link net.minecraft.world.item.ItemCooldowns} 而不是自建计时器，原因有三：
-     * <ol>
-     *   <li>原版在<strong>客户端与服务端</strong>都会检查冷却并拒绝开始使用物品，
-     *       “冷却没走完不能蓄力”这条无需自己实现，也就不会漏掉某一侧；</li>
-     *   <li>{@code addCooldown} 会自动把剩余时间同步给客户端（{@code ClientboundCooldownPacket}），
-     *       无需额外发包；</li>
-     *   <li>HUD 直接用 {@code getCooldownPercent} 读同一份数据，不会与服务端判断不一致。</li>
-     * </ol>
+     * <p>用统一的 {@link SkillCooldowns} 而不是原版 {@code ItemCooldowns}：
+     * 后者按<strong>物品</strong>计冷却，而火箭重拳与上勾拳同属一把铁砧锤，
+     * 共用一份数据会让两个技能互相锁死（打完重拳 4 秒内放不出上勾拳）。
      */
     public static boolean isOnCooldown(Player player, ItemStack stack) {
-        return player.getCooldowns().isOnCooldown(stack.getItem());
+        if (!(player.level() instanceof ServerLevel serverLevel)) return false;
+        return SkillCooldowns.isOnCooldown(serverLevel, player.getUUID(), SkillCooldowns.Skill.ROCKET_PUNCH);
     }
 
     /**
@@ -110,23 +110,9 @@ public final class RocketPunchManager {
             || RocketPunchDashRegistry.isDashing(player.getUUID());
     }
 
-    /**
-     * 冷却剩余比例（1.0 = 刚开始，0.0 = 已结束）。用于 HUD 绘制。
-     */
-    public static float cooldownProgress(Player player, ItemStack stack, float partialTick) {
-        return player.getCooldowns().getCooldownPercent(stack.getItem(), partialTick);
-    }
-
-    /**
-     * 冷却剩余秒数。用于 HUD 上的倒计时数字。
-     */
-    public static float cooldownRemainingSeconds(Player player, ItemStack stack, float partialTick) {
-        return cooldownProgress(player, stack, partialTick) * COOLDOWN_TICKS / 20.0f;
-    }
-
-    private static void startCooldown(ServerPlayer player, Item item) {
-        // 原版会自动把剩余时间同步给客户端（ClientboundCooldownPacket），无需自己发包
-        player.getCooldowns().addCooldown(item, COOLDOWN_TICKS);
+    private static void startCooldown(ServerPlayer player) {
+        // 统一冷却：服务端记截止时刻并自动同步给客户端（见 SkillCooldownPacket）
+        SkillCooldowns.startServer(player, SkillCooldowns.Skill.ROCKET_PUNCH);
     }
 
     /**
@@ -159,7 +145,7 @@ public final class RocketPunchManager {
         int totalTicks = Math.max(1, (int) Math.round(distance / DASH_SPEED));
         ACTIVE_DASHES.put(
             player.getUUID(),
-            new DashState(level, totalTicks, hitDamage, wallDamage, player.getMainHandItem().getItem())
+            new DashState(level, totalTicks, hitDamage, wallDamage)
         );
         // 位移与视角锁定都交给客户端：玩家位置由客户端权威决定，
         // 服务端位移会被下一个位置包覆盖，且 45m/s 会被 "moved too quickly" 拉回。
@@ -189,7 +175,7 @@ public final class RocketPunchManager {
     public static void abortDash(ServerPlayer player) {
         DashState dash = ACTIVE_DASHES.remove(player.getUUID());
         if (dash == null) return;
-        startCooldown(player, dash.cooldownItem);
+        startCooldown(player);
     }
 
     /**
@@ -213,7 +199,7 @@ public final class RocketPunchManager {
             if (dash.remainingTicks-- <= 0) {
                 // 冲刺自然结束：此刻才开始计冷却（“冷却在冲刺结束后计算”）
                 dashes.remove();
-                startCooldown(player, dash.cooldownItem);
+                startCooldown(player);
                 continue;
             }
 
@@ -237,7 +223,7 @@ public final class RocketPunchManager {
                 launchTarget(serverLevel, player, target, dash);
                 // 命中导致冲刺提前结束：同样从这一刻开始计冷却
                 dashes.remove();
-                startCooldown(player, dash.cooldownItem);
+                startCooldown(player);
                 // 立刻让客户端停止位移：位移归客户端管，仅移除服务端状态不会让他停下
                 PacketDistributor.sendToPlayer(player, new RocketPunchStopPacket());
                 break;
@@ -347,22 +333,20 @@ public final class RocketPunchManager {
      * <p>只保留命中判定与倒计时所需的信息；位移参数已经下发给客户端
      * （见 {@code RocketPunchDashPacket}），服务端不再保存方向与距离。
      *
-     * <p>{@code cooldownItem} 记录<strong>释放瞬间</strong>手持的物品：冷却在冲刺结束时才施加，
-     * 若那时再读主手，玩家中途换物品就会把冷却加到错误的东西上。
+     * <p>不再记录「释放瞬间手持的物品」：统一冷却按<strong>技能</strong>计，
+     * 与手持物无关，因此玩家中途换物品也不会影响冷却归属。
      */
     private static final class DashState {
         private final ServerLevel level;
         private final float hitDamage;
         private final float wallDamage;
-        private final Item cooldownItem;
         private int remainingTicks;
 
-        private DashState(ServerLevel level, int remainingTicks, float hitDamage, float wallDamage, Item cooldownItem) {
+        private DashState(ServerLevel level, int remainingTicks, float hitDamage, float wallDamage) {
             this.level = level;
             this.remainingTicks = remainingTicks;
             this.hitDamage = hitDamage;
             this.wallDamage = wallDamage;
-            this.cooldownItem = cooldownItem;
         }
     }
 
