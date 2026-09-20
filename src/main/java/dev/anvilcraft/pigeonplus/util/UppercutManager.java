@@ -38,7 +38,7 @@ import java.util.UUID;
  * 但按技能分别计时，互不影响。
  */
 public final class UppercutManager {
-    /** 命中伤害（占位值，待调）。 */
+    /** 命中伤害。 */
     private static final float DAMAGE = 5.0f;
 
     /** 敌人被上抛的速度（格/tick）。 */

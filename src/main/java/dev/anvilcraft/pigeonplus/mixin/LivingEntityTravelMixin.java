@@ -48,6 +48,16 @@ public class LivingEntityTravelMixin {
         // 集成服务端的 ServerPlayer 两个标志都不满足，无法与主客户端区分。
         if (!((Object) this instanceof LocalPlayer player)) return;
 
+        // 指向性裂地的兜底下砸：飞行超时或被卡住后转为此阶段，直直向下推，
+        // 保证一定会落到地面完成结算，不会卡在半空。
+        if (SeismicSlamClientState.isFlightAborting()) {
+            player.setDeltaMovement(Vec3.ZERO);
+            player.fallDistance = 0.0f;
+            player.move(MoverType.SELF, new Vec3(0.0, -SeismicSlamClientState.abortFallSpeed(), 0.0));
+            ci.cancel();
+            return;
+        }
+
         // 指向性裂地：朝固定落点直线逼近。
         // 不用 SlamLeapRegistry，因为方向每 tick 都要重算（目标不动、人在动）。
         Vec3 flightTarget = SeismicSlamClientState.flightTarget();

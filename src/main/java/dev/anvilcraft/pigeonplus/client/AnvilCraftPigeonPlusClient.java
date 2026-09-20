@@ -7,6 +7,7 @@ import dev.anvilcraft.pigeonplus.block.entity.ModBlockEntities;
 import dev.anvilcraft.pigeonplus.client.hud.RocketPunchChargeHud;
 import dev.anvilcraft.pigeonplus.client.hud.SkillCooldownHud;
 import dev.anvilcraft.pigeonplus.client.hud.SlamDamageHud;
+import dev.anvilcraft.pigeonplus.client.render.SlamHandAnimation;
 import dev.anvilcraft.pigeonplus.client.render.SlamIndicatorRenderer;
 import dev.anvilcraft.pigeonplus.client.particle.RollingPlasmaParticle;
 import dev.anvilcraft.pigeonplus.client.renderer.block.AnvilPumpBlockEntityRenderer;
@@ -42,6 +43,7 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+import net.neoforged.neoforge.client.event.RenderHandEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.model.DynamicFluidContainerModel;
@@ -66,6 +68,7 @@ public class AnvilCraftPigeonPlusClient {
         NeoForge.EVENT_BUS.addListener(this::onClientTick);
         NeoForge.EVENT_BUS.addListener(this::onClientTickPre);
         NeoForge.EVENT_BUS.addListener(this::onRenderLevelStage);
+        NeoForge.EVENT_BUS.addListener(this::onRenderHand);
         NeoForge.EVENT_BUS.addListener(this::onLoggingOut);
     }
 
@@ -96,6 +99,16 @@ public class AnvilCraftPigeonPlusClient {
     }
 
     /**
+     * 第一人称手部动画：裂地重拳期间举锤蓄力、落地瞬间下砸。
+     *
+     * <p>该事件在绘制手持物<strong>之前</strong>触发且带 PoseStack，
+     * 所以在这里改位姿即可作用于随后绘制的手。
+     */
+    private void onRenderHand(RenderHandEvent event) {
+        SlamHandAnimation.onRenderHand(event.getPoseStack(), event.getHand(), event.getPartialTick());
+    }
+
+    /**
      * 断开连接时清空技能冷却镜像。
      *
      * <p>冷却表是静态的，不清会在切换到另一个服务器后残留上一个服务器的冷却时间。
@@ -114,6 +127,8 @@ public class AnvilCraftPigeonPlusClient {
         RocketPunchChargeSoundController.clientTick();
         // 裂地重拳：检测落地并请求结算
         SeismicSlamClientState.clientTick();
+        // 递减下砸动作计时（结算后仍要继续播完，故独立于 clientTick）
+        SeismicSlamClientState.tickSlamSwing();
     }
 
     private void onItemTooltip(ItemTooltipEvent event) {

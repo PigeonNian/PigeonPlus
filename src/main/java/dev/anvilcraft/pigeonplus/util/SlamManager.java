@@ -59,8 +59,8 @@ public final class SlamManager {
     private static final int MAX_AIRTIME_TICKS = 30;
 
     /** 伤害区间：滞空越久越高。 */
-    private static final float MIN_DAMAGE = 20.0f;
-    private static final float MAX_DAMAGE = 80.0f;
+    private static final float MIN_DAMAGE = 2.0f;
+    private static final float MAX_DAMAGE = 15.0f;
 
     /** 砸地命中的眩晕时长（0.6 秒 = 12 tick）。 */
     private static final int STUN_TICKS = 12;
@@ -68,8 +68,13 @@ public final class SlamManager {
     /** 落地判定半径（格），用于把范围内实体纳入候选。 */
     private static final double VERTICAL_RANGE = 3.0;
 
-    /** 指向性裂地的瞄准射程（格）。 */
-    private static final double TARGET_RANGE = 32.0;
+    /**
+     * 指向性裂地的瞄准射程（格）。
+     *
+     * <p>公开给地面指示器使用：指示器用它做射线，服务端用它求落点。
+     * 若两边各写一份，改了一处就会出现「指示器能瞄到但打不到」或反过来的偏差。
+     */
+    public static final double TARGET_RANGE = 15.0;
 
     /**
      * 已起跳、等待落地的玩家：UUID → 起跳时的 gameTime。

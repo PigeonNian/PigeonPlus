@@ -6,6 +6,7 @@ import dev.anvilcraft.pigeonplus.client.SeismicSlamClientState;
 import dev.anvilcraft.pigeonplus.util.AirborneUtil;
 import dev.anvilcraft.pigeonplus.util.DoomfistEnchantmentUtil;
 import dev.anvilcraft.pigeonplus.util.SkillCooldowns;
+import dev.anvilcraft.pigeonplus.util.SlamManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderType;
@@ -107,9 +108,12 @@ public final class SlamIndicatorRenderer {
 
     /**
      * 沿视线找地面落点，规则与 {@code SlamManager#findLandingSpot} 一致。
+     *
+     * <p>射程直接引用 {@link SlamManager#TARGET_RANGE}，与服务端求落点用的是同一个值，
+     * 避免出现「指示器能瞄到但服务端打不到」。
      */
-    private static Vec3 findLanding( Minecraft minecraft, LocalPlayer player) {
-        BlockHitResult hit = (BlockHitResult) player.pick(32.0, 0.0f, false);
+    private static Vec3 findLanding(Minecraft minecraft, LocalPlayer player) {
+        BlockHitResult hit = (BlockHitResult) player.pick(SlamManager.TARGET_RANGE, 0.0f, false);
         if (hit.getType() != HitResult.Type.BLOCK) return null;
 
         Level level = minecraft.level;
