@@ -39,6 +39,14 @@ public final class AddonDamageTypes {
         AnvilCraftPigeonPlus.of("uppercut")
     );
 
+    /**
+     * 裂地重拳砸地造成的伤害。
+     */
+    public static final ResourceKey<DamageType> SEISMIC_SLAM = ResourceKey.create(
+        Registries.DAMAGE_TYPE,
+        AnvilCraftPigeonPlus.of("seismic_slam")
+    );
+
     private AddonDamageTypes() {
     }
 
@@ -56,5 +64,9 @@ public final class AddonDamageTypes {
 
     public static DamageSource uppercut(Level level, @Nullable Entity attacker) {
         return level.damageSources().source(UPPERCUT, attacker);
+    }
+
+    public static DamageSource seismicSlam(Level level, @Nullable Entity attacker) {
+        return level.damageSources().source(SEISMIC_SLAM, attacker);
     }
 }

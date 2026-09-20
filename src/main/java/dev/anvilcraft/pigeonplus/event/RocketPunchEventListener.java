@@ -5,6 +5,8 @@ import dev.anvilcraft.pigeonplus.network.RocketPunchChargeSoundPacket;
 import dev.anvilcraft.pigeonplus.util.DoomfistEnchantmentUtil;
 import dev.anvilcraft.pigeonplus.util.RocketPunchManager;
 import dev.anvilcraft.pigeonplus.util.SkillCooldowns;
+import dev.anvilcraft.pigeonplus.util.SlamManager;
+import dev.anvilcraft.pigeonplus.util.UppercutManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -34,9 +36,15 @@ public class RocketPunchEventListener {
     @SubscribeEvent
     public static void onLevelTick(LevelTickEvent.Post event) {
         RocketPunchManager.tick(event.getLevel());
-        // 清理已过期的技能冷却记录，避免静态表无限增长
         if (event.getLevel() instanceof ServerLevel serverLevel) {
+            // 清理已过期的技能冷却记录，避免静态表无限增长
             SkillCooldowns.prune(serverLevel);
+            // 推进上勾拳的滞空倒计时
+            UppercutManager.tickHover(serverLevel);
+            // 推进上勾拳的上升倒计时（技能互斥用）
+            UppercutManager.tickAscent(serverLevel);
+            // 推进裂地重拳的冲击波扩散动画
+            SlamManager.tickWaves(serverLevel);
         }
     }
 
@@ -100,6 +108,10 @@ public class RocketPunchEventListener {
     @SubscribeEvent
     public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
         SkillCooldowns.clear(event.getEntity().getUUID());
+        // 登出时必须在实体失效前移除重力修饰符，否则会残留在静态状态里
+        UppercutManager.clearHover(event.getEntity());
+        // 落地前离线：清掉待结算记录，避免下次登录被误判为「刚落地」
+        SlamManager.clear(event.getEntity());
     }
 
     /**

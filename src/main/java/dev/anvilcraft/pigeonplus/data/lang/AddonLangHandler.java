@@ -46,6 +46,10 @@ public class AddonLangHandler {
         provider.add("death.attack.rocketPunch", "%1$s was punched into next week by %2$s");
         provider.add("death.attack.rocketPunchWallSlam", "%1$s was slammed into a wall by %2$s");
         provider.add("death.attack.uppercut", "%1$s was launched skyward by %2$s");
+        provider.add("death.attack.seismicSlam", "%1$s was flattened by %2$s");
+        provider.add("subtitles.anvilcraft_pigeon_plus.seismic_slam_leap", "Seismic Slam leaps");
+        provider.add("subtitles.anvilcraft_pigeon_plus.seismic_slam_impact", "Seismic Slam impacts");
+        provider.add("skill.anvilcraft_pigeon_plus.seismic_slam", "Seismic Slam");
         provider.add("skill.anvilcraft_pigeon_plus.rocket_punch", "Rocket Punch");
         provider.add("skill.anvilcraft_pigeon_plus.uppercut", "Uppercut");
         provider.add("effect.anvilcraft_pigeon_plus.stun", "Stun");

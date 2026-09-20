@@ -34,7 +34,9 @@ public final class SkillCooldowns {
         /** 火箭重拳：冷却 4 秒，从冲刺结束开始计。 */
         ROCKET_PUNCH(80, 0xFF35A7FF),
         /** 上勾拳：冷却 6 秒，从释放瞬间开始计。 */
-        UPPERCUT(120, 0xFFFFAA00);
+        UPPERCUT(120, 0xFFFFAA00),
+        /** 裂地重拳：冷却 8 秒，从砸地结算开始计。 */
+        SEISMIC_SLAM(160, 0xFFB06BFF);
 
         private final int cooldownTicks;
         private final int barColor;

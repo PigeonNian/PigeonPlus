@@ -1,6 +1,8 @@
 package dev.anvilcraft.pigeonplus.mixin;
 
+import dev.anvilcraft.pigeonplus.client.SeismicSlamClientState;
 import dev.anvilcraft.pigeonplus.util.RocketPunchDashRegistry;
+import dev.anvilcraft.pigeonplus.util.SlamLeapRegistry;
 import dev.anvilcraft.pigeonplus.util.UppercutAscentRegistry;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -45,6 +47,40 @@ public class LivingEntityTravelMixin {
         // 判定用「是否为客户端玩家类」而不是 isClientSide()/isLocalPlayer()：
         // 集成服务端的 ServerPlayer 两个标志都不满足，无法与主客户端区分。
         if (!((Object) this instanceof LocalPlayer player)) return;
+
+        // 指向性裂地：朝固定落点直线逼近。
+        // 不用 SlamLeapRegistry，因为方向每 tick 都要重算（目标不动、人在动）。
+        Vec3 flightTarget = SeismicSlamClientState.flightTarget();
+        if (flightTarget != null) {
+            Vec3 toTarget = flightTarget.subtract(player.position());
+            double distance = toTarget.length();
+            player.setDeltaMovement(Vec3.ZERO);
+            player.fallDistance = 0.0f;
+            if (distance > 1.0E-4) {
+                // 每 tick 走固定步长，且不超过剩余距离，避免越过目标来回抖
+                double step = Math.min(SeismicSlamClientState.flightMaxStep(), distance);
+                player.move(MoverType.SELF, toTarget.normalize().scale(step));
+            }
+            ci.cancel();
+            return;
+        }
+
+        // 裂地重拳前跃：只在起跳的头几 tick 接管，把人抬离地面后交还原版物理。
+        // 若整段接管，空中就无法左右微调；若不接管，地面的方块摩擦会把水平速度乘掉 0.6。
+        SlamLeapRegistry.Leap leap = SlamLeapRegistry.get(player.getUUID());
+        if (leap != null) {
+            player.setDeltaMovement(Vec3.ZERO);
+            player.fallDistance = 0.0f;
+            player.move(MoverType.SELF, SlamLeapRegistry.leapVelocity(leap));
+            SlamLeapRegistry.tick(player.getUUID());
+            // 交还物理时把当前速度写回，让原版自然接续抛物线
+            if (!SlamLeapRegistry.isLeaping(player.getUUID())) {
+                player.setDeltaMovement(SlamLeapRegistry.leapVelocity(leap));
+                player.hurtMarked = true;
+            }
+            ci.cancel();
+            return;
+        }
 
         // 上勾拳上升：垂直位移，同样接管原版逻辑
         UppercutAscentRegistry.Ascent ascent = UppercutAscentRegistry.get(player.getUUID());

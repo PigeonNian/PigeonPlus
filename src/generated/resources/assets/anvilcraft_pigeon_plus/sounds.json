@@ -53,6 +53,24 @@
     ],
     "subtitle": "subtitles.anvilcraft_pigeon_plus.rocket_punch_wall_slam"
   },
+  "seismic_slam_impact": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "item.mace.smash_ground_heavy"
+      }
+    ],
+    "subtitle": "subtitles.anvilcraft_pigeon_plus.seismic_slam_impact"
+  },
+  "seismic_slam_leap": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "entity.breeze.jump"
+      }
+    ],
+    "subtitle": "subtitles.anvilcraft_pigeon_plus.seismic_slam_leap"
+  },
   "uppercut_cast": {
     "sounds": [
       {

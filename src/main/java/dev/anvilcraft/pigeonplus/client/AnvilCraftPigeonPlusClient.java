@@ -6,6 +6,8 @@ import dev.anvilcraft.lib.v2.config.ConfigManager;
 import dev.anvilcraft.pigeonplus.block.entity.ModBlockEntities;
 import dev.anvilcraft.pigeonplus.client.hud.RocketPunchChargeHud;
 import dev.anvilcraft.pigeonplus.client.hud.SkillCooldownHud;
+import dev.anvilcraft.pigeonplus.client.hud.SlamDamageHud;
+import dev.anvilcraft.pigeonplus.client.render.SlamIndicatorRenderer;
 import dev.anvilcraft.pigeonplus.client.particle.RollingPlasmaParticle;
 import dev.anvilcraft.pigeonplus.client.renderer.block.AnvilPumpBlockEntityRenderer;
 import dev.anvilcraft.pigeonplus.client.renderer.block.BlenderBlockEntityRenderer;
@@ -40,6 +42,7 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.model.DynamicFluidContainerModel;
 import net.neoforged.neoforge.common.NeoForge;
@@ -61,7 +64,35 @@ public class AnvilCraftPigeonPlusClient {
         modBus.addListener(this::onRegisterGuiLayers);
         NeoForge.EVENT_BUS.addListener(this::onItemTooltip);
         NeoForge.EVENT_BUS.addListener(this::onClientTick);
+        NeoForge.EVENT_BUS.addListener(this::onClientTickPre);
+        NeoForge.EVENT_BUS.addListener(this::onRenderLevelStage);
         NeoForge.EVENT_BUS.addListener(this::onLoggingOut);
+    }
+
+    /**
+     * 客户端 tick 前置：处理需要赶在 {@code handleKeybinds} 之前完成的按键拦截。
+     *
+     * <p>{@code Minecraft#tick()} 的顺序是
+     * {@code ClientHooks.fireClientTickPre()} → {@code handleKeybinds()}，
+     * 所以在这里消费 E 键能有效阻止原版打开物品栏。
+     */
+    private void onClientTickPre(ClientTickEvent.Pre event) {
+        SlamKeyHandler.handleInventoryKey();
+    }
+
+    /**
+     * 在世界中绘制指向性裂地重拳的地面扇形指示器。
+     *
+     * <p>用 {@code AFTER_LEVEL} 阶段：此时世界已经画完、深度缓冲可用，
+     * 画在贴地的位置才不会被地形遮挡或穿插。
+     */
+    private void onRenderLevelStage(RenderLevelStageEvent event) {
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_LEVEL) return;
+        SlamIndicatorRenderer.render(
+            event.getPoseStack(),
+            event.getModelViewMatrix(),
+            event.getCamera().getPosition()
+        );
     }
 
     /**
@@ -81,6 +112,8 @@ public class AnvilCraftPigeonPlusClient {
         SkillCooldowns.clientTick();
         // 校准蓄力音效实例（自然播完 / 换维度后清理引用）
         RocketPunchChargeSoundController.clientTick();
+        // 裂地重拳：检测落地并请求结算
+        SeismicSlamClientState.clientTick();
     }
 
     private void onItemTooltip(ItemTooltipEvent event) {
@@ -254,6 +287,10 @@ public class AnvilCraftPigeonPlusClient {
         event.registerAboveAll(
             ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "skill_cooldown"),
             SkillCooldownHud::render
+        );
+        event.registerAboveAll(
+            ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "slam_damage"),
+            SlamDamageHud::render
         );
         try {
             event.wrapLayer(

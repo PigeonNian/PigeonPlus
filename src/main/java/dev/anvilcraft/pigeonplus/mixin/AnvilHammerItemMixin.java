@@ -4,6 +4,8 @@ import com.llamalad7.mixinextras.sugar.Local;
 import dev.anvilcraft.pigeonplus.util.DoomfistEnchantmentUtil;
 import dev.anvilcraft.pigeonplus.util.RocketPunchManager;
 import dev.anvilcraft.pigeonplus.util.SkillCooldowns;
+import dev.anvilcraft.pigeonplus.util.SlamManager;
+import dev.anvilcraft.pigeonplus.util.UppercutManager;
 import dev.dubhe.anvilcraft.api.hammer.HammerManager;
 import dev.dubhe.anvilcraft.api.hammer.HammerRotateBehavior;
 import dev.dubhe.anvilcraft.api.hammer.IHammerChangeable;
@@ -101,6 +103,13 @@ public class AnvilHammerItemMixin {
         // 用 SkillCooldowns 的按侧查询：服务端读权威截止时刻，客户端读本地镜像。
         if (RocketPunchManager.isDashing(player)
             || SkillCooldowns.isOnCooldown(player, SkillCooldowns.Skill.ROCKET_PUNCH)) {
+            cir.setReturnValue(InteractionResultHolder.fail(stack));
+            return;
+        }
+        // 其他技能进行中（上勾拳上升 / 裂地位移）也不得起手蓄力。
+        // 不用 SkillGate.isBusy：它包含 isCharging，而蓄力起点上 isUsingItem 尚为 false；
+        // 直接查另外两个技能更直白，也不会自我死锁。
+        if (UppercutManager.isAscending(player) || SlamManager.isSlamming(player)) {
             cir.setReturnValue(InteractionResultHolder.fail(stack));
         }
     }

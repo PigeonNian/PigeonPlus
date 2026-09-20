@@ -61,6 +61,18 @@ public final class AddonSounds {
         () -> SoundEvent.createVariableRangeEvent(AnvilCraftPigeonPlus.of("uppercut_cast"))
     );
 
+    /** 裂地重拳起跳（向前跃起）。 */
+    public static final Supplier<SoundEvent> SEISMIC_SLAM_LEAP = REGISTER.register(
+        "seismic_slam_leap",
+        () -> SoundEvent.createVariableRangeEvent(AnvilCraftPigeonPlus.of("seismic_slam_leap"))
+    );
+
+    /** 裂地重拳砸击地面。 */
+    public static final Supplier<SoundEvent> SEISMIC_SLAM_IMPACT = REGISTER.register(
+        "seismic_slam_impact",
+        () -> SoundEvent.createVariableRangeEvent(AnvilCraftPigeonPlus.of("seismic_slam_impact"))
+    );
+
     private AddonSounds() {
     }
 

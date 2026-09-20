@@ -2,8 +2,8 @@ package dev.anvilcraft.pigeonplus.client;
 
 import dev.anvilcraft.pigeonplus.network.UppercutRequestPacket;
 import dev.anvilcraft.pigeonplus.util.DoomfistEnchantmentUtil;
-import dev.anvilcraft.pigeonplus.util.RocketPunchManager;
 import dev.anvilcraft.pigeonplus.util.SkillCooldowns;
+import dev.anvilcraft.pigeonplus.util.SkillGate;
 import dev.anvilcraft.pigeonplus.util.UppercutAscentRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -44,9 +44,9 @@ public final class UppercutClientState {
         // 只在手持带铁拳附魔的铁砧锤时才请求；否则玩家每次潜行都会白发一个包。
         // 真正的校验仍在服务端（客户端判断只是省流量）。
         if (!DoomfistEnchantmentUtil.isWieldingDoomfist(player)) return;
-        // 冲刺、上升、冷却中都不触发
-        if (UppercutAscentRegistry.isAscending(player.getUUID())) return;
-        if (RocketPunchManager.isDashing(player)) return;
+        // 技能互斥：蓄力 / 冲刺 / 上升 / 裂地位移期间不得起手。
+        // 与地面指示器、E 键拦截共用同一套判据，避免各处条件不一致。
+        if (SkillGate.isBusy(player)) return;
         if (SkillCooldowns.isOnCooldownClient(SkillCooldowns.Skill.UPPERCUT)) return;
 
         PacketDistributor.sendToServer(new UppercutRequestPacket());

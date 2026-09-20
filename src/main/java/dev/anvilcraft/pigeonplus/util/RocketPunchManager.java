@@ -68,11 +68,11 @@ public final class RocketPunchManager {
     private static final double HIT_RADIUS = 1.6;
 
     /** 不蓄力 / 满蓄力的命中伤害。 */
-    private static final float MIN_HIT_DAMAGE = 25.0f;
-    private static final float MAX_HIT_DAMAGE = 75.0f;
+    private static final float MIN_HIT_DAMAGE = 5.0f;
+    private static final float MAX_HIT_DAMAGE = 10.0f;
     /** 不蓄力 / 满蓄力的撞墙伤害。 */
-    private static final float MIN_WALL_DAMAGE = 10.0f;
-    private static final float MAX_WALL_DAMAGE = 40.0f;
+    private static final float MIN_WALL_DAMAGE = 5.0f;
+    private static final float MAX_WALL_DAMAGE = 15.0f;
 
     /** 撞墙眩晕时长（0.15 秒 = 3 tick）。 */
     private static final int WALL_STUN_TICKS = 3;

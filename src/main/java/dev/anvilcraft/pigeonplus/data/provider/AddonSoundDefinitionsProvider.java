@@ -47,5 +47,13 @@ public class AddonSoundDefinitionsProvider extends SoundDefinitionsProvider {
         add(AddonSounds.UPPERCUT_CAST, definition()
             .subtitle("subtitles.anvilcraft_pigeon_plus.uppercut_cast")
             .with(sound(SoundEvents.MACE_SMASH_GROUND.getLocation(), SoundDefinition.SoundType.EVENT)));
+
+        add(AddonSounds.SEISMIC_SLAM_LEAP, definition()
+            .subtitle("subtitles.anvilcraft_pigeon_plus.seismic_slam_leap")
+            .with(sound(SoundEvents.BREEZE_JUMP.getLocation(), SoundDefinition.SoundType.EVENT)));
+
+        add(AddonSounds.SEISMIC_SLAM_IMPACT, definition()
+            .subtitle("subtitles.anvilcraft_pigeon_plus.seismic_slam_impact")
+            .with(sound(SoundEvents.MACE_SMASH_GROUND_HEAVY.getLocation(), SoundDefinition.SoundType.EVENT)));
     }
 }
