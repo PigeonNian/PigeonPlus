@@ -1,6 +1,9 @@
 package dev.anvilcraft.pigeonplus.mixin;
 
+import dev.anvilcraft.pigeonplus.client.RocketPunchAnimState;
 import dev.anvilcraft.pigeonplus.client.SeismicSlamClientState;
+import dev.anvilcraft.pigeonplus.network.RocketPunchCancelPacket;
+import dev.anvilcraft.pigeonplus.util.ObstructionUtil;
 import dev.anvilcraft.pigeonplus.util.RocketPunchDashRegistry;
 import dev.anvilcraft.pigeonplus.util.SlamLeapRegistry;
 import dev.anvilcraft.pigeonplus.util.UppercutAscentRegistry;
@@ -10,6 +13,7 @@ import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -35,6 +39,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class LivingEntityTravelMixin {
     /** 客户端预测命中用的判定半径（格），与 {@code RocketPunchManager} 保持同量级。 */
     private static final double PREDICT_HIT_RADIUS = 1.6;
+
+    /**
+     * 判定为「只是擦到」的遮挡比例上限。
+     *
+     * <p>超过这个比例说明是正面撞墙，应该停下而不是硬翻上去——
+     * 否则玩家能靠冲刺穿进厚墙，破坏技能语义。
+     */
+    private static final double CLIMB_MAX_OBSTRUCTION = 0.5;
+
+    /** 翻越时的最小垂直分速度（格/tick）。挡得越多用得越小。 */
+    private static final double CLIMB_MIN_SPEED = 0.35;
+    /** 翻越时的最大垂直分速度（格/tick）。只是轻轻蹭到时使用。 */
+    private static final double CLIMB_MAX_SPEED = 0.8;
 
     @Inject(method = "travel", at = @At("HEAD"), cancellable = true)
     private void pigeonplus$rocketPunchDash(Vec3 input, CallbackInfo ci) {
@@ -110,6 +127,9 @@ public class LivingEntityTravelMixin {
         if (pigeonplus$hasTargetAhead(player)) {
             RocketPunchDashRegistry.stop(player.getUUID());
             player.setDeltaMovement(Vec3.ZERO);
+            // 预测命中也要播命中动作：等到服务端回包再播会晚 1~2 tick，
+            // 而冲刺速度高达 2.25 格/tick，那时玩家已经停下、动作却姗姗来迟。
+            RocketPunchAnimState.triggerHit();
             ci.cancel();
             return;
         }
@@ -117,9 +137,52 @@ public class LivingEntityTravelMixin {
         // 清空速度，避免摩擦/重力残留影响下一 tick
         player.setDeltaMovement(Vec3.ZERO);
         player.fallDistance = 0.0f;
-        // 恒定位移：不经过摩擦与重力，严格匀速
-        player.move(MoverType.SELF, dash.direction().scale(dash.speed()));
+
+        // 翻越判定：前方只被方块挡住一小部分（擦到边角）时，转入斜向上冲刺，
+        // 并且**保持这个上升势头直到冲刺结束**——不是越过障碍就停止上升，
+        // 否则只有刚起跳的一小段是斜的，后面又贴回地面，手感很断。
+        // 遮挡比例越高说明越是正面撞墙，就老老实实停下。
+        // 探测距离取本 tick 的实际位移，这样能在撞上之前就发现障碍。
+        if (!dash.climbing()) {
+            double blocked = ObstructionUtil.obstructionRatio(player, dash.direction(), dash.speed());
+            if (blocked > 0.0 && blocked < CLIMB_MAX_OBSTRUCTION) {
+                // 遮挡越少、抬得越高：轻微蹭到就大角度翻越，挡得多就小角度勉强蹭上去
+                double t = 1.0 - blocked / CLIMB_MAX_OBSTRUCTION;
+                double climbSpeed = CLIMB_MIN_SPEED + (CLIMB_MAX_SPEED - CLIMB_MIN_SPEED) * t;
+                RocketPunchDashRegistry.climb(player.getUUID(), climbSpeed);
+                dash = RocketPunchDashRegistry.get(player.getUUID());
+                if (dash == null) {
+                    ci.cancel();
+                    return;
+                }
+            }
+        }
+
+        // 恒定位移：水平按 direction 走，垂直按 climbSpeed（未翻越时为 0）。
+        // climbSpeed 一经设定就保持到冲刺结束，因此上升势头会一直延续。
+        Vec3 motion = dash.direction().scale(dash.speed());
+        if (dash.climbing()) {
+            motion = motion.add(0.0, dash.climbSpeed(), 0.0);
+        }
+        player.move(MoverType.SELF, motion);
         RocketPunchDashRegistry.tick(player.getUUID());
+
+        // 撞墙：水平位移被方块彻底挡住 → 立刻结束冲刺，与打到生物的处理保持一致
+        // （停位移、清权威状态、开始计冷却），而不是顶着墙把剩余 tick 磨完。
+        //
+        // 这里读 move() 之后的 horizontalCollision，而不是把前面的射线结果再判一次：
+        // 它是原版权威的「本 tick 水平位移确实被挡住」标志，还能捕获射线采样可能漏掉的
+        // 细薄障碍（铁栏杆、栅栏），比按比例估算可靠。
+        // climbing 期间不停：那是正在沿墙爬升翻越，本就该贴着墙继续走。
+        if (!dash.climbing() && player.horizontalCollision) {
+            RocketPunchDashRegistry.stop(player.getUUID());
+            player.setDeltaMovement(Vec3.ZERO);
+            // 撞墙也算「打到了」：触发同一套命中动作，让手感一致
+            RocketPunchAnimState.triggerHit();
+            // 让服务端收尾：移除权威冲刺状态并开始计冷却。
+            // 与跳跃取消复用同一个包——两者对服务端而言都是「冲刺在客户端提前结束了」。
+            PacketDistributor.sendToServer(new RocketPunchCancelPacket());
+        }
 
         ci.cancel();
     }

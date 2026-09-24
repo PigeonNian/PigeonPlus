@@ -31,28 +31,34 @@ public final class SkillCooldowns {
      * 可冷却的技能。冷却时长集中在此，新增技能只需加一项。
      */
     public enum Skill {
-        /** 火箭重拳：冷却 4 秒，从冲刺结束开始计。 */
-        ROCKET_PUNCH(80, 0xFF35A7FF),
-        /** 上勾拳：冷却 6 秒，从释放瞬间开始计。 */
-        UPPERCUT(120, 0xFFFFAA00),
-        /** 裂地重拳：冷却 8 秒，从砸地结算开始计。 */
-        SEISMIC_SLAM(160, 0xFFB06BFF);
+        /** 火箭重拳：冷却 4 秒，从冲刺结束开始计。触发键为右键（长按蓄力）。 */
+        ROCKET_PUNCH(80, KeyHint.USE),
+        /** 上勾拳：冷却 6 秒，从释放瞬间开始计。触发键为 Shift（单按）。 */
+        UPPERCUT(120, KeyHint.SHIFT),
+        /** 裂地重拳：冷却 6 秒，从砸地结算开始计。触发键为 E（原物品栏键）。 */
+        SEISMIC_SLAM(120, KeyHint.INVENTORY);
 
         private final int cooldownTicks;
-        private final int barColor;
+        private final KeyHint keyHint;
 
-        Skill(int cooldownTicks, int barColor) {
+        Skill(int cooldownTicks, KeyHint keyHint) {
             this.cooldownTicks = cooldownTicks;
-            this.barColor = barColor;
+            this.keyHint = keyHint;
         }
 
         public int cooldownTicks() {
             return this.cooldownTicks;
         }
 
-        /** HUD 进度条颜色。 */
-        public int barColor() {
-            return this.barColor;
+        /**
+         * 该技能的触发键，供 HUD 显示提示。
+         *
+         * <p>用枚举而非直接存 {@code KeyMapping}：本类位于 common 侧，
+         * 直接引用 {@code Minecraft.options} 会让专用服务端加载失败。
+         * 由客户端 HUD 负责把枚举解析成实际的按键名。
+         */
+        public KeyHint keyHint() {
+            return this.keyHint;
         }
 
         /** 语言文件键，形如 {@code skill.anvilcraft_pigeon_plus.rocket_punch}。 */
@@ -66,6 +72,22 @@ public final class SkillCooldowns {
             if (ordinal < 0 || ordinal >= values.length) return null;
             return values[ordinal];
         }
+    }
+
+    /**
+     * 触发键的抽象标识。
+     *
+     * <p>只用来描述「这个技能按哪个键」，具体按键名由客户端查
+     * {@code Options} 得到——这样玩家改键位后提示会自动跟着变，
+     * 也不会让 common 侧依赖客户端类。
+     */
+    public enum KeyHint {
+        /** 使用/放置键（默认鼠标右键）。 */
+        USE,
+        /** 潜行键（默认 Shift）。 */
+        SHIFT,
+        /** 物品栏键（默认 E，被裂地重拳接管）。 */
+        INVENTORY
     }
 
     /** 服务端权威截止时刻（绝对 gameTime）。 */
@@ -175,7 +197,7 @@ public final class SkillCooldowns {
     }
 
     /**
-     * 剩余 tick 数（已按 {@code partialTick} 插值）。
+     * 剩余 tick 数（已按 {@code partialTick} 插值）。0 表示已就绪。
      */
     public static float remainingTicks(Skill skill, float partialTick) {
         int remaining = CLIENT_REMAINING.getOrDefault(skill, 0);
@@ -183,19 +205,20 @@ public final class SkillCooldowns {
     }
 
     /**
-     * 剩余比例（1.0 = 刚开始，0.0 = 已结束）。HUD 画进度条用。
+     * 剩余秒数（向上取整），HUD 直接显示的整数。
+     *
+     * <p>用向上取整而不是四舍五入：冷却 0.4 秒时显示 1 比显示 0 更符合直觉
+     * ——显示 0 会让人以为已经能放了。
      */
-    public static float progress(Skill skill, float partialTick) {
-        int total = skill.cooldownTicks();
-        if (total <= 0) return 0.0f;
-        return Math.min(1.0f, remainingTicks(skill, partialTick) / total);
+    public static int remainingSecondsCeil(Skill skill, float partialTick) {
+        return (int) Math.ceil(remainingTicks(skill, partialTick) / 20.0);
     }
 
     /**
-     * 剩余秒数，保留一位小数展示用。
+     * 技能是否已就绪（冷却走完）。
      */
-    public static float remainingSeconds(Skill skill, float partialTick) {
-        return remainingTicks(skill, partialTick) / 20.0f;
+    public static boolean isReady(Skill skill, float partialTick) {
+        return remainingTicks(skill, partialTick) <= 0.0f;
     }
 
     /**

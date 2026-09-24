@@ -29,12 +29,30 @@ public final class RocketPunchDashRegistry {
      * @param speed          每 tick 位移量（米），恒定即为匀速
      * @param baseYaw        释放瞬间朝向，视角锁定以此为基准
      * @param remainingTicks 剩余 tick 数
+     * @param climbSpeed     垂直分速度（格/tick）。0 = 纯水平冲刺；
+     *                       擦到方块后会变成正值，并<strong>一直保持到冲刺结束</strong>
      */
-    public record Dash(Vec3 direction, double speed, float baseYaw, int remainingTicks) {
+    public record Dash(
+        Vec3 direction,
+        double speed,
+        float baseYaw,
+        int remainingTicks,
+        double climbSpeed
+    ) {
+        /**
+         * 是否正在向上翻越。
+         *
+         * <p>没有单独的持续时长：一旦擦到方块获得上升势头，就沿用整个冲刺剩余时间
+         * ——这才是「继承向上势头直到冲刺结束」的手感。冲刺本身有固定 tick 数，
+         * 因此上升总高度天然有上限，不会无限升高。
+         */
+        public boolean climbing() {
+            return this.climbSpeed > 0.0;
+        }
     }
 
     public static void start(UUID uuid, Vec3 direction, double speed, int ticks, float baseYaw) {
-        DASHES.put(uuid, new Dash(direction, speed, baseYaw, ticks));
+        DASHES.put(uuid, new Dash(direction, speed, baseYaw, ticks, 0.0));
     }
 
     public static Dash get(UUID uuid) {
@@ -50,6 +68,22 @@ public final class RocketPunchDashRegistry {
     }
 
     /**
+     * 让当前冲刺转为斜向上，并保持到冲刺结束。
+     *
+     * <p>只生效一次：已经在上升时不重复触发，避免贴着墙被反复叠加抬升速度。
+     *
+     * @param climbSpeed 垂直分速度（格/tick）
+     */
+    public static void climb(UUID uuid, double climbSpeed) {
+        Dash dash = DASHES.get(uuid);
+        if (dash == null || dash.climbing()) return;
+        DASHES.put(
+            uuid,
+            new Dash(dash.direction(), dash.speed(), dash.baseYaw(), dash.remainingTicks(), climbSpeed)
+        );
+    }
+
+    /**
      * 递减剩余 tick，归零即移除。由位移 mixin 每次套用位移后调用。
      */
     public static void tick(UUID uuid) {
@@ -60,7 +94,10 @@ public final class RocketPunchDashRegistry {
         } else {
             DASHES.put(
                 uuid,
-                new Dash(dash.direction(), dash.speed(), dash.baseYaw(), dash.remainingTicks() - 1)
+                new Dash(
+                    dash.direction(), dash.speed(), dash.baseYaw(),
+                    dash.remainingTicks() - 1, dash.climbSpeed()
+                )
             );
         }
     }

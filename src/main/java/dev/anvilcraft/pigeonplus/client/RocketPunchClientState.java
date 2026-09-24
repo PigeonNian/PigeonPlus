@@ -40,11 +40,15 @@ public final class RocketPunchClientState {
 
     /**
      * 立即中断冲刺（撞到生物时由服务端下发）。
+     *
+     * <p>同时触发命中动作：这个包的唯一来源就是「服务端判定打中了生物」，
+     * 所以这里就是客户端能拿到的最早命中时机。撞墙则由本地 mixin 直接触发。
      */
     public static void stopDash() {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player != null) {
             RocketPunchDashRegistry.stop(player.getUUID());
+            RocketPunchAnimState.triggerHit();
         }
     }
 

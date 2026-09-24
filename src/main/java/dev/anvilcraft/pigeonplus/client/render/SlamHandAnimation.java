@@ -115,31 +115,10 @@ public final class SlamHandAnimation {
         // 位移先在「屏幕方向」上施加：保持你按屏幕调好的前后/上下偏移不变。
         poseStack.translate(0.0f, translateY, translateZ);
 
-        // ------------------------------------------------------------------
-        // 视角修正：让挥击朝向固定在世界里，不随抬头/低头漂移
-        //
-        // 手部空间由 GameRenderer#renderItemInHand 建立：建栈时乘入相机旋转
-        //     C = Ry(π − yaw) · Rx(−pitch)        （见 Camera.setRotation 的 rotationYXZ）
-        // 动画整体为 C · T · Rx(a)，于是锤子指向的世界方向是
-        //     C · Rx(a) · u = Ry(π−yaw) · Rx(−pitch) · Rx(a) · u
-        //                   = Ry(π−yaw) · Rx(a − pitch) · u
-        // 要让它与 pitch 无关，必须有 a − pitch = 常数，即补偿量为 +pitch。
-        //
-        // 换句话说：Axis.XP 的轴确实水平（挥击平面是竖直的，这点没错），
-        // 但**平面内的起始朝向**会随俯仰一起转 —— 轴对不代表朝向对。
-        // 只有俯仰 0°（你的参数就是在这个角度调的）时朝向才符合预期。
-        //
-        // 位置说明：补偿放在 translate **之后**、动画旋转之前。
-        //   · 与旋转相邻，两者同轴可直接合并为 Rx(a + pitch)，只改朝向；
-        //   · 位移留在外层，仍按屏幕方向生效，你调好的前后/上下偏移不受影响。
-        //
-        // 只补 pitch、不含 xBob：xBob 是原版平滑跟随俯仰的随动量
-        // （xBob += (getXRot()−xBob)*0.5），对应转视线时的滞后摆动，属原版手感，不该抵消。
-        //
-        // 俯仰 0° 时补偿量为 0，因此你按 0° 调好的数值完全不变。
-        // 若实测方向相反（例如低头时反而抡得更高），把这里的正号改成负号即可。
-        // ------------------------------------------------------------------
-        float pitch = player.getViewXRot(partialTick);
-        poseStack.mulPose(Axis.XP.rotationDegrees(rotationX + pitch));
+        // 视角修正：让挥击朝向固定在世界里，不随抬头/低头漂移。
+        // 注意这里**不**做枢轴补偿——本技能的角度是按旧枢轴（相机原点）调定的，
+        // 换枢轴会让这些数值的观感全变。只有上勾拳使用枢轴版（见 HandViewCorrection）。
+        HandViewCorrection.apply(poseStack, player, partialTick);
+        poseStack.mulPose(Axis.XP.rotationDegrees(rotationX));
     }
 }

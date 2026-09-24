@@ -1,5 +1,6 @@
 package dev.anvilcraft.pigeonplus.client;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import dev.anvilcraft.pigeonplus.AddonClientConfig;
 import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
 import dev.anvilcraft.lib.v2.config.ConfigManager;
@@ -7,8 +8,10 @@ import dev.anvilcraft.pigeonplus.block.entity.ModBlockEntities;
 import dev.anvilcraft.pigeonplus.client.hud.RocketPunchChargeHud;
 import dev.anvilcraft.pigeonplus.client.hud.SkillCooldownHud;
 import dev.anvilcraft.pigeonplus.client.hud.SlamDamageHud;
+import dev.anvilcraft.pigeonplus.client.render.RocketPunchHandAnimation;
 import dev.anvilcraft.pigeonplus.client.render.SlamHandAnimation;
 import dev.anvilcraft.pigeonplus.client.render.SlamIndicatorRenderer;
+import dev.anvilcraft.pigeonplus.client.render.UppercutHandAnimation;
 import dev.anvilcraft.pigeonplus.client.particle.RollingPlasmaParticle;
 import dev.anvilcraft.pigeonplus.client.renderer.block.AnvilPumpBlockEntityRenderer;
 import dev.anvilcraft.pigeonplus.client.renderer.block.BlenderBlockEntityRenderer;
@@ -31,6 +34,7 @@ import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -99,13 +103,25 @@ public class AnvilCraftPigeonPlusClient {
     }
 
     /**
-     * 第一人称手部动画：裂地重拳期间举锤蓄力、落地瞬间下砸。
+     * 第一人称手部动画。
      *
      * <p>该事件在绘制手持物<strong>之前</strong>触发且带 PoseStack，
      * 所以在这里改位姿即可作用于随后绘制的手。
+     *
+     * <p>{@code equipProgress} 只透传给上勾拳：它用枢轴补偿（绕握把转），
+     * 需要该值还原原版的手部基准平移；裂地重拳与火箭重拳的角度是按旧枢轴调定的，
+     * 换枢轴会让那些数值的观感全变，故不传。
+     *
+     * <p>三个技能各管一段，靠技能互斥（{@code SkillGate}）保证不会同时生效。
      */
     private void onRenderHand(RenderHandEvent event) {
-        SlamHandAnimation.onRenderHand(event.getPoseStack(), event.getHand(), event.getPartialTick());
+        float partialTick = event.getPartialTick();
+        PoseStack poseStack = event.getPoseStack();
+        InteractionHand hand = event.getHand();
+
+        SlamHandAnimation.onRenderHand(poseStack, hand, partialTick);
+        RocketPunchHandAnimation.onRenderHand(poseStack, hand, partialTick);
+        UppercutHandAnimation.onRenderHand(poseStack, hand, partialTick, event.getEquipProgress());
     }
 
     /**
@@ -115,11 +131,16 @@ public class AnvilCraftPigeonPlusClient {
      */
     private void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
         SkillCooldowns.clearClient();
+        // 命中/挥击动作是静态计时，不清会在切换世界后残留、闪一下
+        RocketPunchAnimState.reset();
+        UppercutClientState.reset();
     }
 
     private void onClientTick(ClientTickEvent.Post event) {
         NozzleSoundController.clientTick();
         RocketPunchClientState.clientTick();
+        // 递减命中动作计时（命中是一瞬间的事件，需要自己记时长才能播完）
+        RocketPunchAnimState.clientTick();
         UppercutClientState.clientTick();
         // 递减统一的技能冷却镜像（HUD 读它，与服务端放行判断同源）
         SkillCooldowns.clientTick();
