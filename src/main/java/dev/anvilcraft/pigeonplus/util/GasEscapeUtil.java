@@ -16,7 +16,10 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.minecraft.util.ARGB;
 import org.joml.Vector3f;
 
 public class GasEscapeUtil {
@@ -28,7 +31,7 @@ public class GasEscapeUtil {
     private GasEscapeUtil() {
     }
 
-    public static void escapeFishTankGas(Level level, BlockPos pos, IFluidHandler handler) {
+    public static void escapeFishTankGas(Level level, BlockPos pos, ResourceHandler<FluidResource> handler) {
         if (!canEscapeThisTick(level) || isCoveredByFullCollisionBlock(level, pos.above())) {
             return;
         }
@@ -39,39 +42,59 @@ public class GasEscapeUtil {
         if (!canEscapeThisTick(level) || isLargeCauldronCovered(level, mainPos)) {
             return;
         }
-        for (FluidStack stack : handler.copyFluids()) {
-            if (stack.getFluid() instanceof GasFluid) {
-                handler.drainStoredFluid(
-                    stack.copyWithAmount(Math.min(GAS_ESCAPE_AMOUNT, stack.getAmount())),
-                    IFluidHandler.FluidAction.EXECUTE
-                );
-            }
-        }
+        drainGas(handler);
     }
 
-    public static void escapeDrainGas(Level level, BlockPos pos, IFluidHandler handler) {
+    public static void escapeDrainGas(Level level, BlockPos pos, ResourceHandler<FluidResource> handler) {
         if (level.isClientSide()
             || level.getGameTime() % DRAIN_GAS_ESCAPE_INTERVAL_TICKS != 0
             || !CompressedAirDrainFluidHandler.isDrainAirExposed(level, pos)) {
             return;
         }
-        for (int tank = 0; tank < handler.getTanks(); tank++) {
-            FluidStack stack = handler.getFluidInTank(tank);
-            if (!(stack.getFluid() instanceof GasFluid)) {
+        for (int tank = 0; tank < handler.size(); tank++) {
+            FluidResource resource = handler.getResource(tank);
+            if (resource.isEmpty() || !(resource.getFluid() instanceof GasFluid)) {
                 continue;
             }
-            int amount = Math.min(DRAIN_GAS_ESCAPE_AMOUNT, stack.getAmount());
-            FluidStack drained = handler.drain(stack.copyWithAmount(amount), IFluidHandler.FluidAction.EXECUTE);
-            if (!drained.isEmpty()) {
-                spawnDrainGasParticles((ServerLevel) level, pos, drained);
+            long available = handler.getAmountAsLong(tank);
+            int amount = (int) Math.min(DRAIN_GAS_ESCAPE_AMOUNT, available);
+            if (amount <= 0) {
+                continue;
+            }
+            int drained = pigeonplus$extract(handler, tank, resource, amount);
+            if (drained > 0) {
+                // 用资源与数量重建 FluidStack，只为取粒子颜色与数量
+                spawnDrainGasParticles((ServerLevel) level, pos, resource.toStack(drained));
             }
         }
     }
 
-    public static boolean hasStoredBiogas(IFluidHandler handler) {
-        for (int tank = 0; tank < handler.getTanks(); tank++) {
-            FluidStack stack = handler.getFluidInTank(tank);
-            if (!stack.isEmpty() && stack.getFluid().isSame(AddonFluids.GASEOUS_BIOGAS.get())) {
+    /**
+     * 在独立事务里抽取流体。
+     *
+     * <p>26.1 的流体能力换成了 {@code ResourceHandler} + {@code Transaction}：
+     * 抽取必须发生在事务内，且只有 {@code commit()} 之后才真正生效。
+     * 因此这里统一封装——抽取成功才提交，失败则自动回滚（try-with-resources 关闭）。
+     */
+    private static int pigeonplus$extract(
+        ResourceHandler<FluidResource> handler, int tank, FluidResource resource, int amount
+    ) {
+        try (Transaction transaction = Transaction.openRoot()) {
+            int extracted = handler.extract(tank, resource, amount, transaction);
+            if (extracted > 0) {
+                transaction.commit();
+            }
+            return extracted;
+        }
+    }
+
+    public static boolean hasStoredBiogas(ResourceHandler<FluidResource> handler) {
+        for (int tank = 0; tank < handler.size(); tank++) {
+            FluidResource resource = handler.getResource(tank);
+            if (resource.isEmpty() || handler.getAmountAsLong(tank) <= 0) {
+                continue;
+            }
+            if (resource.getFluid().isSame(AddonFluids.GASEOUS_BIOGAS.get())) {
                 return true;
             }
         }
@@ -82,16 +105,18 @@ public class GasEscapeUtil {
         return !level.isClientSide() && level.getGameTime() % GAS_ESCAPE_INTERVAL_TICKS == 0;
     }
 
-    private static void drainGas(IFluidHandler handler) {
-        for (int tank = 0; tank < handler.getTanks(); tank++) {
-            FluidStack stack = handler.getFluidInTank(tank);
-            if (!(stack.getFluid() instanceof GasFluid)) {
+    /** 把所有气体储罐各抽走一小口（鱼缸与大炼药锅共用）。 */
+    private static void drainGas(ResourceHandler<FluidResource> handler) {
+        for (int tank = 0; tank < handler.size(); tank++) {
+            FluidResource resource = handler.getResource(tank);
+            if (resource.isEmpty() || !(resource.getFluid() instanceof GasFluid)) {
                 continue;
             }
-            handler.drain(
-                stack.copyWithAmount(Math.min(GAS_ESCAPE_AMOUNT, stack.getAmount())),
-                IFluidHandler.FluidAction.EXECUTE
-            );
+            long available = handler.getAmountAsLong(tank);
+            int amount = (int) Math.min(GAS_ESCAPE_AMOUNT, available);
+            if (amount > 0) {
+                pigeonplus$extract(handler, tank, resource, amount);
+            }
         }
     }
 
@@ -127,14 +152,20 @@ public class GasEscapeUtil {
         }
     }
 
-    private static Vector3f gasParticleColor(Fluid fluid) {
+    /**
+     * 气体对应的粒子颜色。
+     *
+     * <p>26.1 的 {@code DustParticleOptions} 收打包好的 ARGB int，
+     * 不再是 {@code Vector3f}，故这里直接返回 int。
+     */
+    private static int gasParticleColor(Fluid fluid) {
         if (fluid.isSame(AddonFluids.GASEOUS_BIOGAS.get())) {
-            return new Vector3f(0.42f, 0.56f, 0.24f);
+            return ARGB.colorFromFloat(1.0f, 0.42f, 0.56f, 0.24f);
         }
         if (fluid.isSame(AddonFluids.COMPRESSED_AIR.get())) {
-            return new Vector3f(0.85f, 0.95f, 1.0f);
+            return ARGB.colorFromFloat(1.0f, 0.85f, 0.95f, 1.0f);
         }
-        return new Vector3f(0.8f, 0.85f, 0.9f);
+        return ARGB.colorFromFloat(1.0f, 0.8f, 0.85f, 0.9f);
     }
 
     private static boolean isLargeCauldronCovered(Level level, BlockPos mainPos) {

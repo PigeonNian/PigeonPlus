@@ -19,10 +19,10 @@ public class AnvilPumpEventListener {
         }
         BlockPos pumpPos = event.getPos().below();
         if (level.getBlockEntity(pumpPos) instanceof AnvilPumpBlockEntity pump) {
-            pump.activate(event.getFallDistance());
+            pump.activate((float) event.getFallDistance());
         }
         if (level.getBlockEntity(pumpPos) instanceof FeedSpreaderBlockEntity feedSpreader) {
-            feedSpreader.activate(event.getFallDistance());
+            feedSpreader.activate((float) event.getFallDistance());
         }
     }
 }

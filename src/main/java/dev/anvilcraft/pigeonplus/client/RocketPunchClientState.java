@@ -6,7 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 /**
  * 客户端侧的火箭重拳冲刺状态：匀速位移 + 视角锁定。
@@ -111,7 +111,7 @@ public final class RocketPunchClientState {
         // 1) 先断开冲刺，让下一次 travel 走回原版逻辑
         RocketPunchDashRegistry.stop(player.getUUID());
         // 同步给服务端，否则它仍会继续做命中判定（玩家已停下却还在打人）
-        PacketDistributor.sendToServer(new RocketPunchCancelPacket());
+        ClientPacketDistributor.sendToServer(new RocketPunchCancelPacket());
 
         // 2) 按当前视角的水平朝向保留动量；视线几乎垂直时退化为“仅按 yaw 求水平朝向”，
         //    避免 normalize 出现零向量。用 directionFromRotation 而不是手写三角函数，

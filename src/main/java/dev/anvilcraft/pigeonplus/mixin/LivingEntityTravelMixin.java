@@ -13,7 +13,7 @@ import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -181,7 +181,7 @@ public class LivingEntityTravelMixin {
             RocketPunchAnimState.triggerHit();
             // 让服务端收尾：移除权威冲刺状态并开始计冷却。
             // 与跳跃取消复用同一个包——两者对服务端而言都是「冲刺在客户端提前结束了」。
-            PacketDistributor.sendToServer(new RocketPunchCancelPacket());
+            ClientPacketDistributor.sendToServer(new RocketPunchCancelPacket());
         }
 
         ci.cancel();

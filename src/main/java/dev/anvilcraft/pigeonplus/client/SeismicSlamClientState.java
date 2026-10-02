@@ -11,7 +11,7 @@ import dev.anvilcraft.pigeonplus.util.SlamManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 /**
  * 客户端侧的裂地重拳状态：E 键触发 + 前跃 + 落地检测。
@@ -111,7 +111,7 @@ public final class SeismicSlamClientState {
 
         // 悬空时请求指向性；服务端会再校验一次，不满足则回退为普通裂地
         boolean requested = AirborneUtil.isAirborne(player);
-        PacketDistributor.sendToServer(new SlamRequestPacket(requested));
+        ClientPacketDistributor.sendToServer(new SlamRequestPacket(requested));
     }
 
     /**
@@ -219,7 +219,7 @@ public final class SeismicSlamClientState {
      * 保证「请求服务端结算」与「播下砸动画」两件事不会漏掉任何一条。
      */
     private static void triggerImpact() {
-        PacketDistributor.sendToServer(new SlamImpactPacket());
+        ClientPacketDistributor.sendToServer(new SlamImpactPacket());
         // 先记下此刻举到哪，下砸才能从这个姿态平滑抡下去（否则会瞬时跳变）
         slamStartRaise = raiseProgress(0.0f);
         // 再起手动画并 reset：reset 会清掉 airborne，但下砸计时是独立的，

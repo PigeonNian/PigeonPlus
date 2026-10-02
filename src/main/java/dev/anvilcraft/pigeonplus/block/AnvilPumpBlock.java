@@ -130,25 +130,21 @@ public class AnvilPumpBlock extends BetterBaseEntityBlock
     /**
      * 邻居变化时同步红石供电状态。
      *
-     * <p>26.1 把 {@code neighborChanged} 改名为 {@code handleNeighborChanged}，
-     * 且参数里不再传 {@code BlockState}、来源位置也由 {@code BlockPos}
-     * 换成了 {@link Orientation}（红石朝向）。因此这里用
-     * {@code level.getBlockState(pos)} 取当前状态。
+     * <p>26.1 保留了方法名 {@code neighborChanged}，只把「来源位置」参数
+     * 由 {@code BlockPos} 换成了 {@link Orientation}（红石朝向）。
+     * 注意别与 {@code BlockStateBase#handleNeighborChanged} 搞混——
+     * 那是状态层的内部派发方法，不是这里的覆写点。
      */
     @Override
-    public void handleNeighborChanged(
-        Level level, BlockPos pos, net.minecraft.world.level.block.Block block,
+    protected void neighborChanged(
+        BlockState state, Level level, BlockPos pos, net.minecraft.world.level.block.Block block,
         Orientation orientation, boolean isMoving
     ) {
-        super.handleNeighborChanged(level, pos, block, orientation, isMoving);
+        super.neighborChanged(state, level, pos, block, orientation, isMoving);
         if (level.isClientSide()) {
             return;
         }
         FluidNetworkManager.INSTANCE.addAdjacentContainers(level, pos);
-        BlockState state = level.getBlockState(pos);
-        if (!(state.getBlock() instanceof AnvilPumpBlock)) {
-            return;
-        }
         boolean hasSignal = level.hasNeighborSignal(pos);
         if (hasSignal != state.getValue(PumpBlock.POWERED)) {
             level.setBlock(pos, state.setValue(PumpBlock.POWERED, hasSignal), 2);
@@ -165,14 +161,14 @@ public class AnvilPumpBlock extends BetterBaseEntityBlock
     }
 
     /**
-     * 26.1 把 {@code onRemove} 换成了
-     * {@code affectNeighborsAfterRemoval(ServerLevel, BlockPos, boolean)}：
-     * 只在服务端触发，且不再给出新旧状态，因此无法再比较两者是否同方块。
-     * 这里改为直接标记管网为脏——被移除本身就意味着管网结构变化。
+     * 26.1 把 {@code onRemove} 换成了 {@code affectNeighborsAfterRemoval}：
+     * 参数为 {@code (BlockState, ServerLevel, BlockPos, boolean)}，
+     * 仍在移除后触发一次。这里只需标记管网为脏——
+     * 被移除本身就意味着管网结构发生了变化。
      */
     @Override
-    protected void affectNeighborsAfterRemoval(ServerLevel level, BlockPos pos, boolean movedByPiston) {
-        super.affectNeighborsAfterRemoval(level, pos, movedByPiston);
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+        super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
         FluidNetworkManager.INSTANCE.markDirty(level);
     }
 

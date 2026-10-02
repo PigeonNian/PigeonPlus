@@ -132,7 +132,7 @@ public class NozzleBlock extends FlexibleMultiPartBlock<DirectionCube3x3PartHalf
     }
 
     @Override
-    protected boolean propagatesSkylightDown(BlockState state, BlockGetter level, net.minecraft.core.BlockPos pos) {
+    protected boolean propagatesSkylightDown(BlockState state) {
         return true;
     }
 

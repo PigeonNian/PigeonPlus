@@ -18,15 +18,30 @@ public class MixedBiomassBlock extends LiquidBlock {
         super(fluid, properties);
     }
 
+    /**
+     * 泡在混合生物质里会持续反胃。
+     *
+     * <p>26.1 的 {@code entityInside} 新增了两个参数：
+     * {@code InsideBlockEffectApplier}（用于派发「方块内效果」的替换机制）
+     * 与一个 boolean。本方法自己直接施加药水效果，不依赖该机制，
+     * 故只需忽略这两个新参数。
+     */
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+    protected void entityInside(
+        BlockState state,
+        Level level,
+        BlockPos pos,
+        Entity entity,
+        net.minecraft.world.entity.InsideBlockEffectApplier effectApplier,
+        boolean isInside
+    ) {
         if (level.isClientSide() || !(entity instanceof LivingEntity living)) {
             return;
         }
 
-        MobEffectInstance current = living.getEffect(MobEffects.CONFUSION);
+        MobEffectInstance current = living.getEffect(MobEffects.NAUSEA);
         if (current == null || current.getDuration() < NAUSEA_DURATION_TICKS / 2) {
-            living.addEffect(new MobEffectInstance(MobEffects.CONFUSION, NAUSEA_DURATION_TICKS));
+            living.addEffect(new MobEffectInstance(MobEffects.NAUSEA, NAUSEA_DURATION_TICKS));
         }
     }
 }

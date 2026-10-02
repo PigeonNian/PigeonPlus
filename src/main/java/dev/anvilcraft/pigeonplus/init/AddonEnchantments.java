@@ -41,7 +41,7 @@ public class AddonEnchantments {
                     8,
                     EquipmentSlotGroup.MAINHAND
                 )
-            ).build(DOOMFIST_KEY.location())
+            ).build(DOOMFIST_KEY.identifier())
         );
     }
 }

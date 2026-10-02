@@ -61,14 +61,12 @@ public class BlendingRecipe extends AbstractProcessRecipe<BlendingRecipe> {
 
     public boolean isConsumeFluid() {
         HasCauldronSimple hasCauldron = this.getHasCauldron();
-        // 26.1 的 HasCauldronSimple 直接用 Identifier 表示流体，
-        // 原 hasFluid()/transforms() 已被移除，改用空值常量判断
-        return HasCauldron.isNotEmpty(hasCauldron.fluid()) && hasCauldron.consume() > 0;
+        return hasCauldron.hasFluid() && hasCauldron.consume() > 0;
     }
 
     public boolean isProduceFluid() {
         HasCauldronSimple hasCauldron = this.getHasCauldron();
-        return HasCauldron.isNotEmpty(hasCauldron.transform()) && hasCauldron.produce() > 0;
+        return !hasCauldron.transforms().isEmpty() && hasCauldron.produce() > 0;
     }
 
     public static final MapCodec<BlendingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -118,7 +116,7 @@ public class BlendingRecipe extends AbstractProcessRecipe<BlendingRecipe> {
         }
 
         public Builder transform(Identifier transform, int produce) {
-            // 26.1 的 Builder 把 transform 与 produce 拆成两次调用
+            // AnvilCraft 2386 的 Builder 把 transform 与 produce 拆成两次调用
             this.hasCauldron.transform(transform).produce(produce);
             return this;
         }
@@ -162,7 +160,7 @@ public class BlendingRecipe extends AbstractProcessRecipe<BlendingRecipe> {
             if (this.itemIngredients.isEmpty()) {
                 throw new IllegalArgumentException("Recipe ingredients must not be empty, RecipeId: " + id);
             }
-            if (this.results.isEmpty() && !HasCauldron.isNotEmpty(this.hasCauldron.build().transform())) {
+            if (this.results.isEmpty() && this.hasCauldron.build().transforms().isEmpty()) {
                 throw new IllegalArgumentException("Recipe must have results or a fluid transform, RecipeId: " + id);
             }
         }

@@ -1,5 +1,6 @@
 package dev.anvilcraft.pigeonplus.effect;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
@@ -22,8 +23,14 @@ public class StunMobEffect extends MobEffect {
         return true;
     }
 
+    /**
+     * 生效期间持续压制水平速度。
+     *
+     * <p>26.1 的 {@code applyEffectTick} 第一个参数改为
+     * {@link ServerLevel}（该方法本就只在服务端调用）。
+     */
     @Override
-    public boolean applyEffectTick(LivingEntity entity, int amplifier) {
+    public boolean applyEffectTick(ServerLevel level, LivingEntity entity, int amplifier) {
         Vec3 movement = entity.getDeltaMovement();
         entity.setDeltaMovement(movement.x * 0.1, movement.y, movement.z * 0.1);
         entity.hurtMarked = true;

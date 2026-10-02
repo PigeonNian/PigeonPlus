@@ -77,7 +77,7 @@ public class AddonFluids {
         "liquefied_biogas",
         () -> new EvaporatingLiquidBlock(LIQUEFIED_BIOGAS.get(), BlockBehaviour.Properties.of()
             .replaceable()
-            .noCollission()
+            .noCollision()
             .strength(100.0f)
             .pushReaction(PushReaction.DESTROY)
             .noLootTable()
@@ -129,7 +129,7 @@ public class AddonFluids {
         "mixed_biomass",
         () -> new MixedBiomassBlock(MIXED_BIOMASS.get(), BlockBehaviour.Properties.of()
             .replaceable()
-            .noCollission()
+            .noCollision()
             .strength(100.0f)
             .pushReaction(PushReaction.DESTROY)
             .noLootTable()
@@ -161,7 +161,7 @@ public class AddonFluids {
         "liquid_oxygen",
         () -> new EvaporatingLiquidBlock(LIQUID_OXYGEN.get(), BlockBehaviour.Properties.of()
             .replaceable()
-            .noCollission()
+            .noCollision()
             .strength(100.0f)
             .pushReaction(PushReaction.DESTROY)
             .noLootTable()
@@ -195,7 +195,7 @@ public class AddonFluids {
         "liquid_hydrogen",
         () -> new EvaporatingLiquidBlock(LIQUID_HYDROGEN.get(), BlockBehaviour.Properties.of()
             .replaceable()
-            .noCollission()
+            .noCollision()
             .strength(100.0f)
             .pushReaction(PushReaction.DESTROY)
             .noLootTable()

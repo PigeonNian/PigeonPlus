@@ -22,7 +22,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
-import org.joml.Vector3f;
+import net.minecraft.util.ARGB;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -287,8 +287,9 @@ public final class SlamManager {
         }
 
         // 2) 贴地的尘土环：用 DUST 画一圈偏土黄的颜色，强化“裂地”观感
+        // 26.1 的 DustParticleOptions 收打包好的 ARGB int，不再是 Vector3f
         DustParticleOptions dust = new DustParticleOptions(
-            new Vector3f(0.55f, 0.45f, 0.32f), 1.6f
+            ARGB.colorFromFloat(1.0f, 0.55f, 0.45f, 0.32f), 1.6f
         );
         for (int i = 0; i < 40; i++) {
             double angle = Math.toRadians((level.getRandom().nextDouble() * 2.0 - 1.0) * SECTOR_HALF_ANGLE);

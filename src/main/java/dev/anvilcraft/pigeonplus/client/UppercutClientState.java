@@ -8,7 +8,7 @@ import dev.anvilcraft.pigeonplus.util.UppercutAscentRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.util.Mth;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 /**
  * 客户端侧的上勾拳状态：Shift 单击触发 + 上升阶段。
@@ -71,7 +71,7 @@ public final class UppercutClientState {
         if (SkillGate.isBusy(player)) return;
         if (SkillCooldowns.isOnCooldownClient(SkillCooldowns.Skill.UPPERCUT)) return;
 
-        PacketDistributor.sendToServer(new UppercutRequestPacket());
+        ClientPacketDistributor.sendToServer(new UppercutRequestPacket());
     }
 
     /**

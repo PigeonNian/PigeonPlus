@@ -158,16 +158,16 @@ public class FeedSpreaderBlock extends BaseEntityBlock implements IHammerRemovab
 
     /**
      * 26.1 把 {@code onRemove} 换成了 {@code affectNeighborsAfterRemoval}：
-     * 只在服务端触发，且不再给出新旧状态。原先靠
-     * {@code !state.is(newState.getBlock())} 判断「真的被换成别的方块了」，
-     * 现在改为在移除前直接掉落内容物——这样无论后续换成什么方块，
-     * 内容物都不会丢。
+     * 参数为 {@code (BlockState, ServerLevel, BlockPos, boolean)}。
+     * 原先靠 {@code !state.is(newState.getBlock())} 判断「是否真的被换掉」，
+     * 新签名不再提供新状态，因此改为直接掉落内容物——
+     * 无论后续被换成什么方块，内容物都不会丢失。
      */
     @Override
-    protected void affectNeighborsAfterRemoval(ServerLevel level, BlockPos pos, boolean movedByPiston) {
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
         if (level.getBlockEntity(pos) instanceof FeedSpreaderBlockEntity feedSpreader) {
             Containers.dropContents(level, pos, feedSpreader.getDrops());
         }
-        super.affectNeighborsAfterRemoval(level, pos, movedByPiston);
+        super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
     }
 }

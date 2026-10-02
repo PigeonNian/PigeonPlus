@@ -2,6 +2,7 @@ package dev.anvilcraft.pigeonplus.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.util.ARGB;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
@@ -41,20 +42,20 @@ public class EvaporatingLiquidBlock extends LiquidBlock {
     }
 
     /**
-     * 26.1 把 {@code neighborChanged} 改名并改了签名：
-     * 不再传 {@code BlockState}，来源位置由 {@code BlockPos} 换成
-     * {@link Orientation}（红石朝向）。本方法只关心「有变化就重排蒸发」，
-     * 用不到这两个参数。
+     * 26.1 保留了方法名 {@code neighborChanged}，只把「来源位置」参数
+     * 由 {@code BlockPos} 换成了 {@link Orientation}（红石朝向）。
+     * 本方法只关心「有变化就重排蒸发」，用不到该参数。
      */
     @Override
-    protected void handleNeighborChanged(
+    protected void neighborChanged(
+        BlockState state,
         Level level,
         BlockPos pos,
         net.minecraft.world.level.block.Block neighborBlock,
         Orientation orientation,
         boolean movedByPiston
     ) {
-        super.handleNeighborChanged(level, pos, neighborBlock, orientation, movedByPiston);
+        super.neighborChanged(state, level, pos, neighborBlock, orientation, movedByPiston);
         scheduleEvaporation(level, pos);
     }
 
@@ -71,7 +72,7 @@ public class EvaporatingLiquidBlock extends LiquidBlock {
 
     private void evaporate(ServerLevel level, BlockPos pos) {
         level.sendParticles(
-            new DustParticleOptions(this.vaporColor, 1.15f),
+            new DustParticleOptions(ARGB.colorFromFloat(1.0f, this.vaporColor.x, this.vaporColor.y, this.vaporColor.z), 1.15f),
             pos.getX() + 0.5,
             pos.getY() + 0.2,
             pos.getZ() + 0.5,

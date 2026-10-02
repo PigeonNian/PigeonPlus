@@ -18,10 +18,10 @@ import static dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus.REGISTRUM;
 public class AddonDatagen {
     @SubscribeEvent
     public static void gatherData(GatherDataEvent event) {
-        event.getGenerator().addProvider(
-            event.includeClient(),
-            new AddonSoundDefinitionsProvider(event.getGenerator().getPackOutput())
-        );
+        // 26.1 的 GatherDataEvent 移除了 includeClient() 开关；
+        // 且 DataGenerator#addProvider 需要 (boolean, provider) 两个参数，
+        // 故改用事件自身的 addProvider(T)，由它代为处理这些细节。
+        event.addProvider(new AddonSoundDefinitionsProvider(event.getGenerator().getPackOutput()));
     }
 
     /**
