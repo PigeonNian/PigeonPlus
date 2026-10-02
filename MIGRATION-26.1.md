@@ -61,12 +61,87 @@ $m = [regex]::Matches($text, '\\([^\\]+\.java):(\d+): 错误: ')
 | 第五批（BER 三段式 + 独立模型注册）后 | 266 |
 | 第六批（全部 BER 三段式完成）后 | 241 |
 | 第七批（粒子 + NBT + 光照）后 | 205 |
-| 第八批（配方体系）后 | **40** |
+| 第八批（配方体系）后 | 40 |
+| 第九~十四批（HUD/JEI/流体能力/渲染复用）后 | 7 |
+| **完成：编译通过**（`clean compileJava` + `jar` 均 BUILD SUCCESSFUL） | **0** |
 
 > **教训：优先修「被大量引用的签名」。** 205 → 40 的骤降来自两处根因修复：
 > `HasCauldronSimple` 由 `Fluid` 改为 `Identifier`，以及
 > `RecipeSerializer` 由接口变为 record。它们各自级联出几十个错误，
 > 逐个改调用点会做几十次无用功。
+
+## ✅ 移植完成（编译 + 客户端启动均通过）
+
+| 验证项 | 结果 |
+|---|---|
+| `clean compileJava` | BUILD SUCCESSFUL，0 错误 |
+| `jar` | BUILD SUCCESSFUL，产物 `anvilcraft_pigeon_plus-neoforge-26.1.2-1.1.jar`（约 607KB）|
+| `runClient` | 正常启动：mod 加载、mixins 应用、纹理图集创建、声音引擎启动，**全程无 FATAL** |
+| mixin 目标静态校验 | `tools/check-mixin-targets.ps1` → PROBLEMS=0 |
+
+### 最终依赖版本
+
+```
+minecraft = 26.1.2
+neoForge  = 26.1.2.75
+anvilcraft = 1.6.0+snapshot.2386
+anvillib   = 2.0.0+snapshot.541
+ageratum   = 0.0.1+build.125
+jei        = 29.6.2.31
+```
+
+> **注意**：任务最初写明 AnvilLib 519 / Ageratum 109，但用户中途要求
+> 升级 AnvilCraft；升级后必须按新 AnvilCraft 的 **POM** 重新对齐
+> AnvilLib/Ageratum（541/125），否则运行时会 `NoSuchMethodError`。
+> 这一步很重要：2386 相对 2284 还**回退了**部分 API
+> （如 `HasCauldronSimple.fluid()` 又变回 `FluidStackPredicate`）。
+
+### 编译通过 ≠ 能启动：运行时才暴露的三类问题
+
+这三类问题**编译期完全无法发现**，只有 `runClient` 才会报错：
+
+1. **Mixin 注入目标改名**
+   `Entity#hurt` 被拆成 `hurtServer(ServerLevel, ...)` 与 `hurtClient(...)`。
+   伤害与无敌帧由服务端裁决，故应改注入 `hurtServer`。
+
+2. **`@Shadow` 不能解析继承字段**
+   `ClientInput` 的 `keyPresses`/`moveVector` 声明在父类上，
+   `@Shadow` 会抛
+   `@Shadow field ... was not located in the target class`。
+   正确做法：给**字段真正的声明处**加一个 `@Accessor` 接口 mixin
+   （本项目为 `ClientInputAccessor`），再在子类 mixin 里转型调用。
+   另外注意 `KeyboardInput#tick()` **不调用 `super.tick()`**，
+   所以注入点必须在子类方法上。
+
+3. **方块 id 未设置**
+   26.1 起 `BlockBehaviour.Properties` **必须**带 `setId`，
+   否则构造 `Block` 时因掉落表惰性解析而抛 `Block id not set`。
+   `DeferredRegister.create(Registries.BLOCK, ...)` +
+   `BlockBehaviour.Properties.of()` 的写法会绕过它；
+   应改用 `DeferredRegister.createBlocks(...)` 的 `registerBlock(...)`，
+   后者会自动把 id 写入 properties。
+
+4. **`GatherDataEvent` 变成抽象类**
+   监听它会导致加载失败
+   （`Cannot register listeners for abstract class GatherDataEvent`），
+   必须监听具体子类 `GatherDataEvent.Client` / `.Server`。
+
+### 工具：静态校验 mixin 目标
+
+`tools/check-mixin-targets.ps1` 用 `javap` 核对每个 mixin 的
+`method = "..."`、`@Shadow`、`@Accessor` 目标是否真实存在，
+把「只有运行时才暴露」的问题提前到编译后一次性列出，
+避免「改一个、启动一次」的低效循环。
+
+（脚本必须以 **UTF-8 BOM** 保存：PowerShell 5.1 会用 ANSI 解码无 BOM 的
+`.ps1`，脚本内的中文字面量会变成乱码导致匹配失败。）
+
+### 工具：错误日志分析
+
+`tools/analyze-javac.ps1` 统计真实错误数。要点：
+javac 输出中文错误时会**折行**，PowerShell 包装 `gradlew.bat` 时
+也会在约 80 列处折行（连 `.java:25:` 都可能被拆成两截），
+逐行正则会严重漏报。脚本先折叠换行再匹配。
 
 ### ⚠️ 进度计数必须用 clean 编译（重要教训）
 
