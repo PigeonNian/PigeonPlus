@@ -48,8 +48,8 @@ public abstract class FluidNetworkScannerMixin {
         Map<BlockPos, Integer> potential,
         Map<BlockPos, List<BlockPos>> adjacency,
         Deque<BlockPos> queue,
-        List<FluidEndpoint> endpoints,
-        Map<ResourceHandler<FluidResource>, Boolean> seenHandlers
+        Map<BlockPos, FluidEndpoint> endpoints,
+        Set<ResourceHandler<FluidResource>> seenHandlers
     ) {
     }
 
@@ -62,8 +62,8 @@ public abstract class FluidNetworkScannerMixin {
         Map<BlockPos, Integer> potential,
         Map<BlockPos, List<BlockPos>> adjacency,
         Deque<BlockPos> queue,
-        List<FluidEndpoint> endpoints,
-        Map<ResourceHandler<FluidResource>, Boolean> seenHandlers
+        Map<BlockPos, FluidEndpoint> endpoints,
+        Set<ResourceHandler<FluidResource>> seenHandlers
     ) {
     }
 
@@ -76,8 +76,8 @@ public abstract class FluidNetworkScannerMixin {
         Map<BlockPos, Integer> potential,
         Map<BlockPos, List<BlockPos>> adjacency,
         Deque<BlockPos> queue,
-        List<FluidEndpoint> endpoints,
-        Map<ResourceHandler<FluidResource>, Boolean> seenHandlers
+        Map<BlockPos, FluidEndpoint> endpoints,
+        Set<ResourceHandler<FluidResource>> seenHandlers
     ) {
     }
 
@@ -129,8 +129,8 @@ public abstract class FluidNetworkScannerMixin {
         Map<BlockPos, ValveState> valves = new HashMap<>();
         Map<BlockPos, Direction> diodes = new HashMap<>();
         Map<BlockPos, Map<Direction, Direction>> faceFlow = new HashMap<>();
-        List<FluidEndpoint> endpoints = new ArrayList<>();
-        Map<ResourceHandler<FluidResource>, Boolean> seenHandlers = new LinkedHashMap<>();
+        Map<BlockPos, FluidEndpoint> endpoints = new LinkedHashMap<>();
+        Set<ResourceHandler<FluidResource>> seenHandlers = new HashSet<>();
         // 2386 的 FluidPipeNetwork 构造器重新要求传入玻璃管集合
         Set<BlockPos> glassPipes = new HashSet<>();
         Deque<BlockPos> queue = new ArrayDeque<>();
@@ -168,7 +168,7 @@ public abstract class FluidNetworkScannerMixin {
         }
 
         cir.setReturnValue(new FluidPipeNetwork(
-            level, potential.keySet(), adjacency, valves, diodes, faceFlow, glassPipes, endpoints));
+            level, potential.keySet(), adjacency, valves, diodes, faceFlow, glassPipes, new ArrayList<>(endpoints.values())));
     }
 
     /**
@@ -183,8 +183,8 @@ public abstract class FluidNetworkScannerMixin {
         Map<BlockPos, Integer> potential,
         Map<BlockPos, List<BlockPos>> adjacency,
         Deque<BlockPos> queue,
-        List<FluidEndpoint> endpoints,
-        Map<ResourceHandler<FluidResource>, Boolean> seenHandlers
+        Map<BlockPos, FluidEndpoint> endpoints,
+        Set<ResourceHandler<FluidResource>> seenHandlers
     ) {
         Direction outputDir = state.getBlock() instanceof AnvilPumpBlock
             ? AnvilPumpBlock.getOutputDirection(state)
