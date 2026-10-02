@@ -35,6 +35,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Collection;
@@ -531,23 +533,20 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.putInt(EXHAUST_TICKS_TAG, this.duration);
-        tag.putInt(BLOCKED_TICKS_TAG, this.blockedTicks);
-        tag.putString(ACTIVE_PROPELLANT_TAG, this.activePropellant.name());
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.putInt(EXHAUST_TICKS_TAG, this.duration);
+        output.putInt(BLOCKED_TICKS_TAG, this.blockedTicks);
+        output.putString(ACTIVE_PROPELLANT_TAG, this.activePropellant.name());
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        if (tag.contains(EXHAUST_TICKS_TAG)) {
-            this.duration = Math.max(0, tag.getInt(EXHAUST_TICKS_TAG));
-        }
-        if (tag.contains(BLOCKED_TICKS_TAG)) {
-            this.blockedTicks = Math.max(0, tag.getInt(BLOCKED_TICKS_TAG));
-        }
-        this.activePropellant = parsePropellant(tag.getString(ACTIVE_PROPELLANT_TAG));
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        // 旧存档可能缺字段，用带默认值的读取保持向后兼容
+        this.duration = Math.max(0, input.getIntOr(EXHAUST_TICKS_TAG, 0));
+        this.blockedTicks = Math.max(0, input.getIntOr(BLOCKED_TICKS_TAG, 0));
+        this.activePropellant = parsePropellant(input.getStringOr(ACTIVE_PROPELLANT_TAG, ""));
     }
 
     private static NozzleExhaustUtil.JetPropellant parsePropellant(String name) {

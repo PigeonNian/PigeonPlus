@@ -68,6 +68,27 @@ $m = [regex]::Matches($text, '\\([^\\]+\.java):(\d+): 错误: ')
 > `RecipeSerializer` 由接口变为 record。它们各自级联出几十个错误，
 > 逐个改调用点会做几十次无用功。
 
+### ⚠️ 进度计数必须用 clean 编译（重要教训）
+
+**Gradle 增量编译只会重编译受影响的类**，因此当源码改动零星时，
+`compileJava` 报出的错误数会**远少于**真实值——未重编译文件里的错误根本不会出现。
+本轮就因此误判：增量编译显示「1 个错误」，`clean compileJava` 实为 **107 个**。
+
+**唯一可信的做法**：
+
+```
+.\gradlew.bat clean compileJava --console=plain --no-configuration-cache
+```
+
+评估「还差多少」时必须 clean。日常小步验证可以增量，但**不要**用增量数字判断进度。
+
+### ⚠️ 多行文本替换会因换行符静默失败
+
+批量替换脚本若用 `\r\n` 而文件实际是 `LF`，替换会**静默不生效**，
+而脚本仍会打印成功信息（因为 `WriteAllText` 是无条件调用的）。
+本轮第七批就有 3 个 BlockEntity 的 NBT 改写实际未落盘。
+**批量替换后务必回读校验**，并且在 `WriteAllText` 前用 `if ($t -ne $o)` 判断。
+
 ### 配方体系被整体重写
 
 **`RecipeSerializer` 从接口变成 record：**

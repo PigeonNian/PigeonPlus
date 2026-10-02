@@ -6,7 +6,7 @@ import dev.dubhe.anvilcraft.api.fluid.network.FluidEndpoint;
 import dev.dubhe.anvilcraft.api.fluid.network.FluidNetworkScanner;
 import dev.dubhe.anvilcraft.api.fluid.network.FluidPipeNetwork;
 import dev.dubhe.anvilcraft.api.fluid.network.ValveState;
-import dev.dubhe.anvilcraft.block.entity.fluid.AbstractPipeCheckValveBlockEntity;
+import dev.dubhe.anvilcraft.block.entity.fluid.AbstractPipeBlockEntity;
 import dev.dubhe.anvilcraft.block.entity.fluid.ControlValveBlockEntity;
 import dev.dubhe.anvilcraft.block.fluid.ControlValveBlock;
 import dev.dubhe.anvilcraft.block.fluid.PipeBlock;
@@ -15,7 +15,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -29,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,8 +47,8 @@ public abstract class FluidNetworkScannerMixin {
         Map<BlockPos, Integer> potential,
         Map<BlockPos, List<BlockPos>> adjacency,
         Deque<BlockPos> queue,
-        Map<BlockPos, FluidEndpoint> endpoints,
-        Set<IFluidHandler> seenHandlers
+        List<FluidEndpoint> endpoints,
+        Map<ResourceHandler<FluidResource>, Boolean> seenHandlers
     ) {
     }
 
@@ -61,8 +61,8 @@ public abstract class FluidNetworkScannerMixin {
         Map<BlockPos, Integer> potential,
         Map<BlockPos, List<BlockPos>> adjacency,
         Deque<BlockPos> queue,
-        Map<BlockPos, FluidEndpoint> endpoints,
-        Set<IFluidHandler> seenHandlers
+        List<FluidEndpoint> endpoints,
+        Map<ResourceHandler<FluidResource>, Boolean> seenHandlers
     ) {
     }
 
@@ -75,8 +75,8 @@ public abstract class FluidNetworkScannerMixin {
         Map<BlockPos, Integer> potential,
         Map<BlockPos, List<BlockPos>> adjacency,
         Deque<BlockPos> queue,
-        Map<BlockPos, FluidEndpoint> endpoints,
-        Set<IFluidHandler> seenHandlers
+        List<FluidEndpoint> endpoints,
+        Map<ResourceHandler<FluidResource>, Boolean> seenHandlers
     ) {
     }
 
@@ -128,9 +128,8 @@ public abstract class FluidNetworkScannerMixin {
         Map<BlockPos, ValveState> valves = new HashMap<>();
         Map<BlockPos, Direction> diodes = new HashMap<>();
         Map<BlockPos, Map<Direction, Direction>> faceFlow = new HashMap<>();
-        Map<BlockPos, FluidEndpoint> endpoints = new LinkedHashMap<>();
-        Set<BlockPos> glassPipes = new HashSet<>();
-        Set<IFluidHandler> seenHandlers = new HashSet<>();
+        List<FluidEndpoint> endpoints = new ArrayList<>();
+        Map<ResourceHandler<FluidResource>, Boolean> seenHandlers = new HashSet<>();
         Deque<BlockPos> queue = new ArrayDeque<>();
 
         potential.put(seed, 0);
@@ -153,11 +152,8 @@ public abstract class FluidNetworkScannerMixin {
                 diodes.put(pos.immutable(), AnvilPumpBlock.getOutputDirection(state));
                 expandPump(level, pos, state, phi, potential, adjacency, queue, endpoints, seenHandlers);
             } else if (state.getBlock() instanceof PipeBlock pipe) {
-                if (pipe.isGlassPipe()) {
-                    glassPipes.add(pos.immutable());
-                }
                 if (state.getValue(PipeBlock.HAS_CHECK_VALVE)
-                    && level.getBlockEntity(pos) instanceof AbstractPipeCheckValveBlockEntity cv
+                    && level.getBlockEntity(pos) instanceof AbstractPipeBlockEntity cv
                     && !cv.isEmpty()) {
                     faceFlow.put(pos.immutable(), new EnumMap<>(cv.effectiveFlows()));
                 }
@@ -166,7 +162,7 @@ public abstract class FluidNetworkScannerMixin {
         }
 
         cir.setReturnValue(new FluidPipeNetwork(
-            level, potential.keySet(), adjacency, valves, diodes, faceFlow, glassPipes, new ArrayList<>(endpoints.values())));
+            level, potential.keySet(), adjacency, valves, diodes, faceFlow, endpoints));
     }
 
     /**
@@ -181,8 +177,8 @@ public abstract class FluidNetworkScannerMixin {
         Map<BlockPos, Integer> potential,
         Map<BlockPos, List<BlockPos>> adjacency,
         Deque<BlockPos> queue,
-        Map<BlockPos, FluidEndpoint> endpoints,
-        Set<IFluidHandler> seenHandlers
+        List<FluidEndpoint> endpoints,
+        Map<ResourceHandler<FluidResource>, Boolean> seenHandlers
     ) {
         Direction outputDir = state.getBlock() instanceof AnvilPumpBlock
             ? AnvilPumpBlock.getOutputDirection(state)

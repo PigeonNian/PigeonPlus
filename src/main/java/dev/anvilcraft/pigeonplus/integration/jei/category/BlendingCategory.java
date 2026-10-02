@@ -18,7 +18,7 @@ import dev.dubhe.anvilcraft.integration.jei.util.JeiSlotUtil;
 import dev.dubhe.anvilcraft.recipe.anvil.predicate.block.HasCauldron;
 import dev.dubhe.anvilcraft.recipe.component.HasCauldronSimple;
 import dev.dubhe.anvilcraft.util.CauldronUtil;
-import dev.dubhe.anvilcraft.util.FluidStackPredicate;
+import net.minecraft.resources.Identifier;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -213,21 +213,21 @@ public class BlendingCategory extends AbstractProgressCategory<BlendingRecipe> {
         if (recipe.isProduceFluid() && !recipe.isConsumeFluid()) {
             return Blocks.CAULDRON.defaultBlockState();
         }
-        FluidStackPredicate predicate = recipe.getHasCauldron().fluid();
-        if (predicate.fluids().isPresent() && predicate.fluids().get().size() > 0) {
-            return CauldronUtil.fullState(
-                HasCauldron.getDefaultCauldron(predicate.fluids().get().stream().findFirst().orElseThrow().value())
-            );
+        // 26.1 的 HasCauldronSimple 直接用 Identifier 表示流体；
+        // FluidStackPredicate 已被移除，故改为判断哨兵值后取默认锅
+        Identifier fluid = recipe.getHasCauldron().fluid();
+        if (HasCauldron.isNotEmpty(fluid)) {
+            return CauldronUtil.fullState(HasCauldron.getDefaultCauldron(fluid));
         }
         return Blocks.CAULDRON.defaultBlockState();
     }
 
     private static boolean hasInputFluid(HasCauldronSimple cauldron) {
-        return cauldron.hasFluid();
+        return HasCauldron.isNotEmpty(cauldron.fluid());
     }
 
     private static boolean hasOutputFluid(HasCauldronSimple cauldron) {
-        return !cauldron.transforms().isEmpty();
+        return HasCauldron.isNotEmpty(cauldron.transform());
     }
 
     public static void registerRecipes(IRecipeRegistration registration) {
