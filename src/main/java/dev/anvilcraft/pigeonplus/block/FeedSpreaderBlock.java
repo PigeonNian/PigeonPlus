@@ -6,7 +6,7 @@ import dev.anvilcraft.pigeonplus.block.entity.FeedSpreaderBlockEntity;
 import dev.anvilcraft.pigeonplus.block.entity.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.Containers;
@@ -112,7 +112,7 @@ public class FeedSpreaderBlock extends BaseEntityBlock implements IHammerRemovab
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(
+    protected InteractionResult useItemOn(
         ItemStack stack,
         BlockState state,
         Level level,
@@ -122,15 +122,15 @@ public class FeedSpreaderBlock extends BaseEntityBlock implements IHammerRemovab
         BlockHitResult hit
     ) {
         if (!FeedSpreaderBlockEntity.isFeedOrBoneMeal(stack)) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.PASS;
         }
         if (!(level.getBlockEntity(pos) instanceof FeedSpreaderBlockEntity feedSpreader)) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.PASS;
         }
 
         ItemStack remainder = feedSpreader.insertFeed(stack.copy(), true);
         if (remainder.getCount() == stack.getCount()) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.PASS;
         }
         if (!level.isClientSide()) {
             ItemStack insertedRemainder = feedSpreader.insertFeed(stack.copy(), false);
@@ -138,7 +138,7 @@ public class FeedSpreaderBlock extends BaseEntityBlock implements IHammerRemovab
             stack.shrink(inserted);
             level.sendBlockUpdated(pos, state, state, Block.UPDATE_CLIENTS);
         }
-        return ItemInteractionResult.sidedSuccess(level.isClientSide());
+        return InteractionResult.SUCCESS;
     }
 
     @Nullable

@@ -2,9 +2,11 @@ package dev.anvilcraft.pigeonplus.mixin.client;
 
 import dev.anvilcraft.pigeonplus.client.UppercutClientState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.Input;
 import net.minecraft.client.player.KeyboardInput;
+import net.minecraft.world.entity.player.Input;
+import net.minecraft.world.phys.Vec2;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -12,26 +14,43 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 /**
  * 上勾拳上升期间禁用玩家移动操作。
  *
- * <p>注入 {@code KeyboardInput#tick}（而不是更通用的 {@code Input}）：移动输入最终由
- * {@code leftImpulse}/{@code forwardImpulse} 表达，这两个字段正是该方法写入的。
- * 在它写完之后清零，玩家按键就完全不影响位移。
+ * <h3>26.1 的输入模型变化</h3>
+ * 旧版 {@code Input} 是带 {@code forwardImpulse}/{@code jumping} 等可变字段的类，
+ * 直接改字段即可。26.1 拆成了两个概念：
+ * <ul>
+ *   <li>{@code net.minecraft.world.entity.player.Input} 变成了<b>不可变 record</b>
+ *       （forward/backward/left/right/jump/shift/sprint 七个布尔），
+ *       代表「按下了哪些键」，只读。</li>
+ *   <li>移动向量由 {@code ClientInput#moveVector}({@code Vec2}) 表达，
+ *       即实际位移方向与力度。</li>
+ * </ul>
+ * 因此「锁住移动」需要同时清掉这两者：把 {@code keyPresses} 换成
+ * {@link Input#EMPTY}（顺带清掉跳跃），并把 {@code moveVector} 归零。
  *
- * <p>同时清掉 {@code jumping}，避免上升途中再叠加一次跳跃。
+ * <p>注入 {@code KeyboardInput#tick} 的 TAIL：该方法写完输入状态之后立刻清零，
+ * 玩家这一帧的按键就完全不影响位移。
  */
 @Mixin(KeyboardInput.class)
 public class KeyboardInputMixin {
 
-    @Inject(method = "tick", at = @At("TAIL"))
-    private void pigeonplus$lockInputDuringUppercut(boolean isSneaking, float sneakingSpeedMultiplier, CallbackInfo ci) {
-        var player = Minecraft.getInstance().player;
-        if (player == null) return;
-        if (!UppercutClientState.isAscending(player)) return;
+    /** 父类 {@code ClientInput} 的字段，需 shadow 才能访问。 */
+    @Shadow
+    public Input keyPresses;
 
-        Input input = (Input) (Object) this;
-        input.leftImpulse = 0.0f;
-        input.forwardImpulse = 0.0f;
-        input.jumping = false;
-        // 上升期间不潜行，避免“上升时还在慢慢挪”
-        input.shiftKeyDown = false;
+    @Shadow
+    protected Vec2 moveVector;
+
+    @Inject(method = "tick", at = @At("TAIL"))
+    private void pigeonplus$lockInputDuringUppercut(CallbackInfo ci) {
+        var player = Minecraft.getInstance().player;
+        if (player == null) {
+            return;
+        }
+        if (!UppercutClientState.isAscending(player)) {
+            return;
+        }
+        // 清空按键（含跳跃与潜行），并把移动向量归零
+        this.keyPresses = Input.EMPTY;
+        this.moveVector = Vec2.ZERO;
     }
 }

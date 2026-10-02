@@ -7,7 +7,7 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -48,10 +48,10 @@ public class BiogasDrainSpawningManager {
 
     @SubscribeEvent
     private static void blockMonsterSpawn(MobSpawnEvent.PositionCheck event) {
-        MobSpawnType spawnType = event.getSpawnType();
-        if (!spawnType.equals(MobSpawnType.NATURAL)
-            && !spawnType.equals(MobSpawnType.CHUNK_GENERATION)
-            && !spawnType.equals(MobSpawnType.PATROL)) {
+        EntitySpawnReason spawnType = event.getSpawnType();
+        if (!spawnType.equals(EntitySpawnReason.NATURAL)
+            && !spawnType.equals(EntitySpawnReason.CHUNK_GENERATION)
+            && !spawnType.equals(EntitySpawnReason.PATROL)) {
             return;
         }
         Mob mob = event.getEntity();

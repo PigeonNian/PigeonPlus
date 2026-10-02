@@ -4,13 +4,16 @@ import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
 import dev.anvilcraft.pigeonplus.init.AddonSounds;
 import net.minecraft.data.PackOutput;
 import net.minecraft.sounds.SoundEvents;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.common.data.SoundDefinition;
 import net.neoforged.neoforge.common.data.SoundDefinitionsProvider;
 
 public class AddonSoundDefinitionsProvider extends SoundDefinitionsProvider {
-    public AddonSoundDefinitionsProvider(PackOutput output, ExistingFileHelper fileHelper) {
-        super(output, AnvilCraftPigeonPlus.MOD_ID, fileHelper);
+    /**
+     * 26.1 起 {@code ExistingFileHelper} 已被移除，
+     * 父类构造器只收 {@code PackOutput} 与 mod id。
+     */
+    public AddonSoundDefinitionsProvider(PackOutput output) {
+        super(output, AnvilCraftPigeonPlus.MOD_ID);
     }
 
     @Override

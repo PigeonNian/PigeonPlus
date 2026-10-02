@@ -20,7 +20,7 @@ public class AddonDatagen {
     public static void gatherData(GatherDataEvent event) {
         event.getGenerator().addProvider(
             event.includeClient(),
-            new AddonSoundDefinitionsProvider(event.getGenerator().getPackOutput(), event.getExistingFileHelper())
+            new AddonSoundDefinitionsProvider(event.getGenerator().getPackOutput())
         );
     }
 

@@ -14,7 +14,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -95,7 +95,7 @@ public class AnvilHammerItemMixin {
      */
     @Inject(method = "use", at = @At("HEAD"), cancellable = true)
     private void pigeonplus$blockChargeWhileDashing(
-        Level level, Player player, InteractionHand usedHand, CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir
+        Level level, Player player, InteractionHand usedHand, CallbackInfoReturnable<InteractionResult> cir
     ) {
         ItemStack stack = player.getItemInHand(usedHand);
         if (!DoomfistEnchantmentUtil.hasDoomfist(stack)) return;
@@ -103,14 +103,16 @@ public class AnvilHammerItemMixin {
         // 用 SkillCooldowns 的按侧查询：服务端读权威截止时刻，客户端读本地镜像。
         if (RocketPunchManager.isDashing(player)
             || SkillCooldowns.isOnCooldown(player, SkillCooldowns.Skill.ROCKET_PUNCH)) {
-            cir.setReturnValue(InteractionResultHolder.fail(stack));
+            // 26.1 的 Item#use 不再返回带 ItemStack 的包装类，
+            // 直接返回 InteractionResult 的哨兵值即可
+            cir.setReturnValue(InteractionResult.FAIL);
             return;
         }
         // 其他技能进行中（上勾拳上升 / 裂地位移）也不得起手蓄力。
         // 不用 SkillGate.isBusy：它包含 isCharging，而蓄力起点上 isUsingItem 尚为 false；
         // 直接查另外两个技能更直白，也不会自我死锁。
         if (UppercutManager.isAscending(player) || SlamManager.isSlamming(player)) {
-            cir.setReturnValue(InteractionResultHolder.fail(stack));
+            cir.setReturnValue(InteractionResult.FAIL);
         }
     }
 

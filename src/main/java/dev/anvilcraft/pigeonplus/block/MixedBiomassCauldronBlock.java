@@ -6,7 +6,7 @@ import dev.dubhe.anvilcraft.block.cauldron.Layered4LevelCauldronBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -23,7 +23,7 @@ public class MixedBiomassCauldronBlock extends Layered4LevelCauldronBlock implem
     }
 
     @Override
-    public ItemInteractionResult useItemOn(
+    public InteractionResult useItemOn(
         ItemStack stack,
         BlockState state,
         Level level,
@@ -32,9 +32,10 @@ public class MixedBiomassCauldronBlock extends Layered4LevelCauldronBlock implem
         InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        CauldronInteraction interaction = this.interactions.map().get(stack.getItem());
+        // 26.1 的 Dispatcher 直接按物品栈查询交互
+        CauldronInteraction interaction = this.interactions.get(stack);
         if (interaction == null) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.PASS;
         }
         return interaction.interact(state, level, pos, player, hand, stack);
     }
