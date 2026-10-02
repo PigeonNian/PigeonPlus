@@ -11,6 +11,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
@@ -57,17 +59,16 @@ public class BlenderBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        CompoundTag tankTag = new CompoundTag();
-        this.compressedAirTank.writeToNBT(registries, tankTag);
-        tag.put("CompressedAir", tankTag);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        // 26.1 的 ValueOutput 支持直接写子对象，不再需要手工开 CompoundTag
+        this.compressedAirTank.serialize(output.child("CompressedAir"));
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        this.compressedAirTank.readFromNBT(registries, tag.getCompound("CompressedAir"));
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        this.compressedAirTank.deserialize(input.childOrEmpty("CompressedAir"));
     }
 
     private void onAirChanged() {

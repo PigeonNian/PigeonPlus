@@ -11,6 +11,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class AnvilPumpBlockEntity extends BlockEntity {
     private static final int PUMP_DURATION_TICKS = 20;
@@ -195,20 +197,20 @@ public class AnvilPumpBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.putInt("RemainingPumpTicks", this.remainingPumpTicks);
-        tag.putInt("Headlift", this.headlift);
-        tag.putBoolean("ImpactLocked", this.impactLocked);
-        tag.putInt("ImpactUnlockTicks", this.impactUnlockTicks);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.putInt("RemainingPumpTicks", this.remainingPumpTicks);
+        output.putInt("Headlift", this.headlift);
+        output.putBoolean("ImpactLocked", this.impactLocked);
+        output.putInt("ImpactUnlockTicks", this.impactUnlockTicks);
     }
 
     @Override
-    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        this.remainingPumpTicks = tag.getInt("RemainingPumpTicks");
-        this.headlift = tag.getInt("Headlift");
-        this.impactLocked = tag.getBoolean("ImpactLocked");
-        this.impactUnlockTicks = tag.getInt("ImpactUnlockTicks");
+    public void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        this.remainingPumpTicks = input.getIntOr("RemainingPumpTicks", 0);
+        this.headlift = input.getIntOr("Headlift", 0);
+        this.impactLocked = input.getBooleanOr("ImpactLocked", false);
+        this.impactUnlockTicks = input.getIntOr("ImpactUnlockTicks", 0);
     }
 }

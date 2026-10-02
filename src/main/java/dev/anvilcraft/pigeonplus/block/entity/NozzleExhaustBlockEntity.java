@@ -390,7 +390,7 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
                 0.9 + random.nextDouble() * 0.9,
                 (random.nextDouble() - 0.5) * 0.08
             );
-            level.addParticle(ModParticles.PLASMA_JETS.get(), true, pos.x, pos.y, pos.z, velocity.x, velocity.y, velocity.z);
+            level.addParticle(ModParticles.PLASMA_JETS.get(), true, false, pos.x, pos.y, pos.z, velocity.x, velocity.y, velocity.z);
         }
 
         for (int i = 0; i < 10; i++) {
@@ -473,7 +473,7 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
                     (random.nextDouble() - 0.5) * 0.026,
                     (random.nextDouble() - 0.5) * 0.026
                 );
-            level.addParticle(ModParticles.PLASMA_JETS.get(), true, pos.x, pos.y, pos.z, velocity.x, velocity.y, velocity.z);
+            level.addParticle(ModParticles.PLASMA_JETS.get(), true, false, pos.x, pos.y, pos.z, velocity.x, velocity.y, velocity.z);
             if (i < 8) {
                 Vec3 chipVelocity = tangent
                     .scale(0.68)
@@ -481,8 +481,7 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
                     .add(0.0, random.nextDouble() * 0.035, 0.0);
                 level.addParticle(
                     blockParticle,
-                    true,
-                    pos.x,
+                    true, false, pos.x,
                     pos.y,
                     pos.z,
                     chipVelocity.x,
@@ -495,7 +494,7 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
                     .scale(0.24)
                     .subtract(normal.scale(0.016 + random.nextDouble() * 0.030))
                     .add(0.0, 0.035 + random.nextDouble() * 0.055, 0.0);
-                level.addParticle(ParticleTypes.CLOUD, true, pos.x, pos.y, pos.z, smokeVelocity.x, smokeVelocity.y, smokeVelocity.z);
+                level.addParticle(ParticleTypes.CLOUD, true, false, pos.x, pos.y, pos.z, smokeVelocity.x, smokeVelocity.y, smokeVelocity.z);
             }
         }
     }

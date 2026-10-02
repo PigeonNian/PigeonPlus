@@ -5,7 +5,7 @@ import dev.anvilcraft.pigeonplus.util.StasisTimeFreezeManager;
 import dev.dubhe.anvilcraft.init.block.ModBlocks;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.phys.AABB;
 
 import java.util.Comparator;
@@ -48,7 +49,7 @@ public class StasisBeaconBlockEntity extends BlockEntity {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
-        int maxY = level.getMaxBuildHeight();
+        int maxY = level.getMaxY();
 
         if (blockEntity.lastCheckY < y) {
             blockEntity.lastCheckY = y;
@@ -59,7 +60,7 @@ public class StasisBeaconBlockEntity extends BlockEntity {
         for (int i = 0; i < BLOCKS_CHECK_PER_TICK && checkPos.getY() <= maxY; i++) {
             BlockState checkState = level.getBlockState(checkPos);
             if (checkState.getBeaconColorMultiplier(level, checkPos, pos) == null
-                && checkState.getLightBlock(level, checkPos) >= 15
+                && checkState.getLightDampening() >= 15
                 && !checkState.is(Blocks.BEDROCK)) {
                 blockEntity.checkingBeamHeight = checkPos.getY();
                 blockEntity.lastCheckY = maxY;
@@ -301,27 +302,23 @@ public class StasisBeaconBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        if (tag.contains("FrozenEntityClientId")) {
-            this.frozenEntityClientId = tag.getInt("FrozenEntityClientId");
-        }
-        if (tag.contains("FrozenAccumulatedDamage")) {
-            this.frozenAccumulatedDamage = tag.getFloat("FrozenAccumulatedDamage");
-        }
-        if (tag.contains("FrozenAccumulatedSpeed")) {
-            this.frozenAccumulatedSpeed = tag.getDouble("FrozenAccumulatedSpeed");
-        }
-        if (tag.contains("FrozenTicks")) {
-            this.frozenTicks = tag.getInt("FrozenTicks");
-        }
-        if (tag.contains("HasFrozenEntity") && tag.getBoolean("HasFrozenEntity")) {
-            this.frozenEntityId = tag.getUUID("FrozenEntityId");
-        } else if (tag.contains("HasFrozenEntity")) {
-            this.frozenEntityId = null;
-        }
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        // 缺失字段时保留当前值（等价于旧版 tag.contains(...) 的判断）
+        this.frozenEntityClientId = input.getIntOr("FrozenEntityClientId", this.frozenEntityClientId);
+        this.frozenAccumulatedDamage = input.getFloatOr("FrozenAccumulatedDamage", this.frozenAccumulatedDamage);
+        this.frozenAccumulatedSpeed = input.getDoubleOr("FrozenAccumulatedSpeed", this.frozenAccumulatedSpeed);
+        this.frozenTicks = input.getIntOr("FrozenTicks", this.frozenTicks);
+        // 26.1 的 CompoundTag 不再有 getUUID，UUID 统一走 Codec
+        this.frozenEntityId = input.read("FrozenEntityId", UUIDUtil.CODEC).orElse(null);
     }
 
+    /**
+     * 写入同步给客户端的更新数据。
+     *
+     * <p>这里仍是 {@link CompoundTag}（网络包格式），但 26.1 的 CompoundTag
+     * 已移除 {@code putUUID}，故用 {@link UUIDUtil#uuidToIntArray} 存成 int 数组。
+     */
     private void writeUpdateTag(CompoundTag tag) {
         tag.putBoolean("HasFrozenEntity", this.frozenEntityId != null);
         tag.putInt("FrozenEntityClientId", this.frozenEntityClientId);
@@ -329,7 +326,7 @@ public class StasisBeaconBlockEntity extends BlockEntity {
         tag.putDouble("FrozenAccumulatedSpeed", this.frozenAccumulatedSpeed);
         tag.putInt("FrozenTicks", this.frozenTicks);
         if (this.frozenEntityId != null) {
-            tag.putUUID("FrozenEntityId", this.frozenEntityId);
+            tag.putIntArray("FrozenEntityId", UUIDUtil.uuidToIntArray(this.frozenEntityId));
         }
     }
 
@@ -337,7 +334,7 @@ public class StasisBeaconBlockEntity extends BlockEntity {
     public void setLevel(Level level) {
         super.setLevel(level);
         this.lastCheckY = level.getMinY() - 1;
-        this.beamHeight = level.getMaxBuildHeight();
+        this.beamHeight = level.getMaxY();
     }
 
     public int getLevels() {

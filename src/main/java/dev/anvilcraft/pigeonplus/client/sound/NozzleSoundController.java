@@ -502,8 +502,7 @@ public final class NozzleSoundController {
             );
             level.addParticle(
                 ModParticles.PLASMA_JETS.get(),
-                true,
-                pos.x,
+                true, false, pos.x,
                 pos.y,
                 pos.z,
                 velocity.x,

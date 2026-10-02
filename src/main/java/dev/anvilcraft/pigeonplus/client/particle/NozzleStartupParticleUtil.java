@@ -54,8 +54,7 @@ public final class NozzleStartupParticleUtil {
                 );
                 level.addParticle(
                     AddonParticles.ROLLING_PLASMA.get(),
-                    true,
-                    pos.x,
+                    true, false, pos.x,
                     pos.y,
                     pos.z,
                     velocity.x,

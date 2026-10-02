@@ -5,6 +5,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -156,8 +157,8 @@ public class FeedSpreaderBlockEntity extends BlockEntity {
 
     private void sendServerSpreadParticles(ServerLevel serverLevel, int radius, int material) {
         ParticleOptions particle = material == SPREAD_MATERIAL_BONE_MEAL
-            ? new ItemParticleOption(ParticleTypes.ITEM, new ItemStack(Items.BONE_MEAL))
-            : new ItemParticleOption(ParticleTypes.ITEM, this.getSpreadParticleStack());
+            ? new ItemParticleOption(ParticleTypes.ITEM, Items.BONE_MEAL)
+            : new ItemParticleOption(ParticleTypes.ITEM, ItemStackTemplate.fromNonEmptyStack(this.getSpreadParticleStack()));
         int count = 60 + radius * 24;
         double spread = 0.25 + radius * 0.18;
         serverLevel.sendParticles(
@@ -402,7 +403,7 @@ public class FeedSpreaderBlockEntity extends BlockEntity {
     }
 
     private ParticleOptions getSpreadParticle() {
-        return new ItemParticleOption(ParticleTypes.ITEM, this.getSpreadParticleStack());
+        return new ItemParticleOption(ParticleTypes.ITEM, ItemStackTemplate.fromNonEmptyStack(this.getSpreadParticleStack()));
     }
 
     private ItemStack getSpreadParticleStack() {
