@@ -25,7 +25,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -35,7 +35,7 @@ import org.jetbrains.annotations.Nullable;
 public class AnvilPumpBlock extends BetterBaseEntityBlock
     implements IHammerRemovable, IHammerChangeable, IMoveableEntityBlock {
     public static final MapCodec<AnvilPumpBlock> CODEC = simpleCodec(AnvilPumpBlock::new);
-    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+    public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     private static final AABB[] SOUTH_SHAPE_PARTS = {
         new AABB(3.0, 3.0, 0.0, 13.0, 13.0, 16.0),
         new AABB(6.0, 13.0, 6.0, 10.0, 16.0, 10.0),

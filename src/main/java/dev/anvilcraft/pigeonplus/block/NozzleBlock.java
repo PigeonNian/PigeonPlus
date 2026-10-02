@@ -21,7 +21,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -35,11 +35,11 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-public class NozzleBlock extends FlexibleMultiPartBlock<DirectionCube3x3PartHalf, DirectionProperty, Direction> implements EntityBlock, IHammerRemovable {
+public class NozzleBlock extends FlexibleMultiPartBlock<DirectionCube3x3PartHalf, EnumProperty<Direction>, Direction> implements EntityBlock, IHammerRemovable {
     public static final MapCodec<NozzleBlock> CODEC = simpleCodec(NozzleBlock::new);
     public static final EnumProperty<DirectionCube3x3PartHalf> PART =
         EnumProperty.create("part", DirectionCube3x3PartHalf.class);
-    public static final DirectionProperty FACING = DirectionalBlock.FACING;
+    public static final EnumProperty<Direction> FACING = DirectionalBlock.FACING;
     private static final AABB[] UP_GLOBAL_SHAPE_PARTS = {
         new AABB(-9.0, -11.0, -9.0, 25.0, -6.0, 25.0),
         new AABB(-14.0, -16.0, -14.0, 30.0, -11.0, 30.0),
@@ -99,7 +99,7 @@ public class NozzleBlock extends FlexibleMultiPartBlock<DirectionCube3x3PartHalf
     }
 
     @Override
-    public DirectionProperty getAdditionalProperty() {
+    public EnumProperty<Direction> getAdditionalProperty() {
         return FACING;
     }
 

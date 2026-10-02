@@ -107,7 +107,7 @@ public final class UppercutManager {
         // 滞空刻意不算占用，以保住「上挑 → 指向性裂地飞扑」的连招。
         if (SkillGate.isBusy(player)) return;
 
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.level();
         // 冷却改用统一的 SkillCooldowns，与火箭重拳互不影响
         if (SkillCooldowns.isOnCooldown(level, player.getUUID(), SkillCooldowns.Skill.UPPERCUT)) return;
 
@@ -210,7 +210,7 @@ public final class UppercutManager {
                 iterator.remove();
                 continue;
             }
-            if (player.serverLevel() != level) continue;
+            if (player.level() != level) continue;
             if (entry.getValue() <= 1) {
                 iterator.remove();
             } else {
@@ -259,7 +259,7 @@ public final class UppercutManager {
                 continue;
             }
             // 不在本维度：跳过，交给该玩家所在维度的 tick 处理
-            if (player.serverLevel() != level) continue;
+            if (player.level() != level) continue;
 
             if (entry.getValue() <= 1) {
                 removeHoverGravity(player);

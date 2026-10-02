@@ -102,7 +102,7 @@ public class GasEscapeUtil {
         int count = Math.clamp(gas.getAmount() / 40, 6, 18);
         for (int i = 0; i < count; i++) {
             Direction direction = Direction.getRandom(random);
-            Vec3 normal = Vec3.atLowerCornerOf(direction.getNormal());
+            Vec3 normal = Vec3.atLowerCornerOf(direction.getUnitVec3i());
             Vec3 particlePos = center.add(normal.scale(0.48)).add(
                 (random.nextDouble() - 0.5) * 0.35,
                 (random.nextDouble() - 0.5) * 0.35,

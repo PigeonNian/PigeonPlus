@@ -129,7 +129,7 @@ public final class RocketPunchManager {
         PacketDistributor.sendToPlayer(player, new RocketPunchChargeSoundPacket(false));
 
         if (player.isSpectator()) return;
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.level();
         // 已经在冲刺中：直接忽略。防止同一次蓄力被两条路径（finishUsingItem 与
         // LivingEntityUseItemEvent.Stop）各触发一次而打出两拳。
         if (ACTIVE_DASHES.containsKey(player.getUUID())) return;

@@ -160,6 +160,57 @@ dev.anvilcraft.lib.v2.registrum.providers.RegistrumRecipeProvider
 ```
 且 `has(ItemLike)` 由**静态**变为**实例**方法（调用处需 `provider.has(...)`）。
 
+### datagen 模型体系被整体替换（重要）
+
+1.21.1 用的 NeoForge `BlockStateProvider` / `ConfiguredModel` / `ModelFile` /
+`ExistingFileHelper` / `BlockModelProvider`（`net.neoforged.neoforge.client.model.generators`
+顶层类）在 26.1 **全部移除**，改为原版新的 `BlockModelGenerators` 体系。
+AnvilLib 的 `RegistrumBlockModelGenerator extends BlockModelGenerators` 直接暴露新 API。
+
+对照：
+
+| 1.21.1 | 26.1 |
+|---|---|
+| `provider.models().getExistingFile(id)` | `BlockModelGenerators.plainVariant(id)`（不再需要查找校验）|
+| `ConfiguredModel.builder().modelFile(v).rotationY(n).build()` | `MultiVariantGenerator.dispatch(block, variant).with(旋转常量)` |
+| `provider.simpleBlock(block, modelFile)` | `BlockModelGenerators.createSimpleBlock(block, variant)` |
+| `provider.getVariantBuilder(b).forAllStates(...)` | `MultiVariantGenerator.dispatch(b).with(PropertyDispatch.initial(prop).generate(...))` |
+| `prov.withExistingParent(name, id)`（物品模型）| `RegistrumItemModelGenerator.createWithExistingModel(item, id)` |
+| 手写 `rotationY()` 等角度函数 | 原版常量 `ROTATION_HORIZONTAL_FACING`（东=90°）/ `ROTATION_HORIZONTAL_FACING_ALT`（南=0°）|
+
+**注意 `blockstate` / `model` 回调的签名也变了**：现在接收
+`NonNullSupplier<NonNullBiConsumer<...>>`，所以 lambda 必须再包一层供应商：
+```java
+.blockstate(() -> (ctx, gen) -> gen.blockStateOutput.accept(...))   // 注意 () -> 
+.model(() -> (ctx, gen) -> gen.createWithExistingModel(...))
+```
+（1.21.1 是直接传 BiConsumer，所以旧写法会报「lambda 表达式中的参数类型不兼容」。）
+
+三轴旋转（如喷口）无法用原版常量表达，需自行
+`plainVariant(id).with(X_ROT_90).with(Y_ROT_90)`；`VariantMutator` 常量在
+`BlockModelGenerators` 上（`NOP` / `X_ROT_90` / `X_ROT_180` / `Y_ROT_90` …）。
+
+**`AddonBlocks` 已按新 API 重写完毕。**
+
+### 原版源码 jar 可用（重要）
+
+`build/moddev/artifacts/minecraft-patched-26.1.2.75-sources.jar` 是**原版源码**，
+解压后可直接阅读 `BlockModelGenerators` 等实现，比反编译快得多：
+
+```powershell
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+$zip = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path "build/moddev/artifacts/minecraft-patched-26.1.2.75-sources.jar"))
+$e = $zip.Entries | Where-Object { $_.FullName -eq 'net/minecraft/client/data/models/BlockModelGenerators.java' }
+[System.IO.Compression.ZipFileExtensions]::ExtractToFile($e, "$env:TEMP\BMG.java", $true)
+$zip.Dispose()
+```
+
+### 最佳参考：AnvilCraft 26.1 自己的源码
+
+AnvilCraft 用同一套 AnvilLib，其 `dev/dubhe/anvilcraft/util/registrater/DataGenUtil.java`
+是 datagen 迁移的现成范例（`onlyState()` / `horizontalFacingBlock()` /
+`transparentBlock()` / `slabBlock()` 等），遇到不确定的 API 直接照抄它的写法最稳。
+
 ### 错误最多的文件
 
 ```

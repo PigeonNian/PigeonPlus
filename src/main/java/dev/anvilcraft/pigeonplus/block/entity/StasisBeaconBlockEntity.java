@@ -88,7 +88,7 @@ public class StasisBeaconBlockEntity extends BlockEntity {
         }
 
         if (blockEntity.lastCheckY >= maxY) {
-            blockEntity.lastCheckY = level.getMinBuildHeight() - 1;
+            blockEntity.lastCheckY = level.getMinY() - 1;
             blockEntity.beamHeight = blockEntity.checkingBeamHeight;
         }
 
@@ -123,7 +123,7 @@ public class StasisBeaconBlockEntity extends BlockEntity {
         int beaconLevel = 0;
         for (int layer = 1; layer <= MAX_LEVELS; beaconLevel = layer++) {
             int layerY = y - layer;
-            if (layerY < level.getMinBuildHeight()) {
+            if (layerY < level.getMinY()) {
                 break;
             }
 
@@ -208,7 +208,7 @@ public class StasisBeaconBlockEntity extends BlockEntity {
         int x = (int) Math.floor(entity.getX());
         int z = (int) Math.floor(entity.getZ());
         int entityY = (int) Math.floor(entity.getY());
-        for (int y = entityY; y >= level.getMinBuildHeight(); y--) {
+        for (int y = entityY; y >= level.getMinY(); y--) {
             BlockPos beaconPos = new BlockPos(x, y, z);
             BlockState state = level.getBlockState(beaconPos);
             if (!state.hasProperty(StasisBeaconBlock.LIT) || !state.getValue(StasisBeaconBlock.LIT)) {
@@ -336,7 +336,7 @@ public class StasisBeaconBlockEntity extends BlockEntity {
     @Override
     public void setLevel(Level level) {
         super.setLevel(level);
-        this.lastCheckY = level.getMinBuildHeight() - 1;
+        this.lastCheckY = level.getMinY() - 1;
         this.beamHeight = level.getMaxBuildHeight();
     }
 

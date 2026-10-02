@@ -4,14 +4,30 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.particle.SpriteSet;
-import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.util.RandomSource;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.Nullable;
 
-public class RollingPlasmaParticle extends TextureSheetParticle {
+/**
+ * 滚动等离子体粒子：随存活时间在三种颜色之间平滑过渡，并逐渐透明。
+ *
+ * <p>26.1 的粒子体系与 1.21.1 不同，这里按新 API 改写：
+ * <ul>
+ *   <li>基类 {@code TextureSheetParticle} 已移除 → 改用 {@link SingleQuadParticle}
+ *       （新基类不再自带贴图坐标，改为持有一个 {@code TextureAtlasSprite}，
+ *       因此构造时必须传入贴图，见 {@code SpriteSet#first()}）。</li>
+ *   <li>{@code getRenderType()} → {@code getGroup()}，半透明值由
+ *       {@code PARTICLE_SHEET_TRANSLUCENT} 改为 {@link ParticleRenderType#SINGLE_QUADS}。</li>
+ *   <li>新增抽象方法 {@code getLayer()}，决定走哪条渲染管线。
+ *       半透明发光粒子取 {@code Layer.TRANSLUCENT}（与 {@code SoulParticle} 一致）。</li>
+ *   <li>{@code ParticleProvider#createParticle} 末尾多了 {@code RandomSource} 参数。</li>
+ * </ul>
+ */
+public class RollingPlasmaParticle extends SingleQuadParticle {
     private final SpriteSet sprites;
     private final ColorProfile colorProfile;
 
@@ -26,7 +42,8 @@ public class RollingPlasmaParticle extends TextureSheetParticle {
         SpriteSet sprites,
         ColorProfile colorProfile
     ) {
-        super(level, x, y, z);
+        // 新基类需要贴图；速度也走构造器，随后再叠加随机扰动
+        super(level, x, y, z, xSpeed, ySpeed, zSpeed, sprites.first());
         this.xd = xSpeed + (Math.random() * 2.0 - 1.0) * 0.008F;
         this.yd = ySpeed + (Math.random() * 2.0 - 1.0) * 0.004F;
         this.zd = zSpeed + (Math.random() * 2.0 - 1.0) * 0.008F;
@@ -84,8 +101,13 @@ public class RollingPlasmaParticle extends TextureSheetParticle {
     }
 
     @Override
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+    public ParticleRenderType getGroup() {
+        return ParticleRenderType.SINGLE_QUADS;
+    }
+
+    @Override
+    protected Layer getLayer() {
+        return Layer.TRANSLUCENT;
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -105,7 +127,8 @@ public class RollingPlasmaParticle extends TextureSheetParticle {
             double z,
             double xSpeed,
             double ySpeed,
-            double zSpeed
+            double zSpeed,
+            RandomSource random
         ) {
             return new RollingPlasmaParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, this.sprites, ColorProfile.AIR);
         }
@@ -128,7 +151,8 @@ public class RollingPlasmaParticle extends TextureSheetParticle {
             double z,
             double xSpeed,
             double ySpeed,
-            double zSpeed
+            double zSpeed,
+            RandomSource random
         ) {
             return new RollingPlasmaParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, this.sprites, ColorProfile.AIR);
         }
@@ -151,7 +175,8 @@ public class RollingPlasmaParticle extends TextureSheetParticle {
             double z,
             double xSpeed,
             double ySpeed,
-            double zSpeed
+            double zSpeed,
+            RandomSource random
         ) {
             return new RollingPlasmaParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, this.sprites, ColorProfile.HYDROGEN);
         }

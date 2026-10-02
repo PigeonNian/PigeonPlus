@@ -325,7 +325,7 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
         if (effectiveHeight <= 0) {
             return;
         }
-        Vec3 acceleration = Vec3.atLowerCornerOf(facing.getNormal()).scale(accelerationPerTick(propellant));
+        Vec3 acceleration = Vec3.atLowerCornerOf(facing.getUnitVec3i()).scale(accelerationPerTick(propellant));
         Collection<Entity> entities = level.getEntitiesOfClass(
             Entity.class,
             NozzleExhaustUtil.getJetEffectBounds(startPos, facing, effectiveHeight),
@@ -448,9 +448,9 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
 
         RandomSource random = level.getRandom();
         Direction[] plane = planeDirections(facing);
-        Vec3 firstAxis = Vec3.atLowerCornerOf(plane[0].getNormal());
-        Vec3 secondAxis = Vec3.atLowerCornerOf(plane[1].getNormal());
-        Vec3 normal = Vec3.atLowerCornerOf(facing.getNormal());
+        Vec3 firstAxis = Vec3.atLowerCornerOf(plane[0].getUnitVec3i());
+        Vec3 secondAxis = Vec3.atLowerCornerOf(plane[1].getUnitVec3i());
+        Vec3 normal = Vec3.atLowerCornerOf(facing.getUnitVec3i());
         Vec3 impactCenter = Vec3.atCenterOf(obstructionPos).subtract(normal.scale(0.51));
         BlockState obstructionState = level.getBlockState(obstructionPos);
         BlockParticleOption blockParticle = new BlockParticleOption(ParticleTypes.BLOCK, obstructionState);

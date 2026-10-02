@@ -104,7 +104,7 @@ public final class SkillCooldowns {
      * 开始冷却并同步给客户端。
      */
     public static void startServer(ServerPlayer player, Skill skill) {
-        startServer(player.serverLevel(), player.getUUID(), skill);
+        startServer(player.level(), player.getUUID(), skill);
     }
 
     /**

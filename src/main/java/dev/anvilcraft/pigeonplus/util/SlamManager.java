@@ -128,7 +128,7 @@ public final class SlamManager {
         // 必须手持带铁拳附魔的铁砧锤
         if (!DoomfistEnchantmentUtil.isWieldingDoomfist(player)) return;
 
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.level();
         // 冷却未走完不放行（唯一的权威判断）
         if (SkillCooldowns.isOnCooldown(level, player.getUUID(), SkillCooldowns.Skill.SEISMIC_SLAM)) return;
         // 已在空中：忽略重复触发
@@ -172,7 +172,7 @@ public final class SlamManager {
         if (player.isSpectator()) return false;
         if (!DoomfistEnchantmentUtil.isWieldingDoomfist(player)) return false;
 
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.level();
         if (SkillCooldowns.isOnCooldown(level, player.getUUID(), SkillCooldowns.Skill.SEISMIC_SLAM)) return false;
         if (AIRBORNE.containsKey(player.getUUID())) return false;
         // 与其他技能互斥，但**只排除「上升」这一位移阶段**：
@@ -230,7 +230,7 @@ public final class SlamManager {
      * 落地结算：按滞空时长计算伤害，并对前方扇形区域生效。
      */
     public static void impact(ServerPlayer player) {
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.level();
         Long startTime = AIRBORNE.remove(player.getUUID());
         if (startTime == null) return;
 

@@ -30,30 +30,30 @@ public class AddonSoundDefinitionsProvider extends SoundDefinitionsProvider {
         // 而资源包可以按 anvilcraft_pigeon_plus:rocket_punch_cast 这样的名字单独替换。
         add(AddonSounds.ROCKET_PUNCH_CAST, definition()
             .subtitle("subtitles.anvilcraft_pigeon_plus.rocket_punch_cast")
-            .with(sound(SoundEvents.MACE_SMASH_GROUND_HEAVY.getLocation(), SoundDefinition.SoundType.EVENT)));
+            .with(sound(SoundEvents.MACE_SMASH_GROUND_HEAVY.location(), SoundDefinition.SoundType.EVENT)));
 
         add(AddonSounds.ROCKET_PUNCH_CHARGE, definition()
             .subtitle("subtitles.anvilcraft_pigeon_plus.rocket_punch_charge")
-            .with(sound(SoundEvents.RESPAWN_ANCHOR_CHARGE.getLocation(), SoundDefinition.SoundType.EVENT)));
+            .with(sound(SoundEvents.RESPAWN_ANCHOR_CHARGE.location(), SoundDefinition.SoundType.EVENT)));
 
         add(AddonSounds.ROCKET_PUNCH_HIT, definition()
             .subtitle("subtitles.anvilcraft_pigeon_plus.rocket_punch_hit")
-            .with(sound(SoundEvents.MACE_SMASH_GROUND.getLocation(), SoundDefinition.SoundType.EVENT)));
+            .with(sound(SoundEvents.MACE_SMASH_GROUND.location(), SoundDefinition.SoundType.EVENT)));
 
         add(AddonSounds.ROCKET_PUNCH_WALL_SLAM, definition()
             .subtitle("subtitles.anvilcraft_pigeon_plus.rocket_punch_wall_slam")
-            .with(sound(SoundEvents.ANVIL_LAND.getLocation(), SoundDefinition.SoundType.EVENT)));
+            .with(sound(SoundEvents.ANVIL_LAND.location(), SoundDefinition.SoundType.EVENT)));
 
         add(AddonSounds.UPPERCUT_CAST, definition()
             .subtitle("subtitles.anvilcraft_pigeon_plus.uppercut_cast")
-            .with(sound(SoundEvents.MACE_SMASH_GROUND.getLocation(), SoundDefinition.SoundType.EVENT)));
+            .with(sound(SoundEvents.MACE_SMASH_GROUND.location(), SoundDefinition.SoundType.EVENT)));
 
         add(AddonSounds.SEISMIC_SLAM_LEAP, definition()
             .subtitle("subtitles.anvilcraft_pigeon_plus.seismic_slam_leap")
-            .with(sound(SoundEvents.BREEZE_JUMP.getLocation(), SoundDefinition.SoundType.EVENT)));
+            .with(sound(SoundEvents.BREEZE_JUMP.location(), SoundDefinition.SoundType.EVENT)));
 
         add(AddonSounds.SEISMIC_SLAM_IMPACT, definition()
             .subtitle("subtitles.anvilcraft_pigeon_plus.seismic_slam_impact")
-            .with(sound(SoundEvents.MACE_SMASH_GROUND_HEAVY.getLocation(), SoundDefinition.SoundType.EVENT)));
+            .with(sound(SoundEvents.MACE_SMASH_GROUND_HEAVY.location(), SoundDefinition.SoundType.EVENT)));
     }
 }
