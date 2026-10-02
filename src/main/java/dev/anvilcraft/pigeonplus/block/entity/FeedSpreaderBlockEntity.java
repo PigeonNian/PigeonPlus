@@ -24,7 +24,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.items.ItemStackHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
 
 import java.util.List;
 
@@ -42,14 +44,23 @@ public class FeedSpreaderBlockEntity extends BlockEntity {
     private static final int PISTON_RELEASE_DELAY_TICKS = 20;
     private static final int SPREAD_PARTICLE_DELAY_TICKS = 5;
 
-    private final ItemStackHandler inventory = new ItemStackHandler(2) {
+    /**
+     * 喂食器的两个槽位（饲料 + 骨粉）。
+     *
+     * <p>26.1 起用 {@link ItemStacksResourceHandler}（新物品能力的基类）
+     * 取代旧的 {@code ItemStackHandler}。
+     */
+    private final ItemStacksResourceHandler inventory = new ItemStacksResourceHandler(2) {
         @Override
-        public boolean isItemValid(int slot, ItemStack stack) {
-            return slot == FEED_SLOT && FeedSpreaderBlockEntity.isFeedOrBoneMeal(stack);
+        public boolean isValid(int slot, ItemResource resource) {
+            if (slot != FEED_SLOT) {
+                return false;
+            }
+            return FeedSpreaderBlockEntity.isFeedOrBoneMeal(resource.toStack(1));
         }
 
         @Override
-        protected void onContentsChanged(int slot) {
+        protected void onContentsChanged(int slot, ItemStack stack) {
             FeedSpreaderBlockEntity.this.setChanged();
         }
     };
@@ -71,7 +82,7 @@ public class FeedSpreaderBlockEntity extends BlockEntity {
         super(ModBlockEntities.FEED_SPREADER.get(), pos, state);
     }
 
-    public ItemStackHandler getInventory() {
+    public ItemStacksResourceHandler getInventory() {
         return this.inventory;
     }
 
@@ -90,24 +101,56 @@ public class FeedSpreaderBlockEntity extends BlockEntity {
     }
 
     public ItemStack insertFeed(ItemStack stack, boolean simulate) {
-        return this.inventory.insertItem(FEED_SLOT, stack, simulate);
+        ItemResource resource = ItemResource.of(stack);
+        if (resource.isEmpty()) {
+            return ItemStack.EMPTY;
+        }
+        int amount = stack.getCount();
+        try (Transaction transaction = Transaction.openRoot()) {
+            int inserted = this.inventory.insert(FEED_SLOT, resource, amount, transaction);
+            if (!simulate && inserted > 0) {
+                transaction.commit();
+            }
+            return stack.copyWithCount(amount - inserted);
+        }
     }
 
     public ItemStack extractFirstItem() {
-        for (int slot = 0; slot < this.inventory.getSlots(); slot++) {
-            ItemStack stack = this.inventory.extractItem(slot, this.inventory.getSlotLimit(slot), false);
-            if (!stack.isEmpty()) {
-                return stack;
+        for (int slot = 0; slot < this.inventory.size(); slot++) {
+            ItemResource resource = this.inventory.getResource(slot);
+            if (resource.isEmpty()) {
+                continue;
+            }
+            int amount = (int) this.inventory.getAmountAsLong(slot);
+            if (amount <= 0) {
+                continue;
+            }
+            try (Transaction transaction = Transaction.openRoot()) {
+                int extracted = this.inventory.extract(slot, resource, amount, transaction);
+                if (extracted > 0) {
+                    transaction.commit();
+                    return resource.toStack(extracted);
+                }
             }
         }
         return ItemStack.EMPTY;
+    }
+
+    /** 读取某个槽位的物品（新接口按「资源 + 数量」表达，这里还原成 ItemStack）。 */
+    public ItemStack getStackInSlot(int slot) {
+        ItemResource resource = this.inventory.getResource(slot);
+        if (resource.isEmpty()) {
+            return ItemStack.EMPTY;
+        }
+        int amount = (int) this.inventory.getAmountAsLong(slot);
+        return amount <= 0 ? ItemStack.EMPTY : resource.toStack(amount);
     }
 
     public void activate(float fallDistance) {
         if (this.level == null || this.level.isClientSide()) {
             return;
         }
-        ItemStack feed = this.inventory.getStackInSlot(FEED_SLOT);
+        ItemStack feed = this.getStackInSlot(FEED_SLOT);
         if (feed.isEmpty()) {
             return;
         }
@@ -124,8 +167,8 @@ public class FeedSpreaderBlockEntity extends BlockEntity {
 
     public NonNullList<ItemStack> getDrops() {
         NonNullList<ItemStack> drops = NonNullList.create();
-        for (int slot = 0; slot < this.inventory.getSlots(); slot++) {
-            ItemStack stack = this.inventory.getStackInSlot(slot);
+        for (int slot = 0; slot < this.inventory.size(); slot++) {
+            ItemStack stack = this.getStackInSlot(slot);
             if (!stack.isEmpty()) {
                 drops.add(stack.copy());
             }
@@ -194,7 +237,7 @@ public class FeedSpreaderBlockEntity extends BlockEntity {
             this.worldPosition.offset(-radius, 0, -radius),
             this.worldPosition.offset(radius, 0, radius)
         )) {
-            ItemStack feed = this.inventory.getStackInSlot(FEED_SLOT);
+            ItemStack feed = this.getStackInSlot(FEED_SLOT);
             if (feed.isEmpty()) {
                 return;
             }
@@ -210,7 +253,7 @@ public class FeedSpreaderBlockEntity extends BlockEntity {
     }
 
     private void feedAnimals(int radius) {
-        ItemStack feed = this.inventory.getStackInSlot(FEED_SLOT);
+        ItemStack feed = this.getStackInSlot(FEED_SLOT);
         if (feed.isEmpty()) {
             return;
         }
@@ -225,7 +268,7 @@ public class FeedSpreaderBlockEntity extends BlockEntity {
         ItemStack initialFeed = feed.copy();
         List<Animal> animals = this.level.getEntitiesOfClass(Animal.class, bounds, animal -> animal.isFood(initialFeed));
         for (Animal animal : animals) {
-            feed = this.inventory.getStackInSlot(FEED_SLOT);
+            feed = this.getStackInSlot(FEED_SLOT);
             if (feed.isEmpty()) {
                 return;
             }
@@ -412,7 +455,7 @@ public class FeedSpreaderBlockEntity extends BlockEntity {
         if (this.spreadParticleMaterial == SPREAD_MATERIAL_BONE_MEAL) {
             return new ItemStack(Items.BONE_MEAL);
         }
-        ItemStack stack = this.inventory.getStackInSlot(FEED_SLOT);
+        ItemStack stack = this.getStackInSlot(FEED_SLOT);
         return !stack.isEmpty() && !stack.is(Items.BONE_MEAL) ? stack.copyWithCount(1) : new ItemStack(Items.WHEAT);
     }
 

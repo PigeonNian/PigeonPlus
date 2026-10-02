@@ -3,6 +3,7 @@ package dev.anvilcraft.pigeonplus.mixin;
 import dev.anvilcraft.pigeonplus.util.CompressedAirDrainFluidHandler;
 import dev.dubhe.anvilcraft.api.fluid.network.FluidContainerLookup;
 import dev.dubhe.anvilcraft.block.entity.fluid.DrainBlockEntity;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;

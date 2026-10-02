@@ -3,7 +3,7 @@ package dev.anvilcraft.pigeonplus.client.tooltip;
 import dev.anvilcraft.pigeonplus.init.AddonBlocks;
 import dev.anvilcraft.pigeonplus.init.AddonItems;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -82,10 +82,18 @@ public final class AddonItemTooltipManager {
     private AddonItemTooltipManager() {
     }
 
-    public static void addTooltip(ItemStack stack, List<Component> tooltip) {
+    /**
+     * 追加本模组的物品提示。
+     *
+     * <p>26.1 移除了 {@code Screen.hasShiftDown()} 这类静态查询，
+     * 改为由 {@code TooltipFlag} 携带修饰键状态（{@code hasShiftDown()}）。
+     * 该 flag 来自 {@code ItemTooltipEvent#getFlags()}，因此由调用方传入，
+     * 而不是在这里反查键盘状态——这样在非游戏界面（如创造模式搜索）也能得到正确结果。
+     */
+    public static void addTooltip(ItemStack stack, List<Component> tooltip, TooltipFlag flags) {
         Item item = stack.getItem();
         if (SHIFT.containsKey(item)) {
-            if (Screen.hasShiftDown()) {
+            if (flags.hasShiftDown()) {
                 addTranslatedTooltip(tooltip, getShiftTranslationKey(item));
             } else {
                 if (NORMAL.containsKey(item)) {

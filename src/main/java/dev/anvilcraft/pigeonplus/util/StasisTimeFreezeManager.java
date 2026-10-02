@@ -214,7 +214,7 @@ public final class StasisTimeFreezeManager {
         }
 
         private void restore(Entity entity) {
-            entity.moveTo(this.frozenPos.x, this.frozenPos.y, this.frozenPos.z, this.yRot, this.xRot);
+            entity.snapTo(this.frozenPos.x, this.frozenPos.y, this.frozenPos.z, this.yRot, this.xRot);
             entity.setDeltaMovement(Vec3.ZERO);
             entity.fallDistance = 0.0f;
             if (entity instanceof LivingEntity living) {

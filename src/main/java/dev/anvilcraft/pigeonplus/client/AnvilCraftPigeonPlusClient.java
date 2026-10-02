@@ -161,7 +161,7 @@ public class AnvilCraftPigeonPlusClient {
     }
 
     private void onItemTooltip(ItemTooltipEvent event) {
-        AddonItemTooltipManager.addTooltip(event.getItemStack(), event.getToolTip());
+        AddonItemTooltipManager.addTooltip(event.getItemStack(), event.getToolTip(), event.getFlags());
     }
 
     /**

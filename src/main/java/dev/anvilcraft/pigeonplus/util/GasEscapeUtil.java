@@ -18,7 +18,6 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.minecraft.util.ARGB;
 import org.joml.Vector3f;
 
@@ -79,13 +78,7 @@ public class GasEscapeUtil {
     private static int pigeonplus$extract(
         ResourceHandler<FluidResource> handler, int tank, FluidResource resource, int amount
     ) {
-        try (Transaction transaction = Transaction.openRoot()) {
-            int extracted = handler.extract(tank, resource, amount, transaction);
-            if (extracted > 0) {
-                transaction.commit();
-            }
-            return extracted;
-        }
+        return FluidTransactions.extract(handler, tank, resource, amount);
     }
 
     public static boolean hasStoredBiogas(ResourceHandler<FluidResource> handler) {

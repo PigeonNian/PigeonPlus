@@ -250,7 +250,7 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
         );
         for (Entity entity : entities) {
             entity.igniteForSeconds(15.0f);
-            if (entity.hurt(AddonDamageTypes.nozzleExhaust(level), 16.0f)) {
+            if (entity.hurtServer((ServerLevel) level, AddonDamageTypes.nozzleExhaust(level), 16.0f)) {
                 entity.playSound(SoundEvents.GENERIC_BURN, 0.4f, 2.0f + RandomSource.create().nextFloat() * 0.4f);
             }
         }

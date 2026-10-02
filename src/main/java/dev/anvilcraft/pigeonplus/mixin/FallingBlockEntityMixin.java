@@ -45,7 +45,7 @@ public class FallingBlockEntityMixin {
             return;
         }
 
-        entity.moveTo(
+        entity.snapTo(
             this.pigeonplus$initialFallingX,
             this.pigeonplus$initialFallingY,
             this.pigeonplus$initialFallingZ,
