@@ -132,10 +132,12 @@ public final class SlamIndicatorRenderer {
     private static void emitLine(VertexConsumer consumer, Matrix4f matrix, double x1, double z1, double x2, double z2) {
         consumer.addVertex(matrix, (float) x1, 0.0f, (float) z1)
             .setColor(COLOR_READY[0], COLOR_READY[1], COLOR_READY[2], COLOR_READY[3])
-            .setNormal(0.0f, 1.0f, 0.0f);
+            .setNormal(0.0f, 1.0f, 0.0f)
+            .setLineWidth(1.0f);
         consumer.addVertex(matrix, (float) x2, 0.0f, (float) z2)
             .setColor(COLOR_READY[0], COLOR_READY[1], COLOR_READY[2], COLOR_READY[3])
-            .setNormal(0.0f, 1.0f, 0.0f);
+            .setNormal(0.0f, 1.0f, 0.0f)
+            .setLineWidth(1.0f);
     }
 
     /**
