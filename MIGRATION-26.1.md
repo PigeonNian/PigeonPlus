@@ -56,26 +56,68 @@ $m = [regex]::Matches($text, '\\([^\\]+\.java):(\d+): 错误: ')
 | 初始（配置迁移完成） | 417 |
 | 第一批机械替换后 | 387 |
 | 第二批（粒子 + datagen）后 | 336 |
-| 第三批（FluidAction 等）后 | **331** |
+| 第三批（FluidAction 等）后 | 331 |
+| 第四批（客户端入口：流体类型/事件/矩阵）后 | **315**（69 个文件）|
+
+### 客户端渲染体系的三处结构变更（已查证，第四批）
+
+**1. `BlockEntityRenderer` 改为 RenderState 模式**
+
+```java
+// 26.1
+public interface BlockEntityRenderer<T extends BlockEntity, S extends BlockEntityRenderState> {
+    S createRenderState();
+    default void extractRenderState(T, S, float partialTick, Vec3 cameraPos, CrumblingOverlay);
+    void submit(S, PoseStack, SubmitNodeCollector, CameraRenderState);   // 取代 render()
+}
+```
+- `render(...)` **不存在了**；数据提取与绘制拆成两个方法。
+- `registerBlockEntityRenderer` 需要 `BlockEntityRendererProvider<T, S>`（2 个类型参数）。
+- 渲染方块模型改用 `SubmitNodeCollector#submitBlockModel(PoseStack, RenderType, List<BlockStateModelPart>, int[], int, int, int)`，
+  不再有 `BlockRenderDispatcher.renderSingleBlock(BakedModel, ...)`。
+- 范例（**推荐照抄**）：原版 `net/minecraft/client/renderer/blockentity/EnchantTableRenderer.java`，
+  源码可从 `minecraft-patched-26.1.2.75-sources.jar` 提取。
+
+**2. `RenderLevelStageEvent` 由「枚举阶段」改为「事件子类」**
+
+```java
+// 旧：监听 RenderLevelStageEvent，再 if (event.getStage() != Stage.AFTER_LEVEL) return;
+// 新：直接声明参数类型
+private void onRenderLevelStage(RenderLevelStageEvent.AfterLevel event) { ... }
+```
+且 `getCamera()` 已移除 → 相机位置改取
+`event.getLevelRenderState().cameraRenderState.pos`；
+`getModelViewMatrix()` 现在返回**不可变** `Matrix4fc`（旧代码若声明 `Matrix4f` 会报「不兼容的类型」）。
+
+**3. 流体的贴图与渲染层改为数据驱动**
+
+- `ItemBlockRenderTypes` 与 `RenderType.translucent()` 均已移除，**AnvilCraft 26.1 里也没有任何 `setRenderLayer` 调用**。
+- `IClientFluidTypeExtensions` 只剩 `getRenderOverlayTexture` / `renderOverlay` / `modifyFogColor` / `modifyFogRender`；
+  `getStillTexture` / `getFlowingTexture` / `getTintColor` 全部移除。
+- `FluidType` 与 `FluidType.Properties` 也**没有**任何贴图字段。
+  → 流体外观（贴图、是否半透明）现由**资源文件**决定；染色在渲染时用 `tintSource.colorAsStack(...)` 取。
+- `ModClientFluidTypeExtensionImpl` 构造器由 6 参 `(still, flow, fogColor, fogDist, tintColor, flag)`
+  简化为 2 参 `(int fogColor, float fogDistance)`。
+
+**4. `ModelEvent.RegisterAdditional` → `ModelEvent.RegisterStandalone`（API 完全不同）**
+
+```java
+// 旧
+event.register(new ModelResourceLocation(id, "standalone"));
+// 新：需要 StandaloneModelKey<T> + UnbakedStandaloneModel<T>
+<T> void register(StandaloneModelKey<T>, UnbakedStandaloneModel<T>);
+```
+`ModelResourceLocation` 与 `BakedModel` 均已移除。**尚未处理**（需与 BER 重写一起做）。
 
 ### 剩余错误最集中的文件
 
 ```
-42x  client/AnvilCraftPigeonPlusClient.java   （客户端入口：模型/GUI层/BER/流体的注册）
+~30x  client/AnvilCraftPigeonPlusClient.java   （模型注册 + BER 注册）
 21x  client/renderer/block/FeedSpreaderBlockEntityRenderer.java
 17x  client/renderer/block/BlenderBlockEntityRenderer.java
 16x  mixin/client/LargeCauldronBlockEntityRendererMixin.java
 15x  block/entity/CompressedAirDrainFluidHandler.java
 14x  client/renderer/block/StasisBeaconBlockEntityRenderer.java
-13x  block/entity/NozzleExhaustBlockEntity.java
-12x  integration/jei/category/BlendingCategory.java
-12x  recipe/GasLiquefactionRecipe.java
-12x  block/FeedSpreaderBlock.java
-12x  block/entity/StasisBeaconBlockEntity.java
-11x  data/provider/AddonSoundDefinitionsProvider.java
- 9x  client/renderer/block/AnvilPumpBlockEntityRenderer.java
- 9x  block/entity/FeedSpreaderBlockEntity.java
- 9x  recipe/anvil/wrap/BlendingRecipe.java
 ```
 
 ### 已确认的 API 变更对照
@@ -274,4 +316,8 @@ AnvilLib 与 AnvilCraft **都发布了 sources jar**，解压后可直接读到�
 - **批量替换源码文件**：用 `[System.IO.File]::ReadAllText` / `WriteAllText` + `UTF8Encoding($false)`（无 BOM），
   不要用 PowerShell 文本管道（会破坏编码）。替换 `ResourceLocation` 时必须用负向后顾 `(?<!Model)` 排除
   `ModelResourceLocation`，否则会被误改成 `ModelIdentifier`。
+- **查看源码内容一律用 `read` 工具，不要用 `Get-Content`**：`Get-Content` 默认按系统 ANSI（本机 GBK）解码，
+  UTF-8 的中文注释会显示成乱码（如 `鍙湪鎮┖`），容易误判成文件损坏。文件本身是好的
+  （用 `UTF8Encoding($false, $true)` 严格解码可验证）。
+- **`Select-String` 默认不区分大小写**：查 API 名时可能误报（例如查 `FluidAction` 会命中 `fluidaction`）。
 - 构建配置改动后需 `--no-configuration-cache` 或让 Gradle 自行失效缓存。

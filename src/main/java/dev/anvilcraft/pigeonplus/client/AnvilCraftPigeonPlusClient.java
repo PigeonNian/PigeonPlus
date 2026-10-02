@@ -30,8 +30,6 @@ import dev.anvilcraft.pigeonplus.util.DoomfistEnchantmentUtil;
 import dev.anvilcraft.pigeonplus.util.SkillCooldowns;
 import dev.dubhe.anvilcraft.util.ModClientFluidTypeExtensionImpl;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
@@ -90,15 +88,19 @@ public class AnvilCraftPigeonPlusClient {
     /**
      * 在世界中绘制指向性裂地重拳的地面扇形指示器。
      *
-     * <p>用 {@code AFTER_LEVEL} 阶段：此时世界已经画完、深度缓冲可用，
-     * 画在贴地的位置才不会被地形遮挡或穿插。
+     * <p>26.1 起 {@code RenderLevelStageEvent} 由「一个事件 + {@code Stage} 枚举」
+     * 改为「每个阶段一个事件子类」，因此不再需要 {@code getStage()} 判断，
+     * 直接把监听器参数声明成 {@link RenderLevelStageEvent.AfterLevel} 即可，
+     * 且此时世界已画完、深度缓冲可用，画在贴地位置才不会被地形遮挡。
+     *
+     * <p>相机位置也换了来源：原 {@code getCamera()} 已移除，
+     * 改为从 {@code getLevelRenderState().cameraRenderState.pos} 取。
      */
-    private void onRenderLevelStage(RenderLevelStageEvent event) {
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_LEVEL) return;
+    private void onRenderLevelStage(RenderLevelStageEvent.AfterLevel event) {
         SlamIndicatorRenderer.render(
             event.getPoseStack(),
             event.getModelViewMatrix(),
-            event.getCamera().getPosition()
+            event.getLevelRenderState().cameraRenderState.pos
         );
     }
 
@@ -191,79 +193,53 @@ public class AnvilCraftPigeonPlusClient {
     private void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
             HudTooltipManager.INSTANCE.registerBlockEntityTooltip(new StasisBeaconTooltipProvider());
-            ItemBlockRenderTypes.setRenderLayer(AddonFluids.LIQUEFIED_BIOGAS.get(), RenderType.translucent());
-            ItemBlockRenderTypes.setRenderLayer(AddonFluids.LIQUEFIED_BIOGAS_FLOWING.get(), RenderType.translucent());
-            ItemBlockRenderTypes.setRenderLayer(AddonFluids.LIQUID_OXYGEN.get(), RenderType.translucent());
-            ItemBlockRenderTypes.setRenderLayer(AddonFluids.LIQUID_OXYGEN_FLOWING.get(), RenderType.translucent());
-            ItemBlockRenderTypes.setRenderLayer(AddonFluids.LIQUID_HYDROGEN.get(), RenderType.translucent());
-            ItemBlockRenderTypes.setRenderLayer(AddonFluids.LIQUID_HYDROGEN_FLOWING.get(), RenderType.translucent());
+            // 26.1 起流体的贴图与渲染层改为**数据驱动**，代码里不再需要设置：
+            // ItemBlockRenderTypes 与 RenderType.translucent() 均已移除，
+            // IClientFluidTypeExtensions 也只保留 overlay 与 fog 相关方法。
+            // 流体外观现由资源文件决定（assets/<modid>/ 下的流体模型/材质定义）。
         });
     }
 
     private void onRegisterClientExtensions(RegisterClientExtensionsEvent event) {
         event.registerFluidType(
             new ModClientFluidTypeExtensionImpl(
-                Identifier.withDefaultNamespace("block/water_still"),
-                Identifier.withDefaultNamespace("block/water_flow"),
                 0x6B8E3D,
-                24.0f,
-                0xFF6B8E3D,
-                false
+                24.0f
             ),
             AddonFluids.GASEOUS_BIOGAS_TYPE
         );
         event.registerFluidType(
             new ModClientFluidTypeExtensionImpl(
-                Identifier.withDefaultNamespace("block/water_still"),
-                Identifier.withDefaultNamespace("block/water_flow"),
                 0xD9F2FF,
-                48.0f,
-                0x66D9F2FF,
-                false
+                48.0f
             ),
             AddonFluids.COMPRESSED_AIR_TYPE
         );
         event.registerFluidType(
             new ModClientFluidTypeExtensionImpl(
-                Identifier.withDefaultNamespace("block/water_still"),
-                Identifier.withDefaultNamespace("block/water_flow"),
                 0x6E5F2C,
-                20.0f,
-                0xFF6E5F2C,
-                false
+                20.0f
             ),
             AddonFluids.MIXED_BIOMASS_TYPE
         );
         event.registerFluidType(
             new ModClientFluidTypeExtensionImpl(
-                Identifier.withDefaultNamespace("block/water_still"),
-                Identifier.withDefaultNamespace("block/water_flow"),
                 0x8FD2B3,
-                28.0f,
-                0xD08FD2B3,
-                false
+                28.0f
             ),
             AddonFluids.LIQUEFIED_BIOGAS_TYPE
         );
         event.registerFluidType(
             new ModClientFluidTypeExtensionImpl(
-                Identifier.withDefaultNamespace("block/water_still"),
-                Identifier.withDefaultNamespace("block/water_flow"),
                 0x87CEEB,
-                8.0f,
-                0x7087CEEB,
-                false
+                8.0f
             ),
             AddonFluids.LIQUID_OXYGEN_TYPE
         );
         event.registerFluidType(
             new ModClientFluidTypeExtensionImpl(
-                Identifier.withDefaultNamespace("block/water_still"),
-                Identifier.withDefaultNamespace("block/water_flow"),
                 0xB8E2F4,
-                8.0f,
-                0x70B8E2F4,
-                false
+                8.0f
             ),
             AddonFluids.LIQUID_HYDROGEN_TYPE
         );

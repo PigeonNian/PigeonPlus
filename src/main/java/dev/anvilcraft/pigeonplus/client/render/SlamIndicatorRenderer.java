@@ -18,6 +18,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
 
 /**
  * 指向性裂地重拳的地面指示器。
@@ -53,7 +54,7 @@ public final class SlamIndicatorRenderer {
      * @param modelView     事件提供的 modelView 矩阵
      * @param cameraPos     相机世界坐标
      */
-    public static void render(PoseStack poseStack, Matrix4f modelView, Vec3 cameraPos) {
+    public static void render(PoseStack poseStack, Matrix4fc modelView, Vec3 cameraPos) {
         Minecraft minecraft = Minecraft.getInstance();
         LocalPlayer player = minecraft.player;
         if (player == null || minecraft.level == null) return;
