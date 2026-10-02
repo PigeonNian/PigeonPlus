@@ -1,34 +1,66 @@
 package dev.anvilcraft.pigeonplus.client.renderer.block;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.QuadInstance;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.anvilcraft.pigeonplus.block.StasisBeaconBlock;
 import dev.anvilcraft.pigeonplus.block.entity.StasisBeaconBlockEntity;
 import dev.dubhe.anvilcraft.client.init.ModRenderTypes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.block.BlockStateModelSet;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.LightCoordsUtil;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ChainBlock;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class StasisBeaconBlockEntityRenderer implements BlockEntityRenderer<StasisBeaconBlockEntity> {
+/**
+ * 静滞信标的立柱光束与锁链特效。
+ *
+ * <h3>26.1 改写要点</h3>
+ * <ul>
+ *   <li>渲染器改三段式：光束在 {@code submit} 里通过
+ *       {@link SubmitNodeCollector#submitCustomGeometry} 提交。</li>
+ *   <li>锁链是<b>延迟</b>渲染的（要在世界渲染结束后、带着深度缓冲画到实体周围），
+ *       因此它保留了「静态列表 + 渲染事件」的架构，不走 {@code submit}。
+ *       它的缓冲来源 {@code Minecraft#renderBuffers().bufferSource()} 在 26.1 仍然可用。</li>
+ *   <li>原版不再有 {@code BlockRenderDispatcher#renderSingleBlock}。
+ *       改为取出 {@link BlockStateModel}、展开成
+ *       {@link BlockStateModelPart}、再逐面用
+ *       {@link VertexConsumer#putBakedQuad} 绘制。</li>
+ *   <li>锁链的半透明淡出不再需要自己包一层 {@code VertexConsumer}
+ *       （那要求实现全部抽象方法，且 26.1 新增了 {@code setLineWidth}）。
+ *       现在只需给 {@link QuadInstance} 设颜色，{@code putBakedQuad} 会把它应用到四个顶点。</li>
+ * </ul>
+ */
+public class StasisBeaconBlockEntityRenderer
+    implements BlockEntityRenderer<StasisBeaconBlockEntity, StasisBeaconBlockEntityRenderer.State> {
+
     private static final float BEAM_BASE_Y = 0.5f;
     private static final float BEAM_INNER_HALF = 0.08f;
     private static final int BEAM_GLOW_LAYERS = 4;
@@ -36,7 +68,8 @@ public class StasisBeaconBlockEntityRenderer implements BlockEntityRenderer<Stas
     private static final float BEAM_R = 0.1f;
     private static final float BEAM_G = 0.75f;
     private static final float BEAM_B = 1.0f;
-    private static final BlockState CHAIN_STATE = Blocks.CHAIN.defaultBlockState().setValue(ChainBlock.AXIS, net.minecraft.core.Direction.Axis.Y);
+    private static final BlockState CHAIN_STATE =
+        Blocks.IRON_CHAIN.defaultBlockState().setValue(ChainBlock.AXIS, Direction.Axis.Y);
     private static final float CHAIN_SEGMENT_SCALE = 0.36f;
     private static final float CHAIN_SEGMENT_SPACING = 0.36f;
     private static final int CHAIN_ALPHA = 145;
@@ -65,31 +98,37 @@ public class StasisBeaconBlockEntityRenderer implements BlockEntityRenderer<Stas
     }
 
     @Override
-    public void render(
+    public State createRenderState() {
+        return new State();
+    }
+
+    @Override
+    public void extractRenderState(
         StasisBeaconBlockEntity blockEntity,
+        State state,
         float partialTick,
-        PoseStack poseStack,
-        MultiBufferSource bufferSource,
-        int packedLight,
-        int packedOverlay
+        Vec3 cameraPosition,
+        ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress
     ) {
+        BlockEntityRenderer.super.extractRenderState(blockEntity, state, partialTick, cameraPosition, breakProgress);
+        state.lit = false;
         Level level = blockEntity.getLevel();
         if (level == null) {
             return;
         }
-        BlockState state = level.getBlockState(blockEntity.getBlockPos());
-        if (!state.hasProperty(StasisBeaconBlock.LIT) || !state.getValue(StasisBeaconBlock.LIT)) {
+        BlockState blockState = level.getBlockState(blockEntity.getBlockPos());
+        if (!blockState.hasProperty(StasisBeaconBlock.LIT) || !blockState.getValue(StasisBeaconBlock.LIT)) {
             return;
         }
 
         int beamTopY = blockEntity.getBeamHeight();
         int posY = blockEntity.getBlockPos().getY();
         if (beamTopY > posY + 1) {
-            VertexConsumer beamConsumer = bufferSource.getBuffer(ModRenderTypes.CORRUPTED_BEACON_BEAM);
-            float beamHeight = (float) (beamTopY - posY) - BEAM_BASE_Y;
-            renderBeam(beamConsumer, poseStack.last(), 0.5f, BEAM_BASE_Y, 0.5f, beamHeight);
+            state.lit = true;
+            state.beamHeight = (float) (beamTopY - posY) - BEAM_BASE_Y;
         }
 
+        // 被冻结实体的锁链：这里登记，稍后由渲染事件统一绘制
         if (level instanceof ClientLevel clientLevel && blockEntity.getFrozenEntityClientId() >= 0) {
             Entity entity = clientLevel.getEntity(blockEntity.getFrozenEntityClientId());
             if (entity != null) {
@@ -104,6 +143,18 @@ public class StasisBeaconBlockEntityRenderer implements BlockEntityRenderer<Stas
         }
     }
 
+    @Override
+    public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+        if (!state.lit) {
+            return;
+        }
+        collector.submitCustomGeometry(
+            poseStack,
+            ModRenderTypes.CORRUPTED_BEACON_BEAM,
+            (pose, buffer) -> renderBeam(buffer, pose, 0.5f, BEAM_BASE_Y, 0.5f, state.beamHeight)
+        );
+    }
+
     public static boolean hasStasisEffect(Entity entity) {
         return ACTIVE_STASIS_EFFECT_ENTITY_IDS.contains(entity.getId());
     }
@@ -114,48 +165,50 @@ public class StasisBeaconBlockEntityRenderer implements BlockEntityRenderer<Stas
         NEXT_STASIS_EFFECT_ENTITY_IDS.clear();
     }
 
-    public static void renderDeferredChains(PoseStack poseStack, MultiBufferSource bufferSource, Vec3 camera) {
+    /**
+     * 绘制延迟锁链。
+     *
+     * <p>由 {@code StasisBeaconRenderEventListener} 在世界渲染结束、深度缓冲可用时调用。
+     */
+    public static void renderDeferredChains(PoseStack poseStack, net.minecraft.client.renderer.MultiBufferSource bufferSource, Vec3 camera) {
         if (DEFERRED_CHAINS.isEmpty()) {
             return;
         }
-
+        // 锁链模型固定不变，整批只取一次
+        List<BlockStateModelPart> parts = pigeonplus$chainParts();
+        VertexConsumer buffer = bufferSource.getBuffer(RenderTypes.translucentMovingBlock());
         for (ChainRenderData data : DEFERRED_CHAINS) {
-            renderStasisChains(poseStack, bufferSource, camera, data);
+            renderStasisChains(poseStack, buffer, parts, camera, data);
         }
         DEFERRED_CHAINS.clear();
     }
 
     private static void renderStasisChains(
         PoseStack poseStack,
-        MultiBufferSource bufferSource,
+        VertexConsumer buffer,
+        List<BlockStateModelPart> parts,
         Vec3 camera,
         ChainRenderData data
     ) {
-        Minecraft minecraft = Minecraft.getInstance();
         for (int i = 0; i < CHAIN_DIRECTIONS.length; i++) {
             Vec3 direction = CHAIN_DIRECTIONS[i].normalize();
             float length = CHAIN_LENGTHS[i] + data.entityWidth * 0.35f;
-            Vec3 start = data.entityCenter;
-            renderChainModelSegments(poseStack, bufferSource, camera, minecraft, start, direction, length);
+            renderChainModelSegments(poseStack, buffer, parts, camera, data.entityCenter, direction, length);
         }
     }
 
     private static void renderChainModelSegments(
         PoseStack poseStack,
-        MultiBufferSource bufferSource,
+        VertexConsumer buffer,
+        List<BlockStateModelPart> parts,
         Vec3 camera,
-        Minecraft minecraft,
         Vec3 start,
         Vec3 direction,
         float length
     ) {
         Quaternionf rotation = new Quaternionf().rotationTo(
-            0.0f,
-            1.0f,
-            0.0f,
-            (float) direction.x,
-            (float) direction.y,
-            (float) direction.z
+            0.0f, 1.0f, 0.0f,
+            (float) direction.x, (float) direction.y, (float) direction.z
         );
         for (float distance = 0.2f; distance < length; distance += CHAIN_SEGMENT_SPACING) {
             int alpha = chainAlpha(distance / length);
@@ -165,15 +218,41 @@ public class StasisBeaconBlockEntityRenderer implements BlockEntityRenderer<Stas
             poseStack.mulPose(rotation);
             poseStack.scale(CHAIN_SEGMENT_SCALE, CHAIN_SEGMENT_SCALE, CHAIN_SEGMENT_SCALE);
             poseStack.translate(-0.5f, -0.5f, -0.5f);
-            minecraft.getBlockRenderer().renderSingleBlock(
-                CHAIN_STATE,
-                poseStack,
-                new TintedChainBufferSource(bufferSource, alpha),
-                LightTexture.FULL_BRIGHT,
-                OverlayTexture.NO_OVERLAY
-            );
+            // 每个链节透明度不同，故各自一份 QuadInstance
+            QuadInstance instance = new QuadInstance();
+            instance.setColor((alpha << 24) | (CHAIN_R << 16) | (CHAIN_G << 8) | CHAIN_B);
+            instance.setLightCoords(LightCoordsUtil.FULL_BRIGHT);
+            instance.setOverlayCoords(OverlayTexture.NO_OVERLAY);
+
+            PoseStack.Pose pose = poseStack.last();
+            for (BlockStateModelPart part : parts) {
+                for (Direction side : Direction.values()) {
+                    pigeonplus$emitQuads(buffer, pose, part.getQuads(side), instance);
+                }
+                pigeonplus$emitQuads(buffer, pose, part.getQuads(null), instance);
+            }
             poseStack.popPose();
         }
+    }
+
+    private static void pigeonplus$emitQuads(
+        VertexConsumer buffer,
+        PoseStack.Pose pose,
+        List<BakedQuad> quads,
+        QuadInstance instance
+    ) {
+        for (BakedQuad quad : quads) {
+            buffer.putBakedQuad(pose, quad, instance);
+        }
+    }
+
+    /** 取出锁链方块的模型部件（整批绘制只调用一次）。 */
+    private static List<BlockStateModelPart> pigeonplus$chainParts() {
+        BlockStateModelSet modelSet = Minecraft.getInstance().getModelManager().getBlockStateModelSet();
+        BlockStateModel model = modelSet.get(CHAIN_STATE);
+        List<BlockStateModelPart> parts = new ArrayList<>();
+        model.collectParts(RandomSource.create(0L), parts);
+        return parts;
     }
 
     private static int chainAlpha(float progress) {
@@ -182,45 +261,6 @@ public class StasisBeaconBlockEntityRenderer implements BlockEntityRenderer<Stas
         }
         float fade = (progress - CHAIN_FADE_START) / (1.0f - CHAIN_FADE_START);
         return (int) (CHAIN_ALPHA + (CHAIN_END_ALPHA - CHAIN_ALPHA) * Math.min(fade, 1.0f));
-    }
-
-    private record TintedChainBufferSource(MultiBufferSource delegate, int alpha) implements MultiBufferSource {
-        @Override
-        public VertexConsumer getBuffer(RenderType renderType) {
-            return new TintedChainVertexConsumer(this.delegate.getBuffer(RenderTypes.translucentMovingBlock()), this.alpha);
-        }
-    }
-
-    private record TintedChainVertexConsumer(VertexConsumer delegate, int alpha) implements VertexConsumer {
-        @Override
-        public VertexConsumer addVertex(float x, float y, float z) {
-            return this.delegate.addVertex(x, y, z);
-        }
-
-        @Override
-        public VertexConsumer setColor(int red, int green, int blue, int alpha) {
-            return this.delegate.setColor(CHAIN_R, CHAIN_G, CHAIN_B, this.alpha);
-        }
-
-        @Override
-        public VertexConsumer setUv(float u, float v) {
-            return this.delegate.setUv(u, v);
-        }
-
-        @Override
-        public VertexConsumer setUv1(int u, int v) {
-            return this.delegate.setUv1(u, v);
-        }
-
-        @Override
-        public VertexConsumer setUv2(int u, int v) {
-            return this.delegate.setUv2(u, v);
-        }
-
-        @Override
-        public VertexConsumer setNormal(float x, float y, float z) {
-            return this.delegate.setNormal(x, y, z);
-        }
     }
 
     private static void renderBeam(
@@ -272,7 +312,7 @@ public class StasisBeaconBlockEntityRenderer implements BlockEntityRenderer<Stas
     }
 
     @Override
-    public boolean shouldRenderOffScreen(StasisBeaconBlockEntity blockEntity) {
+    public boolean shouldRenderOffScreen() {
         return true;
     }
 
@@ -293,5 +333,11 @@ public class StasisBeaconBlockEntityRenderer implements BlockEntityRenderer<Stas
         BlockPos pos = blockEntity.getBlockPos();
         int topY = Math.max(blockEntity.getBeamHeight(), pos.getY() + 1);
         return new AABB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1.0, topY, pos.getZ() + 1.0);
+    }
+
+    /** 渲染状态。 */
+    public static class State extends BlockEntityRenderState {
+        boolean lit;
+        float beamHeight;
     }
 }

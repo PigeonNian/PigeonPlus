@@ -93,7 +93,7 @@ public class BlenderBlockEntityRenderer
      */
     private static boolean pigeonplus$isLargeCauldronCore(Level level, BlockPos pos) {
         BlockState blockState = level.getBlockState(pos);
-        Identifier id = blockState.getBlock().builtInRegistryHolder().key().location();
+        Identifier id = blockState.getBlock().builtInRegistryHolder().key().identifier();
         if (!id.equals(Identifier.fromNamespaceAndPath("anvilcraft", "large_cauldron"))) {
             return false;
         }

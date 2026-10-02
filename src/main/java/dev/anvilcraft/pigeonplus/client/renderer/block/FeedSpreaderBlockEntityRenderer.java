@@ -60,7 +60,7 @@ public class FeedSpreaderBlockEntityRenderer
         }
         state.valid = true;
         // 方块位置的真实光照；基类给的是实体自身的光照，这里要以方块为准
-        state.blockLight = LevelRenderer.getLightColor(level, blockEntity.getBlockPos());
+        state.blockLight = LevelRenderer.getLightCoords(level, blockEntity.getBlockPos());
         state.bucketRotation = 720.0F * pigeonplus$easeInOut(blockEntity.getBucketRotation(partialTick));
         state.pistonDrop = MAX_PISTON_DROP * blockEntity.getPistonPress(partialTick);
     }

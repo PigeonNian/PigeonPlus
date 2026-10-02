@@ -3,14 +3,18 @@ package dev.anvilcraft.pigeonplus.client.renderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.anvilcraft.pigeonplus.util.NozzleExhaustUtil;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 
 public final class NozzleExhaustRenderer {
-    private static final Identifier BEAM_TEXTURE =
+    /**
+     * 火焰束使用的贴图。
+     *
+     * <p>26.1 里渲染层必须由提交方（{@code submitCustomGeometry} 的调用者）指定，
+     * 因此这个贴图对外公开，便于调用方构造
+     * {@code RenderTypes.beaconBeam(BEAM_TEXTURE, true)}。
+     */
+    public static final Identifier BEAM_TEXTURE =
         Identifier.withDefaultNamespace("textures/entity/beacon_beam.png");
     private static final int FULL_BRIGHT = 0x00F000F0;
     private static final float CENTER_X = 0.5F;
@@ -24,11 +28,18 @@ public final class NozzleExhaustRenderer {
     private NozzleExhaustRenderer() {
     }
 
+    /**
+     * 绘制喷口火焰。
+     *
+     * <p>26.1 起不再从 {@code MultiBufferSource} 取缓冲：绘制要包在
+     * {@code SubmitNodeCollector#submitCustomGeometry} 的回调里进行，
+     * 由回调提供 {@link VertexConsumer} 与 {@link PoseStack.Pose}。
+     * 因此本方法改为直接接收这两者，渲染层由调用方在回调里指定。
+     */
     public static void render(
-        PoseStack poseStack,
-        MultiBufferSource buffers,
+        PoseStack.Pose pose,
+        VertexConsumer buffer,
         float time,
-        BlockPos pos,
         Direction facing,
         Propellant propellant,
         float visibleLength,
@@ -38,8 +49,6 @@ public final class NozzleExhaustRenderer {
             return;
         }
 
-        VertexConsumer buffer = buffers.getBuffer(RenderTypes.beaconBeam(BEAM_TEXTURE, true));
-        PoseStack.Pose pose = poseStack.last();
         RenderProfile profile = profile(propellant);
         float heightScale = flameProgress * flameProgress * (3.0F - 2.0F * flameProgress);
         float radiusScale = 0.30F + flameProgress * 0.70F;
