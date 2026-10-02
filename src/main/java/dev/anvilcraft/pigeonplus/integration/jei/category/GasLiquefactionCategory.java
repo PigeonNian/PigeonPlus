@@ -19,7 +19,7 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -96,7 +96,7 @@ public class GasLiquefactionCategory implements IRecipeCategory<RecipeHolder<Gas
     public void draw(
         RecipeHolder<GasLiquefactionRecipe> recipe,
         IRecipeSlotsView recipeSlotsView,
-        GuiGraphics guiGraphics,
+        GuiGraphicsExtractor guiGraphics,
         double mouseX,
         double mouseY
     ) {
@@ -110,7 +110,7 @@ public class GasLiquefactionCategory implements IRecipeCategory<RecipeHolder<Gas
         guiGraphics.pose().scale(TANK_SCALE, TANK_SCALE, 1.0f);
         guiGraphics.renderItem(new ItemStack(ModBlocks.LARGE_FLUID_TANK), 0, 0);
         guiGraphics.pose().popPose();
-        guiGraphics.drawString(
+        guiGraphics.text(
             Minecraft.getInstance().font,
             Component.translatable("gui.anvilcraft_pigeon_plus.gas_liquefaction.fill_then"),
             69,
@@ -118,7 +118,7 @@ public class GasLiquefactionCategory implements IRecipeCategory<RecipeHolder<Gas
             0xFF404040,
             false
         );
-        guiGraphics.drawString(
+        guiGraphics.text(
             Minecraft.getInstance().font,
             Component.translatable("gui.anvilcraft_pigeon_plus.gas_liquefaction.liquefy"),
             108,
@@ -126,7 +126,7 @@ public class GasLiquefactionCategory implements IRecipeCategory<RecipeHolder<Gas
             0xFF404040,
             false
         );
-        guiGraphics.drawString(
+        guiGraphics.text(
             Minecraft.getInstance().font,
             Component.translatable("gui.anvilcraft_pigeon_plus.gas_liquefaction.keep_pumping"),
             32,

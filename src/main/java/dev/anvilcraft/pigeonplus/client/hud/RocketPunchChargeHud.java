@@ -4,7 +4,7 @@ import dev.anvilcraft.pigeonplus.util.DoomfistEnchantmentUtil;
 import dev.anvilcraft.pigeonplus.util.RocketPunchManager;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.util.Mth;
 
@@ -58,7 +58,7 @@ public final class RocketPunchChargeHud {
     private RocketPunchChargeHud() {
     }
 
-    public static void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
+    public static void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.options.hideGui || minecraft.screen != null) return;
         LocalPlayer player = minecraft.player;

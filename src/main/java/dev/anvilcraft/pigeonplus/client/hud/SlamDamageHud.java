@@ -4,7 +4,7 @@ import dev.anvilcraft.pigeonplus.client.SeismicSlamClientState;
 import dev.anvilcraft.pigeonplus.util.SlamManager;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -35,7 +35,7 @@ public final class SlamDamageHud {
     private SlamDamageHud() {
     }
 
-    public static void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
+    public static void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.options.hideGui || minecraft.screen != null) return;
         LocalPlayer player = minecraft.player;
@@ -54,7 +54,7 @@ public final class SlamDamageHud {
         int textWidth = minecraft.font.width(text);
         int y = graphics.guiHeight() / CENTER_DIVISOR + CROSSHAIR_OFFSET_Y;
 
-        graphics.drawString(
+        graphics.text(
             minecraft.font,
             Component.literal(text),
             centerX - textWidth / CENTER_DIVISOR,

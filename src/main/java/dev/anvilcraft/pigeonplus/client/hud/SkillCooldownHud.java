@@ -5,7 +5,7 @@ import dev.anvilcraft.pigeonplus.util.SkillCooldowns;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 
@@ -50,7 +50,7 @@ public final class SkillCooldownHud {
     private SkillCooldownHud() {
     }
 
-    public static void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
+    public static void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.options.hideGui || minecraft.screen != null) return;
         LocalPlayer player = minecraft.player;
@@ -137,7 +137,7 @@ public final class SkillCooldownHud {
     }
 
     private static void renderRow(
-        GuiGraphics graphics,
+        GuiGraphicsExtractor graphics,
         Minecraft minecraft,
         SkillCooldowns.Skill skill,
         int left,
@@ -153,16 +153,16 @@ public final class SkillCooldownHud {
         // 按键提示：中性灰，不随状态变色，避免与状态色抢视觉
         String key = keyTextFor(minecraft, skill);
         if (!key.isEmpty()) {
-            graphics.drawString(minecraft.font, key, x, y, COLOR_KEY, true);
+            graphics.text(minecraft.font, key, x, y, COLOR_KEY, true);
             x += minecraft.font.width(key) + GAP;
         }
 
         Component label = labelFor(skill);
-        graphics.drawString(minecraft.font, label, x, y, color, true);
+        graphics.text(minecraft.font, label, x, y, color, true);
         x += minecraft.font.width(label) + GAP;
 
         if (!cooldown.isEmpty()) {
-            graphics.drawString(minecraft.font, cooldown, x, y, color, true);
+            graphics.text(minecraft.font, cooldown, x, y, color, true);
         }
     }
 }

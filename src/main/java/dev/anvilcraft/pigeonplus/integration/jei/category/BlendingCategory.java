@@ -29,7 +29,7 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -113,7 +113,7 @@ public class BlendingCategory extends AbstractProgressCategory<BlendingRecipe> {
     public void draw(
         RecipeHolder<BlendingRecipe> recipeHolder,
         IRecipeSlotsView recipeSlotsView,
-        GuiGraphics guiGraphics,
+        GuiGraphicsExtractor guiGraphics,
         double mouseX,
         double mouseY
     ) {
