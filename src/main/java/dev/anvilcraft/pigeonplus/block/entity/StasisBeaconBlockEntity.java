@@ -5,6 +5,7 @@ import dev.anvilcraft.pigeonplus.util.StasisTimeFreezeManager;
 import dev.dubhe.anvilcraft.init.block.ModBlocks;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;

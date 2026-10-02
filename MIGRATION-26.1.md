@@ -58,7 +58,91 @@ $m = [regex]::Matches($text, '\\([^\\]+\.java):(\d+): 错误: ')
 | 第二批（粒子 + datagen）后 | 336 |
 | 第三批（FluidAction 等）后 | 331 |
 | 第四批（客户端入口：流体类型/事件/矩阵）后 | 315（69 个文件）|
-| 第五批（BER 三段式 + 独立模型注册）后 | **266** |
+| 第五批（BER 三段式 + 独立模型注册）后 | 266 |
+| 第六批（全部 BER 三段式完成）后 | 241 |
+| 第七批（粒子 + NBT + 光照）后 | 205 |
+| 第八批（配方体系）后 | **40** |
+
+> **教训：优先修「被大量引用的签名」。** 205 → 40 的骤降来自两处根因修复：
+> `HasCauldronSimple` 由 `Fluid` 改为 `Identifier`，以及
+> `RecipeSerializer` 由接口变为 record。它们各自级联出几十个错误，
+> 逐个改调用点会做几十次无用功。
+
+### 配方体系被整体重写
+
+**`RecipeSerializer` 从接口变成 record：**
+```java
+// 旧：class Serializer implements RecipeSerializer<T> { codec(); streamCodec(); }
+// 新：
+public static final RecipeSerializer<T> SERIALIZER = new RecipeSerializer<>(CODEC, STREAM_CODEC);
+```
+注册处也从 `Serializer::new` 改为 `() -> T.SERIALIZER`。
+
+**`Recipe` 接口新增/移除的方法：**
+
+| 变化 | 说明 |
+|---|---|
+| 新增 `placementInfo()` | 返回 `PlacementInfo.NOT_PLACEABLE`（不走合成台摆放）|
+| 新增 `recipeBookCategory()` | 如 `RecipeBookCategories.CRAFTING_MISC` |
+| 新增 `display()` | 有默认实现，可不覆写 |
+| 移除 `assemble(input, registries)` | → `assemble(input)` |
+| 移除 `canCraftInDimensions` / `getResultItem` | — |
+
+**`HasCauldronSimple` / `HasCauldron` 改用 `Identifier`：**
+```java
+// 旧
+hasCauldron.fluid(BuiltInRegistries.FLUID.get(id));
+hasCauldron.transform(BuiltInRegistries.FLUID.get(id), produce);
+hasCauldron.hasFluid();  hasCauldron.transforms()
+// 新：直接传 Identifier；hasFluid/transforms 移除，改用空值常量判断
+hasCauldron.fluid(id);
+hasCauldron.transform(id).produce(produce);   // transform 与 produce 拆成两次调用
+HasCauldron.isNotEmpty(hasCauldron.fluid())    // EMPTY / NULL 两个哨兵
+```
+`HasCauldron` 的包是 `dev.dubhe.anvilcraft.recipe.anvil.predicate.block`
+（**不是** `recipe.component`，`HasCauldronSimple` 才在 `recipe.component`）。
+`WrapUtils.cauldron2Fluid(Block)` 现在返回 `Identifier`。
+
+### 粒子 API
+
+- `addParticle` 新增 `alwaysShow` 参数（取代 `addAlwaysVisibleParticle`）：
+  旧 8 参 → 新 9 参 `addParticle(opts, overrideLimiter, alwaysShow, x,y,z,vx,vy,vz)`。
+  原第二参 `true` 语义是 `overrideLimiter`，迁移时须补 `alwaysShow=false` **以保持原行为**。
+- `ItemParticleOption` 不再接受 `ItemStack`：改为 `Item` 或 `ItemStackTemplate`
+  （用 `ItemStackTemplate.fromNonEmptyStack(stack)` 转换）。
+
+### NBT 序列化（ValueInput / ValueOutput）
+
+```java
+// 旧                                   // 新
+saveAdditional(CompoundTag, Provider)   saveAdditional(ValueOutput)
+loadAdditional(CompoundTag, Provider)   loadAdditional(ValueInput)
+tag.putInt/getInt                       output.putInt / input.getIntOr(name, default)
+tag.contains(x) ? tag.getInt(x) : d     input.getIntOr(name, d)   // 一行完成
+tag.put(name, subTag)                   output.child(name) / input.childOrEmpty(name)
+tag.getUUID / putUUID                   移除！改用 UUIDUtil.CODEC / uuidToIntArray
+```
+- `InfinityFluidTank`：`writeToNBT/readFromNBT` → `serialize(ValueOutput)/deserialize(ValueInput)`
+- `ItemStackHandler`：`serializeNBT/deserializeNBT` → `serialize(ValueOutput)/deserialize(ValueInput)`
+- `ContainerHelper.saveAllItems/loadAllItems` 也已适配新 API。
+
+### 光照 API
+
+- `Level#getMaxBuildHeight` → `LevelHeightAccessor#getMaxY`
+- `BlockState#getLightBlock(level,pos)` → `getLightDampening()`
+  （与新版原版 `BeaconBlockEntity` 的写法一致，可直接照抄）
+
+### 剩余 40 个错误的性质（下一步）
+
+```
+HUD 体系（GuiGraphics -> GuiGraphicsExtractor）  8 处，5 个类
+ItemInteractionResult / InteractionResultHolder   6 处
+三个渲染 mixin（AnvilCraft 已删或改名目标类）     10 处
+ExistingFileHelper / MobSpawnType / InteractionMap /
+  EnchantedBookItem / Input / FluidStackPredicate 6 处
+LargeCauldronBlockEntityRendererMixin            6 处（方案见上文）
+FluidMixingRecipeSerializerMixin                 1 处（Serializer 变 private）
+```
 
 ### 独立方块模型的新写法（已落地，可复用）
 

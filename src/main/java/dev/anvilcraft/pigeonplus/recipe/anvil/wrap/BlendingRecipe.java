@@ -10,13 +10,13 @@ import dev.anvilcraft.pigeonplus.init.AddonBlocks;
 import dev.anvilcraft.pigeonplus.init.AddonRecipeTypes;
 import dev.dubhe.anvilcraft.recipe.anvil.util.WrapUtils;
 import dev.dubhe.anvilcraft.recipe.anvil.wrap.AbstractProcessRecipe;
+import dev.dubhe.anvilcraft.recipe.anvil.predicate.block.HasCauldron;
 import dev.dubhe.anvilcraft.recipe.component.HasCauldronSimple;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
@@ -61,55 +61,55 @@ public class BlendingRecipe extends AbstractProcessRecipe<BlendingRecipe> {
 
     public boolean isConsumeFluid() {
         HasCauldronSimple hasCauldron = this.getHasCauldron();
-        return hasCauldron.hasFluid() && hasCauldron.consume() > 0;
+        // 26.1 的 HasCauldronSimple 直接用 Identifier 表示流体，
+        // 原 hasFluid()/transforms() 已被移除，改用空值常量判断
+        return HasCauldron.isNotEmpty(hasCauldron.fluid()) && hasCauldron.consume() > 0;
     }
 
     public boolean isProduceFluid() {
         HasCauldronSimple hasCauldron = this.getHasCauldron();
-        return !hasCauldron.transforms().isEmpty() && hasCauldron.produce() > 0;
+        return HasCauldron.isNotEmpty(hasCauldron.transform()) && hasCauldron.produce() > 0;
     }
 
-    public static class Serializer implements RecipeSerializer<BlendingRecipe> {
-        private static final MapCodec<BlendingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            ItemIngredientPredicate.CODEC.listOf().optionalFieldOf("ingredients", List.of())
-                .forGetter(BlendingRecipe::getInputItems),
-            ChanceItemStack.CODEC.listOf().optionalFieldOf("results", List.of())
-                .forGetter(BlendingRecipe::getResultItems),
-            HasCauldronSimple.CODEC.forGetter(BlendingRecipe::getHasCauldron)
-        ).apply(instance, BlendingRecipe::new));
+    public static final MapCodec<BlendingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+        ItemIngredientPredicate.CODEC.listOf().optionalFieldOf("ingredients", List.of())
+            .forGetter(BlendingRecipe::getInputItems),
+        ChanceItemStack.CODEC.listOf().optionalFieldOf("results", List.of())
+            .forGetter(BlendingRecipe::getResultItems),
+        HasCauldronSimple.CODEC.forGetter(BlendingRecipe::getHasCauldron)
+    ).apply(instance, BlendingRecipe::new));
 
-        private static final StreamCodec<RegistryFriendlyByteBuf, BlendingRecipe> STREAM_CODEC =
-            StreamCodec.composite(
-                ItemIngredientPredicate.STREAM_CODEC.apply(ByteBufCodecs.list()),
-                BlendingRecipe::getInputItems,
-                ChanceItemStack.STREAM_CODEC.apply(ByteBufCodecs.list()),
-                BlendingRecipe::getResultItems,
-                HasCauldronSimple.STREAM_CODEC,
-                BlendingRecipe::getHasCauldron,
-                BlendingRecipe::new
-            );
+    public static final StreamCodec<RegistryFriendlyByteBuf, BlendingRecipe> STREAM_CODEC =
+        StreamCodec.composite(
+            ItemIngredientPredicate.STREAM_CODEC.apply(ByteBufCodecs.list()),
+            BlendingRecipe::getInputItems,
+            ChanceItemStack.STREAM_CODEC.apply(ByteBufCodecs.list()),
+            BlendingRecipe::getResultItems,
+            HasCauldronSimple.STREAM_CODEC,
+            BlendingRecipe::getHasCauldron,
+            BlendingRecipe::new
+        );
 
-        @Override
-        public MapCodec<BlendingRecipe> codec() {
-            return CODEC;
-        }
-
-        @Override
-        public StreamCodec<RegistryFriendlyByteBuf, BlendingRecipe> streamCodec() {
-            return STREAM_CODEC;
-        }
-    }
+    /**
+     * 序列化器。
+     *
+     * <p>26.1 起 {@code RecipeSerializer} 从接口变成了 record，
+     * 直接 {@code new RecipeSerializer<>(codec, streamCodec)} 即可，
+     * 不再需要自己实现 {@code codec()}/{@code streamCodec()} 的包装类。
+     */
+    public static final RecipeSerializer<BlendingRecipe> SERIALIZER =
+        new RecipeSerializer<>(CODEC, STREAM_CODEC);
 
     public static class Builder extends SimpleAbstractBuilder<BlendingRecipe, Builder> {
         private final HasCauldronSimple.Builder hasCauldron = HasCauldronSimple.empty();
 
         public Builder fluid(Identifier fluid) {
-            this.hasCauldron.fluid(BuiltInRegistries.FLUID.get(fluid));
+            this.hasCauldron.fluid(fluid);
             return this;
         }
 
         public Builder fluid(Block cauldron) {
-            this.hasCauldron.fluid(BuiltInRegistries.FLUID.get(WrapUtils.cauldron2Fluid(cauldron)));
+            this.hasCauldron.fluid(WrapUtils.cauldron2Fluid(cauldron));
             return this;
         }
 
@@ -118,7 +118,8 @@ public class BlendingRecipe extends AbstractProcessRecipe<BlendingRecipe> {
         }
 
         public Builder transform(Identifier transform, int produce) {
-            this.hasCauldron.transform(BuiltInRegistries.FLUID.get(transform), produce);
+            // 26.1 的 Builder 把 transform 与 produce 拆成两次调用
+            this.hasCauldron.transform(transform).produce(produce);
             return this;
         }
 
@@ -161,7 +162,7 @@ public class BlendingRecipe extends AbstractProcessRecipe<BlendingRecipe> {
             if (this.itemIngredients.isEmpty()) {
                 throw new IllegalArgumentException("Recipe ingredients must not be empty, RecipeId: " + id);
             }
-            if (this.results.isEmpty() && this.hasCauldron.build().transforms().isEmpty()) {
+            if (this.results.isEmpty() && !HasCauldron.isNotEmpty(this.hasCauldron.build().transform())) {
                 throw new IllegalArgumentException("Recipe must have results or a fluid transform, RecipeId: " + id);
             }
         }

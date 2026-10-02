@@ -19,12 +19,13 @@ public class AddonRecipeTypes {
 
     public static final DeferredHolder<RecipeType<?>, RecipeType<BlendingRecipe>> BLENDING_TYPE =
         registerType("blending");
+    // 26.1 的 RecipeSerializer 是 record，序列化器改为持有实例而非 Supplier
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<BlendingRecipe>> BLENDING_SERIALIZER =
-        RECIPE_SERIALIZERS.register("blending", BlendingRecipe.Serializer::new);
+        RECIPE_SERIALIZERS.register("blending", () -> BlendingRecipe.SERIALIZER);
     public static final DeferredHolder<RecipeType<?>, RecipeType<GasLiquefactionRecipe>> GAS_LIQUEFACTION_TYPE =
         registerType("gas_liquefaction");
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<GasLiquefactionRecipe>> GAS_LIQUEFACTION_SERIALIZER =
-        RECIPE_SERIALIZERS.register("gas_liquefaction", GasLiquefactionRecipe.Serializer::new);
+        RECIPE_SERIALIZERS.register("gas_liquefaction", () -> GasLiquefactionRecipe.SERIALIZER);
 
     private static <T extends Recipe<?>> DeferredHolder<RecipeType<?>, RecipeType<T>> registerType(String name) {
         return RECIPE_TYPES.register(
