@@ -105,6 +105,29 @@ $env:JAVA_HOME = "C:\Users\鸽の念\.jdks\jbr-25.0.3"
 | `net.neoforged.neoforge.client.model.generators` | **包已移除** | 2 处 |
 | `ExistingFileHelper` / `DynamicFluidContainerModel` / `RegisterAdditional` | 移位或移除 | |
 
+### 在 26.1.2 中**完全不存在**的类（已逐一核实，需结构性改造）
+
+这些不是改名，而是在 jar 里搜不到任何精确匹配，需要找替代概念或改写实现：
+
+```
+MobSpawnType                （曾用于实体生成）
+InteractionResultHolder     （交互返回值包装）
+DirectionProperty           （方块朝向属性）
+ItemInteractionResult       （物品交互结果）
+TextureSheetParticle        （粒子基类）
+ExistingFileHelper          （数据生成辅助）
+FluidStackPredicate         （AnvilCraft）
+FluidTankRenderUtil         （AnvilCraft）
+AbstractPipeCheckValveBlockEntity（AnvilCraft）
+```
+
+已确认存在（可直接改导入）：
+```
+LightTexture   -> net.minecraft.client.renderer.Lightmap
+BlockBehaviour.Properties -> net.minecraft.world.level.block.state.BlockBehaviour$Properties
+Input          -> net.minecraft.world.entity.player.Input
+```
+
 ### AnvilCraft 26.1.2 类迁移（已查证）
 
 ```
