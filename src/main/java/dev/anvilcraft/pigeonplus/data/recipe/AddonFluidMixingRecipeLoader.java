@@ -13,7 +13,7 @@ import java.util.List;
 public class AddonFluidMixingRecipeLoader {
     public static void init(RegistrumRecipeProvider provider) {
         provider.accept(
-            AnvilCraftPigeonPlus.of("fluid_mixing/mixed_biomass_to_gaseous_biogas"),
+            provider.safeKey(AnvilCraftPigeonPlus.of("fluid_mixing/mixed_biomass_to_gaseous_biogas")),
             new FluidMixingRecipe(
                 List.of(SizedFluidIngredient.of(AddonFluids.MIXED_BIOMASS.get(), FluidType.BUCKET_VOLUME)),
                 List.of(),

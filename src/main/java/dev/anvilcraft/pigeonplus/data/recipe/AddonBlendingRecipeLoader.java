@@ -9,8 +9,8 @@ import net.neoforged.neoforge.common.Tags;
 public class AddonBlendingRecipeLoader {
     public static void init(RegistrumRecipeProvider provider) {
         BlendingRecipe.builder()
-            .requires(Tags.Items.CROPS, 25)
+            .requires(provider.getItems(), Tags.Items.CROPS, 25)
             .transform(AddonBlocks.MIXED_BIOMASS_CAULDRON.get(), 250)
-            .save(provider, AnvilCraftPigeonPlus.of("blending/mixed_biomass_from_crops"));
+            .save(provider, provider.safeKey(AnvilCraftPigeonPlus.of("blending/mixed_biomass_from_crops")));
     }
 }
