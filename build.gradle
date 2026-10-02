@@ -36,7 +36,8 @@ apply from: "$rootDir/gradle/scripts/publishing.gradle"
 apply from: "$rootDir/gradle/scripts/resources.gradle"
 apply from: "$rootDir/dependencies.gradle"
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+// 26.1 起需要 Java 25（值来自 gradle.properties 的 java_version）
+java.toolchain.languageVersion = JavaLanguageVersion.of(java_version)
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 

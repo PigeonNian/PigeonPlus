@@ -2,6 +2,9 @@ dependencies {
     // Anvil Lib
     implementation(libs.anvillib)
 
+    // Ageratum（鸢尾）：AnvilCraft 26.1 新增的资源库依赖
+    implementation(libs.ageratum)
+
     // AnvilCraft
     implementation(libs.anvilcraft) { transitive = false }
     interfaceInjectionData(libs.anvilcraft) { transitive = false }

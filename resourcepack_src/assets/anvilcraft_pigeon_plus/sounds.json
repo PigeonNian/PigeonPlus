@@ -1,0 +1,53 @@
+{
+  "rocket_punch_charge": {
+    "replace": true,
+    "sounds": [
+      {
+        "name": "anvilcraft_pigeon_plus:rocket_punch_charge"
+      }
+    ],
+    "subtitle": "subtitles.anvilcraft_pigeon_plus.rocket_punch_charge"
+  },
+  "rocket_punch_cast": {
+    "replace": true,
+    "sounds": [
+      {
+        "name": "anvilcraft_pigeon_plus:rocket_punch_cast"
+      }
+    ],
+    "subtitle": "subtitles.anvilcraft_pigeon_plus.rocket_punch_cast"
+  },
+  "rocket_punch_hit": {
+    "replace": true,
+    "sounds": [
+      {
+        "name": "anvilcraft_pigeon_plus:rocket_punch_hit1"
+      },
+      {
+        "name": "anvilcraft_pigeon_plus:rocket_punch_hit2"
+      },
+      {
+        "name": "anvilcraft_pigeon_plus:rocket_punch_hit3"
+      }
+    ],
+    "subtitle": "subtitles.anvilcraft_pigeon_plus.rocket_punch_hit"
+  },
+  "seismic_slam_leap": {
+    "replace": true,
+    "sounds": [
+      {
+        "name": "anvilcraft_pigeon_plus:seismic_slam_leap"
+      }
+    ],
+    "subtitle": "subtitles.anvilcraft_pigeon_plus.seismic_slam_leap"
+  },
+  "seismic_slam_impact": {
+    "replace": true,
+    "sounds": [
+      {
+        "name": "anvilcraft_pigeon_plus:seismic_slam_impact"
+      }
+    ],
+    "subtitle": "subtitles.anvilcraft_pigeon_plus.seismic_slam_impact"
+  }
+}

@@ -7,7 +7,9 @@ publishing {
     publications {
         register('mavenJava', MavenPublication) {
             groupId = project.group
-            artifactId = project.archivesBaseName
+            // Gradle 9 移除了 project.archivesBaseName（在 Gradle 8 已弃用）。
+            // 归档名现在统一由 base.archivesName 提供，见 jars.gradle。
+            artifactId = project.base.archivesName.get()
             version = project.version
 
             from components.java

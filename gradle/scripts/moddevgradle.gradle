@@ -1,10 +1,8 @@
 neoForge {
     version = libs.versions.neoForge.get()
 
-    parchment {
-        mappingsVersion = project.parchment_mappings_version
-        minecraftVersion = project.parchment_minecraft_version
-    }
+    // 注意：AnvilCraft 26.1 起不再使用 Parchment 映射，这里同步移除。
+    // 若将来 Parchment 支持 26.1.2，可再补回 parchment {} 块。
 
     var isJbr = System.getProperty('java.vm.vendor').contains('JetBrains')
 
@@ -27,7 +25,9 @@ neoForge {
         }
 
         data {
-            data()
+            // 用 clientData() 而不是 data()：本模组有一个 includeClient() 的声音定义
+            // 提供器（sounds.json 属于客户端资源），只跑服务端数据生成会漏掉它。
+            clientData()
             programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
         }
 
@@ -35,6 +35,7 @@ neoForge {
             if (isJbr) {
                 jvmArgument "-XX:+AllowEnhancedClassRedefinition"
             }
+            jvmArgument "-XX:+IgnoreUnrecognizedVMOptions"
             systemProperty 'forge.logging.markers', 'REGISTRIES'
             logLevel = org.slf4j.event.Level.DEBUG
         }

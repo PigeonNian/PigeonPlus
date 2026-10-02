@@ -1,19 +1,25 @@
 repositories {
     mavenLocal()
-    mavenCentral()
-    maven { // Anvil Lib
-        name = "Cjsah Maven"
-        url = "https://server.cjsah.net:1002/maven/releases"
-        content {
+    // AnvilCraft 26.1 的新版地址与分组：注意路径由 .../maven/releases 变为 .../maven/，
+    // 且新增了 dev.anvilcraft.resource（Ageratum 所在分组）。
+    // 用 exclusiveContent 限定这些分组只从该仓库取，避免与 mavenCentral 的解析顺序打架。
+    exclusiveContent {
+        forRepositories(
+            mavenCentral(),
+            maven { // Anvil Lib / AnvilCraft / Ageratum
+                name = "Cjsah Maven"
+                url = "https://server.cjsah.net:1002/maven/"
+                content {
+                    includeGroup "dev.anvilcraft.lib"
+                    includeGroup "dev.anvilcraft.resource"
+                    includeGroup "dev.dubhe"
+                }
+            }
+        )
+        filter {
             includeGroup "dev.anvilcraft.lib"
+            includeGroup "dev.anvilcraft.resource"
             includeGroup "dev.dubhe"
-        }
-    }
-    maven { // Registrate Fork
-        name = "Ithundxr Maven"
-        url = "https://maven.ithundxr.dev/snapshots"
-        content {
-            includeGroup "com.tterrag.registrate"
         }
     }
     maven { // JEI
