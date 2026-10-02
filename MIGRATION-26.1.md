@@ -98,19 +98,57 @@ event.register(List.<BlockTintSource>of(state -> 0x6E5F2C), block);
 `ItemModel`（`net.neoforged.neoforge.client.model.item.`），流体桶染色改为数据驱动，
 所以物品染色注册整段可以去掉。
 
-### 剩余错误最集中的文件
+### 流体盒渲染的新写法（已查明，待实施）
 
+`FluidRenderHelper#renderFluidBox` 签名大改（旧版收 `FluidStack` + `MultiBufferSource`）：
+
+```java
+public void renderFluidBox(
+    TextureAtlasSprite sprite,      // 新增：贴图要从 FluidModel 取
+    FluidResource fluid,            // 由 FluidStack 改为 FluidResource
+    float minX, minY, minZ, maxX, maxY, maxZ,
+    int color,                      // 新增：染色值
+    VertexConsumer builder,
+    PoseStack.Pose pose,            // 由 MultiBufferSource 改为直接给 buffer + pose
+    int light,
+    boolean renderBottom,
+    boolean invertGasses
+)
 ```
-16x  mixin/client/LargeCauldronBlockEntityRendererMixin.java   （BER mixin，需按新结构重写）
-14x  client/renderer/block/StasisBeaconBlockEntityRenderer.java
-13x  block/entity/NozzleExhaustBlockEntity.java
-12x  integration/jei/category/BlendingCategory.java
-12x  recipe/GasLiquefactionRecipe.java
-12x  block/entity/StasisBeaconBlockEntity.java
-12x  block/FeedSpreaderBlock.java
-11x  data/provider/AddonSoundDefinitionsProvider.java
-10x  block/entity/CompressedAirDrainFluidHandler.java
+
+调用方要改成「在 `submitCustomGeometry` 的回调里画」：
+
+```java
+FluidModel model = FluidRenderHelper.getModel(
+    Minecraft.getInstance().getModelManager().getFluidStateModelSet(),
+    resource.getFluid());
+var tintSource = model.fluidTintSource();
+int tintColor = tintSource == null ? -1 : tintSource.colorAsStack(resource.toStack(1));
+TextureAtlasSprite sprite = model.stillMaterial().sprite();
+
+submitNodeCollector.submitCustomGeometry(poseStack, FLUID_RENDER_TYPE, (pose, buffer) ->
+    FluidRenderHelper.INSTANCE.renderFluidBox(
+        sprite, resource, minX, minY, minZ, maxX, maxY, maxZ,
+        tintColor, buffer, pose, state.lightCoords, true, false));
 ```
+
+`FLUID_RENDER_TYPE` 取自 AnvilCraft 的 `BaseFluidHandlerHolderRenderer.FLUID_RENDER_TYPE`。
+参考实现：AnvilCraft `LargeCauldronBlockEntityRenderer#submitFluids`。
+
+### 大炼药锅 BER mixin 的重写方向（待实施）
+
+AnvilCraft 的 `LargeCauldronBlockEntityRenderer` 已改为
+`BlockEntityRenderer<LargeCauldronBlockEntity, LargeCauldronRenderState>`，
+我们 mixin 里的三个注入点需要重新定位：
+
+| 原注入 | 新的做法 |
+|---|---|
+| `@Inject(method="render", TAIL)` 渲染喷口盖板 | 改注入 `submit` 的 TAIL；坐标从 `state.blockPos` 取，`level` 从 `Minecraft.getInstance().level` 取 |
+| `@Inject(method="drawFluids", HEAD)` 画气体层 | `drawFluids` 已改名 `submitFluids(state, poseStack, submitNodeCollector)`；改用 `submitCustomGeometry` |
+| `@Redirect(method="render", drawFire)` 隐藏火焰 | 火焰现在是 `state.getFire()`（`BlockModelRenderState`）。更干净的做法：注入 `extractRenderState` 的 TAIL，有推进剂时把 fire 状态清空 |
+
+若要连同喷口盖板一起渲染，`LargeCauldronAttachmentModels.TOP/BOTTOM` 已经定义好。
+
 
 ### 客户端渲染体系的三处结构变更（已查证，第四批）
 
