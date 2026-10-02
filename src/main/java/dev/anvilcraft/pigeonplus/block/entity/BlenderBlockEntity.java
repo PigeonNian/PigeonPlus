@@ -108,17 +108,17 @@ public class BlenderBlockEntity extends BlockEntity {
         }
 
         @Override
-        public int fill(FluidStack resource, FluidAction action) {
+        public int fill(FluidStack resource, IFluidHandler.FluidAction action) {
             return compressedAirTank.fill(resource, action);
         }
 
         @Override
-        public FluidStack drain(FluidStack resource, FluidAction action) {
+        public FluidStack drain(FluidStack resource, IFluidHandler.FluidAction action) {
             return FluidStack.EMPTY;
         }
 
         @Override
-        public FluidStack drain(int maxDrain, FluidAction action) {
+        public FluidStack drain(int maxDrain, IFluidHandler.FluidAction action) {
             return FluidStack.EMPTY;
         }
     }

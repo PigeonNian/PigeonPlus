@@ -41,46 +41,42 @@ $env:JAVA_HOME = "C:\Users\鸽の念\.jdks\jbr-25.0.3"
 
 ## 编译现状
 
-构建配置已通过（`gradlew help` 成功）。
+**度量方法**：日志里错误列表会出现两遍，且同一行可能报多个错误。
+唯一可信的指标是「去重后的 `文件:行` 位置数」。用：
 
-> **重要：以 `-Xmaxerrs 10000` 为准。**
-> javac 默认只报 100 个错误就截断，此前看到的「189 / 200 个错误」全是
-> `100 错误 × 2 行` 的假象，会严重低估工作量。已在 `build.gradle` 里设置
-> `options.compilerArgs << "-Xmaxerrs" << "10000"`，务必用真实数字判断进度。
+```powershell
+$enc = [System.Text.UTF8Encoding]::new($false, $false)   # 容错解码，日志是混合编码
+$text = [System.IO.File]::ReadAllText($err, $enc)
+$m = [regex]::Matches($text, '\\([^\\]+\.java):(\d+): 错误: ')
+($m | ForEach-Object { "$($_.Groups[1].Value):$($_.Groups[2].Value)" } | Sort-Object -Unique).Count
+```
 
-**真实规模：1010 个错误 / 76 个文件**（完成第一批机械修复后为 **926**）。
-
-### 真实错误分类（1010 时）
-
-| 数量 | 错误 | 说明 |
-|---|---|---|
-| 582 | 找不到符号 | 见下方 API 对照 |
-| 116 | 方法不会覆盖或实现超类型的方法 | 签名变更，主要是 BER / 渲染体系 |
-| 32 | 无法从静态上下文引用非静态 `has(ItemLike)` | `RegistrumRecipeProvider.has()` 由静态变实例 |
-| 28 | `random` 在 `Level` 中是 protected | → `level.getRandom()` |
-| 24 | `isClientSide` 在 `Level` 中是 private | → `level.isClientSide()` |
-| 14 | lambda 参数类型不兼容 | |
-| 12 | `ResourceHandler<FluidResource>` 无法转为 `IFluidHandler` | 流体能力 API 变更 |
-| 12 | `ModClientFluidTypeExtensionImpl` 构造器不匹配 | 我们自己的类 + NeoForge API |
-| 10 | `Optional<Integer>` 无法转为 `int` | |
-| 10 | `addParticle` 签名不匹配 | |
-| 10 | `registerBlockEntityRenderer` 类型不匹配 | BER 需要 2 个类型参数 |
-| 10 | `FluidRenderHelper.renderFluidBox` 不匹配 | |
-| 10 | `BlockEntity.loadAdditional` 不匹配 | 签名变更 |
-
-### 已完成的第一批机械修复（1010 → 926）
-
-| 修复 | 处数 |
+| 阶段 | 唯一错误位置 |
 |---|---|
-| `ResourceLocation` → `Identifier` | 78（14 文件）|
-| `advancements.critereon` → `advancements.criterion` | 3 文件 |
-| `implements SimpleInstance` → `SimpleInstance`（内部类） | 3 文件 |
-| `RenderType.X()` → `RenderTypes.X()`（含 `beaconBeam`/`lines`/`cutoutMovingBlock`/`translucentMovingBlock`）| 4 文件 |
-| AnvilLib `providers.RegistrumRecipeProvider` → `providers.generators.` | 6 文件 |
-| AnvilCraft 类包路径迁移 | 7 文件 |
-| `RegistrumRecipeProvider.has()` → `provider.has()` | 16 |
-| `level.isClientSide` → `level.isClientSide()` | 12 |
-| `level.random` → `level.getRandom()` | 14 |
+| 初始（配置迁移完成） | 417 |
+| 第一批机械替换后 | 387 |
+| 第二批（粒子 + datagen）后 | 336 |
+| 第三批（FluidAction 等）后 | **331** |
+
+### 剩余错误最集中的文件
+
+```
+42x  client/AnvilCraftPigeonPlusClient.java   （客户端入口：模型/GUI层/BER/流体的注册）
+21x  client/renderer/block/FeedSpreaderBlockEntityRenderer.java
+17x  client/renderer/block/BlenderBlockEntityRenderer.java
+16x  mixin/client/LargeCauldronBlockEntityRendererMixin.java
+15x  block/entity/CompressedAirDrainFluidHandler.java
+14x  client/renderer/block/StasisBeaconBlockEntityRenderer.java
+13x  block/entity/NozzleExhaustBlockEntity.java
+12x  integration/jei/category/BlendingCategory.java
+12x  recipe/GasLiquefactionRecipe.java
+12x  block/FeedSpreaderBlock.java
+12x  block/entity/StasisBeaconBlockEntity.java
+11x  data/provider/AddonSoundDefinitionsProvider.java
+ 9x  client/renderer/block/AnvilPumpBlockEntityRenderer.java
+ 9x  block/entity/FeedSpreaderBlockEntity.java
+ 9x  recipe/anvil/wrap/BlendingRecipe.java
+```
 
 ### 已确认的 API 变更对照
 

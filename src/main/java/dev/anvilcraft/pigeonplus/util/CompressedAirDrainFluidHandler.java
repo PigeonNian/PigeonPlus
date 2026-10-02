@@ -83,12 +83,12 @@ public class CompressedAirDrainFluidHandler extends InfinityFluidTank {
     }
 
     @Override
-    public int fill(FluidStack resource, FluidAction action) {
+    public int fill(FluidStack resource, IFluidHandler.FluidAction action) {
         return this.delegate.fill(resource, action);
     }
 
     @Override
-    public @NotNull FluidStack drain(FluidStack resource, FluidAction action) {
+    public @NotNull FluidStack drain(FluidStack resource, IFluidHandler.FluidAction action) {
         if (resource.getFluid().isSame(AddonFluids.COMPRESSED_AIR.get()) && this.canExtractAir()) {
             int amount = Math.min(resource.getAmount(), AIR_CAPACITY);
             this.spawnAirIntakeParticles(amount, action);
@@ -98,7 +98,7 @@ public class CompressedAirDrainFluidHandler extends InfinityFluidTank {
     }
 
     @Override
-    public @NotNull FluidStack drain(int maxDrain, FluidAction action) {
+    public @NotNull FluidStack drain(int maxDrain, IFluidHandler.FluidAction action) {
         FluidStack drained = this.delegate.drain(maxDrain, action);
         if (!drained.isEmpty()) {
             return drained;
@@ -111,8 +111,8 @@ public class CompressedAirDrainFluidHandler extends InfinityFluidTank {
         return new FluidStack(AddonFluids.COMPRESSED_AIR.get(), amount);
     }
 
-    private void spawnAirIntakeParticles(int amount, FluidAction action) {
-        if (action != FluidAction.EXECUTE || amount <= 0 || !(this.level instanceof ServerLevel serverLevel)) {
+    private void spawnAirIntakeParticles(int amount, IFluidHandler.FluidAction action) {
+        if (action != IFluidHandler.FluidAction.EXECUTE || amount <= 0 || !(this.level instanceof ServerLevel serverLevel)) {
             return;
         }
         RandomSource random = serverLevel.getRandom();
