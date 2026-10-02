@@ -57,7 +57,60 @@ $m = [regex]::Matches($text, '\\([^\\]+\.java):(\d+): 错误: ')
 | 第一批机械替换后 | 387 |
 | 第二批（粒子 + datagen）后 | 336 |
 | 第三批（FluidAction 等）后 | 331 |
-| 第四批（客户端入口：流体类型/事件/矩阵）后 | **315**（69 个文件）|
+| 第四批（客户端入口：流体类型/事件/矩阵）后 | 315（69 个文件）|
+| 第五批（BER 三段式 + 独立模型注册）后 | **266** |
+
+### 独立方块模型的新写法（已落地，可复用）
+
+26.1 没有「可直接丢给渲染器的模型对象」了，渲染一个独立模型要走：
+
+```java
+// 1) 顶层静态常量（使用点所在类里）
+public static final StandaloneModelKey<BlockStateModel> MY_MODEL =
+    StandaloneBlockModels.key("block/my_model");
+
+// 2) 在 ModelEvent.RegisterStandalone 里注册
+StandaloneBlockModels.register(event, MY_MODEL, id("block/my_model"));
+
+// 3) 在 BER 的 submit() 里绘制
+StandaloneBlockModels.submit(poseStack, collector, MY_MODEL, lightCoords, OverlayTexture.NO_OVERLAY);
+```
+
+底层做的事（`StandaloneBlockModels` 已封装）：
+- 注册：`SimpleUnbakedStandaloneModel.blockStateModel(id)`；
+- 取模型：`Minecraft.getInstance().getModelManager().getStandaloneModel(key)`；
+- 展开：`BlockStateModel.collectParts(RandomSource, List<BlockStateModelPart>)`；
+- 提交：`SubmitNodeCollector#submitBlockModel(poseStack, RenderType, parts, int[] tints, light, overlay, outline)`；
+- 渲染层用 `Sheets.cutoutBlockSheet()`（这些附加模型都带镂空）。
+
+**已按新结构重写的 BER**（零错误）：
+`AnvilPumpBlockEntityRenderer`、`BlenderBlockEntityRenderer`、`FeedSpreaderBlockEntityRenderer`。
+
+### 颜色注册改为「染色来源」模型
+
+```java
+// 方块：注册 BlockTintSource 的**列表**（每个 tintIndex 一个）
+event.register(List.<BlockTintSource>of(state -> 0x6E5F2C), block);
+
+// 物品：RegisterColorHandlersEvent.ItemTintSources，注册 ItemTintSource + MapCodec
+```
+`DynamicFluidContainerModel.Colors` **已删除**；`DynamicFluidContainerModel` 本身改为完整
+`ItemModel`（`net.neoforged.neoforge.client.model.item.`），流体桶染色改为数据驱动，
+所以物品染色注册整段可以去掉。
+
+### 剩余错误最集中的文件
+
+```
+16x  mixin/client/LargeCauldronBlockEntityRendererMixin.java   （BER mixin，需按新结构重写）
+14x  client/renderer/block/StasisBeaconBlockEntityRenderer.java
+13x  block/entity/NozzleExhaustBlockEntity.java
+12x  integration/jei/category/BlendingCategory.java
+12x  recipe/GasLiquefactionRecipe.java
+12x  block/entity/StasisBeaconBlockEntity.java
+12x  block/FeedSpreaderBlock.java
+11x  data/provider/AddonSoundDefinitionsProvider.java
+10x  block/entity/CompressedAirDrainFluidHandler.java
+```
 
 ### 客户端渲染体系的三处结构变更（已查证，第四批）
 

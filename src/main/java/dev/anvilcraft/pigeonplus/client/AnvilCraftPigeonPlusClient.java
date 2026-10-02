@@ -13,6 +13,10 @@ import dev.anvilcraft.pigeonplus.client.render.SlamHandAnimation;
 import dev.anvilcraft.pigeonplus.client.render.SlamIndicatorRenderer;
 import dev.anvilcraft.pigeonplus.client.render.UppercutHandAnimation;
 import dev.anvilcraft.pigeonplus.client.particle.RollingPlasmaParticle;
+import dev.anvilcraft.pigeonplus.client.renderer.block.StandaloneBlockModels;
+import dev.anvilcraft.pigeonplus.client.renderer.block.LargeCauldronAttachmentModels;
+import dev.anvilcraft.pigeonplus.client.renderer.block.FeedSpreaderBlockEntityRenderer;
+import dev.anvilcraft.pigeonplus.client.renderer.block.AnvilPumpBlockEntityRenderer;
 import dev.anvilcraft.pigeonplus.client.renderer.block.AnvilPumpBlockEntityRenderer;
 import dev.anvilcraft.pigeonplus.client.renderer.block.BlenderBlockEntityRenderer;
 import dev.anvilcraft.pigeonplus.client.renderer.block.FeedSpreaderBlockEntityRenderer;
@@ -30,7 +34,7 @@ import dev.anvilcraft.pigeonplus.util.DoomfistEnchantmentUtil;
 import dev.anvilcraft.pigeonplus.util.SkillCooldowns;
 import dev.dubhe.anvilcraft.util.ModClientFluidTypeExtensionImpl;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import dev.anvilcraft.pigeonplus.client.renderer.block.BlenderBlockEntityRenderer;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.neoforged.api.distmarker.Dist;
@@ -48,17 +52,19 @@ import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.event.RenderHandEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
-import net.neoforged.neoforge.client.model.DynamicFluidContainerModel;
+import net.minecraft.client.color.block.BlockTintSource;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import dev.dubhe.anvilcraft.api.tooltip.HudTooltipManager;
+
+import java.util.List;
 
 @Mod(value = AnvilCraftPigeonPlus.MOD_ID, dist = Dist.CLIENT)
 public class AnvilCraftPigeonPlusClient {
     public static final AddonClientConfig CLIENT_CONFIG = ConfigManager.register(AnvilCraftPigeonPlus.MOD_ID, AddonClientConfig::new);
 
     public AnvilCraftPigeonPlusClient(IEventBus modBus, ModContainer container) {
-        modBus.addListener(this::onRegisterAdditionalModels);
+        modBus.addListener(this::onRegisterStandaloneModels);
         modBus.addListener(this::onRegisterBER);
         modBus.addListener(this::onClientSetup);
         modBus.addListener(this::onRegisterClientExtensions);
@@ -158,28 +164,36 @@ public class AnvilCraftPigeonPlusClient {
         AddonItemTooltipManager.addTooltip(event.getItemStack(), event.getToolTip());
     }
 
-    private void onRegisterAdditionalModels(ModelEvent.RegisterAdditional event) {
-        Identifier bottom = Identifier.fromNamespaceAndPath(
-            AnvilCraftPigeonPlus.MOD_ID, "block/blender_bottom");
-        Identifier top = Identifier.fromNamespaceAndPath(
-            AnvilCraftPigeonPlus.MOD_ID, "block/blender_top");
-        Identifier anvilPumpPiston = Identifier.fromNamespaceAndPath(
-            AnvilCraftPigeonPlus.MOD_ID, "block/anvil_pump_pistion");
-        Identifier largeCauldronTop = Identifier.fromNamespaceAndPath(
-            AnvilCraftPigeonPlus.MOD_ID, "block/large_cauldron_top");
-        Identifier largeCauldronBottom = Identifier.fromNamespaceAndPath(
-            AnvilCraftPigeonPlus.MOD_ID, "block/large_cauldron_bottom");
-        Identifier feedSpreaderBucket = Identifier.fromNamespaceAndPath(
-            AnvilCraftPigeonPlus.MOD_ID, "block/feed_spreader_bucket");
-        Identifier feedSpreaderPiston = Identifier.fromNamespaceAndPath(
-            AnvilCraftPigeonPlus.MOD_ID, "block/feed_spreader_piston");
-        event.register(new ModelResourceLocation(bottom, "standalone"));
-        event.register(new ModelResourceLocation(top, "standalone"));
-        event.register(new ModelResourceLocation(anvilPumpPiston, "standalone"));
-        event.register(new ModelResourceLocation(largeCauldronTop, "standalone"));
-        event.register(new ModelResourceLocation(largeCauldronBottom, "standalone"));
-        event.register(new ModelResourceLocation(feedSpreaderBucket, "standalone"));
-        event.register(new ModelResourceLocation(feedSpreaderPiston, "standalone"));
+    /**
+     * 注册 BER 用到的「独立方块模型」。
+     *
+     * <p>26.1 把 {@code ModelEvent.RegisterAdditional} 换成了
+     * {@link ModelEvent.RegisterStandalone}，且 API 完全不同：
+     * 旧写法是 {@code event.register(new ModelResourceLocation(id, "standalone"))}，
+     * 现在是「{@code StandaloneModelKey} + {@code UnbakedStandaloneModel}」配对注册，
+     * 烘焙后用 {@code ModelManager.getStandaloneModel(key)} 取回。
+     *
+     * <p>因此每个模型都需要一个稳定的 key 常量，它们定义在各自的 BER 里，
+     * 这里统一注册，避免注册点与使用点分散在两处而对不上。
+     */
+    private void onRegisterStandaloneModels(ModelEvent.RegisterStandalone event) {
+        StandaloneBlockModels.register(event, AnvilPumpBlockEntityRenderer.PISTON,
+            pigeonplus$id("block/anvil_pump_pistion"));
+        StandaloneBlockModels.register(event, FeedSpreaderBlockEntityRenderer.BUCKET_MODEL,
+            pigeonplus$id("block/feed_spreader_bucket"));
+        StandaloneBlockModels.register(event, FeedSpreaderBlockEntityRenderer.PISTON_MODEL,
+            pigeonplus$id("block/feed_spreader_piston"));
+        StandaloneBlockModels.register(event, BlenderBlockEntityRenderer.TOP_MODEL,
+            pigeonplus$id("block/blender_top"));
+        StandaloneBlockModels.register(event, LargeCauldronAttachmentModels.TOP,
+            pigeonplus$id("block/large_cauldron_top"));
+        StandaloneBlockModels.register(event, LargeCauldronAttachmentModels.BOTTOM,
+            pigeonplus$id("block/large_cauldron_bottom"));
+    }
+
+    /** 本模组的资源 id。 */
+    private static Identifier pigeonplus$id(String path) {
+        return Identifier.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, path);
     }
 
     private void onRegisterBER(EntityRenderersEvent.RegisterRenderers event) {
@@ -245,29 +259,41 @@ public class AnvilCraftPigeonPlusClient {
         );
     }
 
-    private void onRegisterItemColors(RegisterColorHandlersEvent.Item event) {
-        DynamicFluidContainerModel.Colors colors = new DynamicFluidContainerModel.Colors();
+    /**
+     * 方块染色。
+     *
+     * <p>26.1 把 {@code RegisterColorHandlersEvent.Block} 换成了
+     * {@link RegisterColorHandlersEvent.BlockTintSources}：不再是「注册一个
+     * {@code BlockColor} 函数」，而是要提供 {@link BlockTintSource} 的**列表**
+     * （每个 tintIndex 一个来源），与原版红石线等方块的写法一致。
+     *
+     * <p>本模组只有混合生物质炼药锅需要染色：tintIndex 0 是液面，其余部件用白色
+     * （即不改变原贴图颜色）。
+     */
+    private void onRegisterBlockColors(RegisterColorHandlersEvent.BlockTintSources event) {
         event.register(
-            colors,
-            AddonItems.GASEOUS_BIOGAS_BUCKET.get(),
-            AddonItems.COMPRESSED_AIR_BUCKET.get(),
-            AddonItems.MIXED_BIOMASS_BUCKET.get()
-        );
-        event.register(
-            (stack, tintIndex) -> {
-                int color = colors.getColor(stack, tintIndex);
-                return (color & 0x00FFFFFF) | 0xFF000000;
-            },
-            AddonItems.LIQUEFIED_BIOGAS_BUCKET.get(),
-            AddonItems.LIQUID_OXYGEN_BUCKET.get()
+            List.<BlockTintSource>of(state -> 0x6E5F2C),
+            AddonBlocks.MIXED_BIOMASS_CAULDRON.get()
         );
     }
 
-    private void onRegisterBlockColors(RegisterColorHandlersEvent.Block event) {
-        event.register(
-            (state, level, pos, tintIndex) -> tintIndex == 0 ? 0x6E5F2C : 0xFFFFFF,
-            AddonBlocks.MIXED_BIOMASS_CAULDRON.get()
-        );
+    /**
+     * 物品染色。
+     *
+     * <p>原先这里用 {@code DynamicFluidContainerModel.Colors} 给流体桶染色，
+     * 但该类在 26.1 已被重写为完整的 {@code ItemModel}
+     * （{@code net.neoforged.neoforge.client.model.item.DynamicFluidContainerModel}），
+     * 不再暴露 {@code Colors}；流体的贴图与颜色改为**数据驱动**，
+     * 由桶的模型定义里声明的流体自行决定。
+     *
+     * <p>因此这里不再需要注册任何物品染色来源，方法保留为空壳仅作说明。
+     * 若将来确有自定义物品染色需求，应改为实现
+     * {@code ItemTintSource} 并通过
+     * {@link RegisterColorHandlersEvent.ItemTintSources} 注册
+     * （需要同时提供 {@code MapCodec}，因为 26.1 的染色来源是可在模型里引用的类型）。
+     */
+    private void onRegisterItemColors(RegisterColorHandlersEvent.ItemTintSources event) {
+        // 无需注册：流体桶的染色由数据驱动
     }
 
     private void onRegisterParticleProviders(RegisterParticleProvidersEvent event) {
