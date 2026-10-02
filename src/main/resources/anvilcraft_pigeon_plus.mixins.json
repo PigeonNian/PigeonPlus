@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "dev.anvilcraft.pigeonplus.mixin",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_25",
   "mixins": [
     "AbstractMultiPartBlockMixin",
     "AnvilHammerItemMixin",
@@ -19,6 +19,7 @@
   ],
   "client": [
     "LivingEntityTravelMixin",
+    "client.ClientInputAccessor",
     "client.EntityClientMixin",
     "client.GasTankFillMixin",
     "client.KeyboardInputMixin",

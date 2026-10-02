@@ -29,10 +29,8 @@ public class AddonFluids {
         Registries.FLUID,
         AnvilCraftPigeonPlus.MOD_ID
     );
-    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(
-        Registries.BLOCK,
-        AnvilCraftPigeonPlus.MOD_ID
-    );
+    public static final DeferredRegister.Blocks BLOCKS =
+        DeferredRegister.createBlocks(AnvilCraftPigeonPlus.MOD_ID);
 
     public static final DeferredHolder<FluidType, FluidType> GASEOUS_BIOGAS_TYPE = FLUID_TYPES.register(
         "gaseous_biogas",
@@ -73,9 +71,9 @@ public class AddonFluids {
         () -> new BaseFlowingFluid.Flowing(liquefiedBiogasProperties())
     );
 
-    public static final DeferredHolder<Block, LiquidBlock> LIQUEFIED_BIOGAS_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, LiquidBlock> LIQUEFIED_BIOGAS_BLOCK = BLOCKS.registerBlock(
         "liquefied_biogas",
-        () -> new EvaporatingLiquidBlock(LIQUEFIED_BIOGAS.get(), BlockBehaviour.Properties.of()
+        props -> new EvaporatingLiquidBlock(LIQUEFIED_BIOGAS.get(), props
             .replaceable()
             .noCollision()
             .strength(100.0f)
@@ -125,9 +123,9 @@ public class AddonFluids {
         () -> new BaseFlowingFluid.Flowing(mixedBiomassProperties())
     );
 
-    public static final DeferredHolder<Block, MixedBiomassBlock> MIXED_BIOMASS_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, MixedBiomassBlock> MIXED_BIOMASS_BLOCK = BLOCKS.registerBlock(
         "mixed_biomass",
-        () -> new MixedBiomassBlock(MIXED_BIOMASS.get(), BlockBehaviour.Properties.of()
+        props -> new MixedBiomassBlock(MIXED_BIOMASS.get(), props
             .replaceable()
             .noCollision()
             .strength(100.0f)
@@ -157,9 +155,9 @@ public class AddonFluids {
         () -> new BaseFlowingFluid.Flowing(liquidOxygenProperties())
     );
 
-    public static final DeferredHolder<Block, LiquidBlock> LIQUID_OXYGEN_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, LiquidBlock> LIQUID_OXYGEN_BLOCK = BLOCKS.registerBlock(
         "liquid_oxygen",
-        () -> new EvaporatingLiquidBlock(LIQUID_OXYGEN.get(), BlockBehaviour.Properties.of()
+        props -> new EvaporatingLiquidBlock(LIQUID_OXYGEN.get(), props
             .replaceable()
             .noCollision()
             .strength(100.0f)
@@ -191,9 +189,9 @@ public class AddonFluids {
         () -> new BaseFlowingFluid.Flowing(liquidHydrogenProperties())
     );
 
-    public static final DeferredHolder<Block, LiquidBlock> LIQUID_HYDROGEN_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, LiquidBlock> LIQUID_HYDROGEN_BLOCK = BLOCKS.registerBlock(
         "liquid_hydrogen",
-        () -> new EvaporatingLiquidBlock(LIQUID_HYDROGEN.get(), BlockBehaviour.Properties.of()
+        props -> new EvaporatingLiquidBlock(LIQUID_HYDROGEN.get(), props
             .replaceable()
             .noCollision()
             .strength(100.0f)
