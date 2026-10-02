@@ -63,7 +63,13 @@ public class LargeCauldronBlockEntityRendererMixin {
     @Unique
     private static final float PIGEONPLUS_MAX_Y = 1.75F - 0.001F;
     /**
-     * 提取阶段：气体抬满 + 有推进剂时熄火。
+     * 提取阶段：有推进剂时熄火。
+     *
+     * <p>气体的「铺满」不再在这里改数据：AnvilCraft 把流体层渲染抽成了
+     * {@link FluidRenderLayers}，其中的 {@code create} 会按
+     * {@code fluidType.isLighterThanAir()} 自动把气体铺满剩余空间
+     * （见其源码：气体按「剩余高度 / 气体种数」均分，而不是按体积）。
+     * 因此本模组原先自己实现的「抬到满容量」已成为多余逻辑。
      */
     @Inject(method = "extractRenderState", at = @At("RETURN"))
     private void pigeonplus$adjustLargeCauldronState(
@@ -77,27 +83,6 @@ public class LargeCauldronBlockEntityRendererMixin {
         // 有推进剂时把火焰状态清空，等价于原先「隐藏点燃火焰贴图」
         if (NozzleExhaustUtil.hasAnyPropellant(cauldron)) {
             state.setFire(null);
-        }
-
-        List<LargeCauldronRenderState.FluidLayerRenderState> fluids = state.getFluids();
-        if (fluids.isEmpty()) {
-            return;
-        }
-        boolean hasGas = false;
-        List<LargeCauldronRenderState.FluidLayerRenderState> adjusted = new ArrayList<>(fluids.size());
-        for (LargeCauldronRenderState.FluidLayerRenderState layer : fluids) {
-            if (layer.resource().getFluid() instanceof GasFluid) {
-                hasGas = true;
-                // 抬到满容量：AnvilCraft 的 submitFluids 会据此画出满层
-                adjusted.add(new LargeCauldronRenderState.FluidLayerRenderState(
-                    layer.resource(), LargeCauldronFluidHandler.TOTAL_CAPACITY));
-            } else {
-                adjusted.add(layer);
-            }
-        }
-        if (hasGas) {
-            fluids.clear();
-            fluids.addAll(adjusted);
         }
     }
 

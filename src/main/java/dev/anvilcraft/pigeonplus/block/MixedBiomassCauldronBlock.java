@@ -40,17 +40,33 @@ public class MixedBiomassCauldronBlock extends Layered4LevelCauldronBlock implem
         return interaction.interact(state, level, pos, player, hand, stack);
     }
 
+    /**
+     * 26.1 的 {@code entityInside} 新增 {@code InsideBlockEffectApplier} 与 boolean 两个参数。
+     * 本模组的炼药锅不需要方块内效果派发，故忽略它们。
+     */
     @Override
-    public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+    public void entityInside(
+        BlockState state,
+        Level level,
+        BlockPos pos,
+        Entity entity,
+        net.minecraft.world.entity.InsideBlockEffectApplier effectApplier,
+        boolean isInside
+    ) {
     }
 
+    /**
+     * 26.1 把 {@code getCloneItemStack} 的签名由
+     * {@code (BlockState, HitResult, LevelReader, BlockPos, Player)}
+     * 改为 {@code (LevelReader, BlockPos, BlockState, boolean)}，
+     * 且不再需要 {@code HitResult} 与 {@code Player}。
+     */
     @Override
-    public ItemStack getCloneItemStack(
-        BlockState state,
-        HitResult target,
+    protected ItemStack getCloneItemStack(
         LevelReader level,
         BlockPos pos,
-        Player player
+        BlockState state,
+        boolean includeData
     ) {
         return new ItemStack(Items.CAULDRON);
     }

@@ -93,8 +93,9 @@ public class LargeCauldronBlockEntityMixin {
     @Unique
     private static boolean pigeonplus$isMixedBiomassRecipe(FluidMixingRecipe recipe) {
         return recipe.getFluidIngredients().size() == 1
-            && Arrays.stream(recipe.getFluidIngredients().getFirst().getFluids())
-                .anyMatch(fluid -> fluid.getFluid().isSame(AddonFluids.MIXED_BIOMASS.get()))
+            && recipe.getFluidIngredients().getFirst().ingredient().fluids().stream()
+                // fluids() 返回 Holder<Fluid>，取值需用 value()
+                .anyMatch(fluid -> fluid.value().isSame(AddonFluids.MIXED_BIOMASS.get()))
             && recipe.getFluidResults().stream()
                 .anyMatch(fluid -> fluid.getFluid().isSame(AddonFluids.GASEOUS_BIOGAS.get()));
     }

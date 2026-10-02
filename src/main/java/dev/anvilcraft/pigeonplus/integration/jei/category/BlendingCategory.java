@@ -191,7 +191,7 @@ public class BlendingCategory extends AbstractProgressCategory<BlendingRecipe> {
         }
         // AnvilCraft 2386 的 HasCauldronSimple 用 FluidStackPredicate 描述流体
         FluidStackPredicate predicate = recipe.getHasCauldron().fluid();
-        if (predicate.fluids().isPresent() && !predicate.fluids().get().isEmpty()) {
+        if (predicate.fluids().isPresent() && predicate.fluids().get().size() > 0) {
             return CauldronUtil.fullState(
                 HasCauldron.getDefaultCauldron(predicate.fluids().get().stream().findFirst().orElseThrow().value())
             );

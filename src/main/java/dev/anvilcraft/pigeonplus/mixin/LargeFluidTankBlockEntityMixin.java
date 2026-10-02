@@ -115,10 +115,12 @@ public abstract class LargeFluidTankBlockEntityMixin {
                 continue;
             }
             List<GasLiquefactionRecipe> recipes = new ArrayList<>();
-            for (var holder : server.getRecipeManager().getAllRecipesFor(
-                    AddonRecipeTypes.GAS_LIQUEFACTION_TYPE.get())) {
-                if (holder.value().input().getFluid().isSame(resource.getFluid())) {
-                    recipes.add(holder.value());
+            // 26.1 移除了 RecipeManager#getAllRecipesFor；
+            // 改为遍历 getRecipes() 并按类型过滤（本模组的液化配方数量极少，开销可忽略）
+            for (var holder : server.getRecipeManager().getRecipes()) {
+                if (holder.value() instanceof GasLiquefactionRecipe recipe
+                    && recipe.input().getFluid().isSame(resource.getFluid())) {
+                    recipes.add(recipe);
                 }
             }
             if (!recipes.isEmpty()) {

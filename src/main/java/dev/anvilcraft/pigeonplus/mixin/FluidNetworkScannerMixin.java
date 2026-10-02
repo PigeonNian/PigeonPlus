@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -129,7 +130,9 @@ public abstract class FluidNetworkScannerMixin {
         Map<BlockPos, Direction> diodes = new HashMap<>();
         Map<BlockPos, Map<Direction, Direction>> faceFlow = new HashMap<>();
         List<FluidEndpoint> endpoints = new ArrayList<>();
-        Map<ResourceHandler<FluidResource>, Boolean> seenHandlers = new HashSet<>();
+        Map<ResourceHandler<FluidResource>, Boolean> seenHandlers = new LinkedHashMap<>();
+        // 2386 的 FluidPipeNetwork 构造器重新要求传入玻璃管集合
+        Set<BlockPos> glassPipes = new HashSet<>();
         Deque<BlockPos> queue = new ArrayDeque<>();
 
         potential.put(seed, 0);
@@ -152,6 +155,9 @@ public abstract class FluidNetworkScannerMixin {
                 diodes.put(pos.immutable(), AnvilPumpBlock.getOutputDirection(state));
                 expandPump(level, pos, state, phi, potential, adjacency, queue, endpoints, seenHandlers);
             } else if (state.getBlock() instanceof PipeBlock pipe) {
+                if (pipe.isGlassPipe()) {
+                    glassPipes.add(pos.immutable());
+                }
                 if (state.getValue(PipeBlock.HAS_CHECK_VALVE)
                     && level.getBlockEntity(pos) instanceof AbstractPipeBlockEntity cv
                     && !cv.isEmpty()) {
@@ -162,7 +168,7 @@ public abstract class FluidNetworkScannerMixin {
         }
 
         cir.setReturnValue(new FluidPipeNetwork(
-            level, potential.keySet(), adjacency, valves, diodes, faceFlow, endpoints));
+            level, potential.keySet(), adjacency, valves, diodes, faceFlow, glassPipes, endpoints));
     }
 
     /**
