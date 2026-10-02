@@ -119,33 +119,9 @@ public class BlendingCategory extends AbstractProgressCategory<BlendingRecipe> {
     ) {
         BlendingRecipe recipe = recipeHolder.value();
         float anvilYOffset = JeiRenderHelper.getAnvilAnimationOffset(timer);
-        RenderSupport.renderBlock(
-            guiGraphics,
-            Blocks.ANVIL.defaultBlockState(),
-            81,
-            12 + anvilYOffset,
-            20,
-            12,
-            RenderSupport.SINGLE_BLOCK
-        );
-        RenderSupport.renderBlock(
-            guiGraphics,
-            getDisplayedInputCauldron(recipe),
-            81,
-            30,
-            10,
-            12,
-            RenderSupport.SINGLE_BLOCK
-        );
-        RenderSupport.renderBlock(
-            guiGraphics,
-            AddonBlocks.BLENDER.getDefaultState().setValue(BlenderBlock.WORKING, true),
-            81,
-            40,
-            0,
-            12,
-            RenderSupport.SINGLE_BLOCK
-        );
+        RenderSupport.renderBlock(guiGraphics, Blocks.ANVIL.defaultBlockState(), 81, 12 + anvilYOffset, 12);
+        RenderSupport.renderBlock(guiGraphics, getDisplayedInputCauldron(recipe), 81, 30, 12);
+        RenderSupport.renderBlock(guiGraphics, AddonBlocks.BLENDER.getDefaultState().setValue(BlenderBlock.WORKING, true), 81, 40, 12);
 
         arrowIn.draw(guiGraphics, 54, 20);
         arrowOut.draw(guiGraphics, 92, 19);

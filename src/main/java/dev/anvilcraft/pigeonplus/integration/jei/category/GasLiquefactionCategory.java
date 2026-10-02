@@ -7,6 +7,8 @@ import dev.anvilcraft.pigeonplus.integration.jei.AnvilCraftPigeonPlusJeiPlugin;
 import dev.anvilcraft.pigeonplus.init.AddonRecipeTypes;
 import dev.anvilcraft.pigeonplus.recipe.GasLiquefactionRecipe;
 import dev.dubhe.anvilcraft.init.block.ModBlocks;
+import dev.dubhe.anvilcraft.client.support.RenderSupport;
+import dev.dubhe.anvilcraft.integration.jei.util.JeiRecipeUtil;
 import dev.dubhe.anvilcraft.integration.jei.util.JeiRenderHelper;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -105,11 +107,17 @@ public class GasLiquefactionCategory implements IRecipeCategory<RecipeHolder<Gas
         this.arrowDefault.draw(guiGraphics, LEFT_ARROW_X, LEFT_ARROW_Y);
         this.arrowDefault.draw(guiGraphics, 108, 30);
         this.pump.draw(guiGraphics, LEFT_ARROW_X , 40);
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate((WIDTH - 16 * TANK_SCALE) / 2.0f, 25, 0);
-        guiGraphics.pose().scale(TANK_SCALE, TANK_SCALE, 1.0f);
-        guiGraphics.renderItem(new ItemStack(ModBlocks.LARGE_FLUID_TANK), 0, 0);
-        guiGraphics.pose().popPose();
+        // 26.1 的 GuiGraphicsExtractor 没有 renderItem，且 pose() 已改为
+        // 2D 的 Matrix3x2fStack（不再支持 pushPose/三维缩放）。
+        // 与 AnvilCraft 的做法一致，改用 RenderSupport.renderBlock 直接画方块：
+        // 原先是「物品按 1.6 倍缩放」，这里换算成等价的显示盒尺寸（16 * 1.6 ≈ 26）。
+        RenderSupport.renderBlock(
+            guiGraphics,
+            ModBlocks.LARGE_FLUID_TANK.get().defaultBlockState(),
+            (WIDTH - 16 * TANK_SCALE) / 2.0f,
+            25.0f,
+            16 * TANK_SCALE
+        );
         guiGraphics.text(
             Minecraft.getInstance().font,
             Component.translatable("gui.anvilcraft_pigeon_plus.gas_liquefaction.fill_then"),
@@ -137,11 +145,12 @@ public class GasLiquefactionCategory implements IRecipeCategory<RecipeHolder<Gas
     }
 
     public static void registerRecipes(IRecipeRegistration registration) {
-        var recipeManager = Minecraft.getInstance().getConnection().getRecipeManager();
-        List<RecipeHolder<GasLiquefactionRecipe>> recipes = recipeManager.getAllRecipesFor(
-            AddonRecipeTypes.GAS_LIQUEFACTION_TYPE.get()
+        // 26.1 起不再从客户端连接取 RecipeManager（字段访问受限），
+        // 改用 AnvilCraft 提供的 JeiRecipeUtil（BlendingCategory 也用这个）
+        registration.addRecipes(
+            AnvilCraftPigeonPlusJeiPlugin.GAS_LIQUEFACTION,
+            JeiRecipeUtil.getRecipeHoldersFromType(AddonRecipeTypes.GAS_LIQUEFACTION_TYPE.get())
         );
-        registration.addRecipes(AnvilCraftPigeonPlusJeiPlugin.GAS_LIQUEFACTION, recipes);
     }
 
     public static void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
