@@ -76,7 +76,7 @@ public class BlenderBlockEntity extends BlockEntity {
     }
 
     private void setWorking(boolean working) {
-        if (this.level == null || this.level.isClientSide) {
+        if (this.level == null || this.level.isClientSide()) {
             return;
         }
 

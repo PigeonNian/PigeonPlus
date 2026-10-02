@@ -1,7 +1,7 @@
 package dev.anvilcraft.pigeonplus.util;
 
 import dev.anvilcraft.pigeonplus.init.AddonFluids;
-import dev.dubhe.anvilcraft.api.fluidtank.InfinityFluidTank;
+import dev.dubhe.anvilcraft.api.fluid.InfinityFluidTank;
 import dev.dubhe.anvilcraft.block.entity.fluid.DrainBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

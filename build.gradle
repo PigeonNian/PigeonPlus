@@ -41,6 +41,13 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(java_version)
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
+// javac 默认只报 100 个错误就截断（-Xmaxerrs），移植期间需要看到完整清单才能分批推进。
+// 同时开启 -Xlint:all 之外的基础告警便于定位，但不用 -Werror，避免告警阻塞移植。
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs << "-Xmaxerrs" << "10000"
+    options.encoding = 'UTF-8'
+}
+
 idea {
     module {
         downloadSources = true

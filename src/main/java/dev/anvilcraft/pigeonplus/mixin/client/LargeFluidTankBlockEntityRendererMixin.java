@@ -5,7 +5,7 @@ import dev.anvilcraft.pigeonplus.client.renderer.GasContainerRenderUtil;
 import dev.anvilcraft.pigeonplus.client.renderer.GasTankRenderContext;
 import dev.anvilcraft.pigeonplus.fluid.GasFluid;
 import dev.dubhe.anvilcraft.block.entity.LargeFluidTankBlockEntity;
-import dev.dubhe.anvilcraft.client.renderer.blockentity.LargeFluidTankBlockEntityRenderer;
+import dev.dubhe.anvilcraft.client.renderer.blockentity.LargeFluidTankRenderer;
 import dev.dubhe.anvilcraft.client.support.FluidRenderHelper;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.registries.BuiltInRegistries;

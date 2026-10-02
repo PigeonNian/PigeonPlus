@@ -33,7 +33,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -157,19 +157,19 @@ public class AnvilCraftPigeonPlusClient {
     }
 
     private void onRegisterAdditionalModels(ModelEvent.RegisterAdditional event) {
-        ResourceLocation bottom = ResourceLocation.fromNamespaceAndPath(
+        Identifier bottom = Identifier.fromNamespaceAndPath(
             AnvilCraftPigeonPlus.MOD_ID, "block/blender_bottom");
-        ResourceLocation top = ResourceLocation.fromNamespaceAndPath(
+        Identifier top = Identifier.fromNamespaceAndPath(
             AnvilCraftPigeonPlus.MOD_ID, "block/blender_top");
-        ResourceLocation anvilPumpPiston = ResourceLocation.fromNamespaceAndPath(
+        Identifier anvilPumpPiston = Identifier.fromNamespaceAndPath(
             AnvilCraftPigeonPlus.MOD_ID, "block/anvil_pump_pistion");
-        ResourceLocation largeCauldronTop = ResourceLocation.fromNamespaceAndPath(
+        Identifier largeCauldronTop = Identifier.fromNamespaceAndPath(
             AnvilCraftPigeonPlus.MOD_ID, "block/large_cauldron_top");
-        ResourceLocation largeCauldronBottom = ResourceLocation.fromNamespaceAndPath(
+        Identifier largeCauldronBottom = Identifier.fromNamespaceAndPath(
             AnvilCraftPigeonPlus.MOD_ID, "block/large_cauldron_bottom");
-        ResourceLocation feedSpreaderBucket = ResourceLocation.fromNamespaceAndPath(
+        Identifier feedSpreaderBucket = Identifier.fromNamespaceAndPath(
             AnvilCraftPigeonPlus.MOD_ID, "block/feed_spreader_bucket");
-        ResourceLocation feedSpreaderPiston = ResourceLocation.fromNamespaceAndPath(
+        Identifier feedSpreaderPiston = Identifier.fromNamespaceAndPath(
             AnvilCraftPigeonPlus.MOD_ID, "block/feed_spreader_piston");
         event.register(new ModelResourceLocation(bottom, "standalone"));
         event.register(new ModelResourceLocation(top, "standalone"));
@@ -203,8 +203,8 @@ public class AnvilCraftPigeonPlusClient {
     private void onRegisterClientExtensions(RegisterClientExtensionsEvent event) {
         event.registerFluidType(
             new ModClientFluidTypeExtensionImpl(
-                ResourceLocation.withDefaultNamespace("block/water_still"),
-                ResourceLocation.withDefaultNamespace("block/water_flow"),
+                Identifier.withDefaultNamespace("block/water_still"),
+                Identifier.withDefaultNamespace("block/water_flow"),
                 0x6B8E3D,
                 24.0f,
                 0xFF6B8E3D,
@@ -214,8 +214,8 @@ public class AnvilCraftPigeonPlusClient {
         );
         event.registerFluidType(
             new ModClientFluidTypeExtensionImpl(
-                ResourceLocation.withDefaultNamespace("block/water_still"),
-                ResourceLocation.withDefaultNamespace("block/water_flow"),
+                Identifier.withDefaultNamespace("block/water_still"),
+                Identifier.withDefaultNamespace("block/water_flow"),
                 0xD9F2FF,
                 48.0f,
                 0x66D9F2FF,
@@ -225,8 +225,8 @@ public class AnvilCraftPigeonPlusClient {
         );
         event.registerFluidType(
             new ModClientFluidTypeExtensionImpl(
-                ResourceLocation.withDefaultNamespace("block/water_still"),
-                ResourceLocation.withDefaultNamespace("block/water_flow"),
+                Identifier.withDefaultNamespace("block/water_still"),
+                Identifier.withDefaultNamespace("block/water_flow"),
                 0x6E5F2C,
                 20.0f,
                 0xFF6E5F2C,
@@ -236,8 +236,8 @@ public class AnvilCraftPigeonPlusClient {
         );
         event.registerFluidType(
             new ModClientFluidTypeExtensionImpl(
-                ResourceLocation.withDefaultNamespace("block/water_still"),
-                ResourceLocation.withDefaultNamespace("block/water_flow"),
+                Identifier.withDefaultNamespace("block/water_still"),
+                Identifier.withDefaultNamespace("block/water_flow"),
                 0x8FD2B3,
                 28.0f,
                 0xD08FD2B3,
@@ -247,8 +247,8 @@ public class AnvilCraftPigeonPlusClient {
         );
         event.registerFluidType(
             new ModClientFluidTypeExtensionImpl(
-                ResourceLocation.withDefaultNamespace("block/water_still"),
-                ResourceLocation.withDefaultNamespace("block/water_flow"),
+                Identifier.withDefaultNamespace("block/water_still"),
+                Identifier.withDefaultNamespace("block/water_flow"),
                 0x87CEEB,
                 8.0f,
                 0x7087CEEB,
@@ -258,8 +258,8 @@ public class AnvilCraftPigeonPlusClient {
         );
         event.registerFluidType(
             new ModClientFluidTypeExtensionImpl(
-                ResourceLocation.withDefaultNamespace("block/water_still"),
-                ResourceLocation.withDefaultNamespace("block/water_flow"),
+                Identifier.withDefaultNamespace("block/water_still"),
+                Identifier.withDefaultNamespace("block/water_flow"),
                 0xB8E2F4,
                 8.0f,
                 0x70B8E2F4,
@@ -317,20 +317,20 @@ public class AnvilCraftPigeonPlusClient {
      */
     private void onRegisterGuiLayers(RegisterGuiLayersEvent event) {
         event.registerAboveAll(
-            ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "rocket_punch_charge"),
+            Identifier.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "rocket_punch_charge"),
             RocketPunchChargeHud::render
         );
         event.registerAboveAll(
-            ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "skill_cooldown"),
+            Identifier.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "skill_cooldown"),
             SkillCooldownHud::render
         );
         event.registerAboveAll(
-            ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "slam_damage"),
+            Identifier.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "slam_damage"),
             SlamDamageHud::render
         );
         try {
             event.wrapLayer(
-                ResourceLocation.fromNamespaceAndPath("anvilcraft", "anvil_hammer_use"),
+                Identifier.fromNamespaceAndPath("anvilcraft", "anvil_hammer_use"),
                 original -> (graphics, deltaTracker) -> {
                     // 手持带铁拳附魔的铁砧锤蓄力时，改由 RocketPunchChargeHud 绘制
                     Minecraft minecraft = Minecraft.getInstance();

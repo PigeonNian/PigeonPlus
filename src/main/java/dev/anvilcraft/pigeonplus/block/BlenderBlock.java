@@ -108,7 +108,7 @@ public class BlenderBlock extends BaseEntityBlock implements IHammerRemovable {
         BlockState state,
         BlockEntityType<T> blockEntityType
     ) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return null;
         }
         return createTickerHelper(

@@ -9,11 +9,11 @@ import dev.anvilcraft.pigeonplus.block.MixedBiomassCauldronBlock;
 import dev.anvilcraft.pigeonplus.block.NozzleBlock;
 import dev.anvilcraft.pigeonplus.block.PigeonAnvilBlock;
 import dev.anvilcraft.pigeonplus.block.StasisBeaconBlock;
-import dev.dubhe.anvilcraft.block.item.FlexibleMultiPartBlockItem;
+import dev.dubhe.anvilcraft.item.block.FlexibleMultiPartBlockItem;
 import dev.dubhe.anvilcraft.block.multipart.FlexibleMultiPartBlock;
 import dev.dubhe.anvilcraft.block.state.DirectionCube3x3PartHalf;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -36,7 +36,7 @@ public class AddonBlocks {
         .properties(properties -> properties.noOcclusion().sound(SoundType.WOOL))
         .blockstate((ctx, provider) -> provider.getVariantBuilder(ctx.getEntry()).forAllStates(state ->
             ConfiguredModel.builder()
-                .modelFile(provider.models().getExistingFile(ResourceLocation.fromNamespaceAndPath(
+                .modelFile(provider.models().getExistingFile(Identifier.fromNamespaceAndPath(
                     AnvilCraftPigeonPlus.MOD_ID,
                     "block/pigeon_anvil"
                 )))
@@ -44,7 +44,7 @@ public class AddonBlocks {
                 .build()))
         .item(BlockItem::new)
         .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
-            ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/pigeon_anvil")))
+            Identifier.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/pigeon_anvil")))
         .build()
         .tag(BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.ANVIL)
         .register();
@@ -55,12 +55,12 @@ public class AddonBlocks {
         .blockstate((ctx, prov) -> prov.getVariantBuilder(ctx.getEntry()).forAllStates(state ->
             ConfiguredModel.builder()
                 .modelFile(prov.models().getExistingFile(
-                    ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/blender_bottom")))
+                    Identifier.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/blender_bottom")))
                 .rotationY(rotationY(state.getValue(BlenderBlock.FACING)))
                 .build()))
         .item(BlockItem::new)
         .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
-            ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/blender")))
+            Identifier.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/blender")))
         .build()
         .register();
 
@@ -69,7 +69,7 @@ public class AddonBlocks {
         .initialProperties(() -> Blocks.IRON_BLOCK)
         .properties(properties -> properties.noOcclusion().sound(SoundType.METAL))
         .blockstate((ctx, provider) -> provider.getVariantBuilder(ctx.getEntry()).forAllStates(state -> ConfiguredModel.builder()
-            .modelFile(provider.models().getExistingFile(ResourceLocation.fromNamespaceAndPath(
+            .modelFile(provider.models().getExistingFile(Identifier.fromNamespaceAndPath(
                 AnvilCraftPigeonPlus.MOD_ID,
                 "block/anvil_pump"
             )))
@@ -77,7 +77,7 @@ public class AddonBlocks {
             .build()))
         .item(BlockItem::new)
         .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
-            ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/anvil_pump_full")))
+            Identifier.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/anvil_pump_full")))
         .build()
         .tag(BlockTags.MINEABLE_WITH_PICKAXE)
         .register();
@@ -88,14 +88,14 @@ public class AddonBlocks {
         .properties(properties -> properties.noOcclusion().sound(SoundType.METAL))
         .blockstate((ctx, provider) -> provider.simpleBlock(
             ctx.getEntry(),
-            provider.models().getExistingFile(ResourceLocation.fromNamespaceAndPath(
+            provider.models().getExistingFile(Identifier.fromNamespaceAndPath(
                 AnvilCraftPigeonPlus.MOD_ID,
                 "block/feed_spreader_bottom"
             ))
         ))
         .item(BlockItem::new)
         .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
-            ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/feed_spreader_full")))
+            Identifier.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/feed_spreader_full")))
         .build()
         .tag(BlockTags.MINEABLE_WITH_PICKAXE)
         .register();
@@ -110,7 +110,7 @@ public class AddonBlocks {
             .explosionResistance(1200.0F))
         .blockstate((ctx, provider) -> provider.getVariantBuilder(ctx.getEntry()).forAllStates(state ->
             ConfiguredModel.builder()
-                .modelFile(provider.models().getExistingFile(ResourceLocation.fromNamespaceAndPath(
+                .modelFile(provider.models().getExistingFile(Identifier.fromNamespaceAndPath(
                     AnvilCraftPigeonPlus.MOD_ID,
                     state.getValue(NozzleBlock.PART) == DirectionCube3x3PartHalf.MID_CENTER
                         ? "block/nozzle"
@@ -122,7 +122,7 @@ public class AddonBlocks {
         .loot(FlexibleMultiPartBlock::loot)
         .item(FlexibleMultiPartBlockItem<DirectionCube3x3PartHalf, DirectionProperty, Direction>::new)
             .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
-                ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/nozzle")))
+                Identifier.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/nozzle")))
             .build()
         .tag(BlockTags.MINEABLE_WITH_PICKAXE)
         .register();
@@ -133,14 +133,14 @@ public class AddonBlocks {
         .properties(properties -> properties.isValidSpawn(Blocks::never))
         .blockstate((ctx, provider) -> provider.getVariantBuilder(ctx.getEntry()).forAllStates(state ->
             ConfiguredModel.builder()
-                .modelFile(provider.models().getExistingFile(ResourceLocation.fromNamespaceAndPath(
+                .modelFile(provider.models().getExistingFile(Identifier.fromNamespaceAndPath(
                     AnvilCraftPigeonPlus.MOD_ID,
                     "block/stasis_beacon"
                 )))
                 .build()))
         .item(BlockItem::new)
             .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
-                ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/stasis_beacon")))
+                Identifier.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/stasis_beacon")))
             .build()
         .tag(BlockTags.MINEABLE_WITH_PICKAXE)
         .register();
@@ -150,7 +150,7 @@ public class AddonBlocks {
         .initialProperties(() -> Blocks.CAULDRON)
         .blockstate((ctx, prov) -> prov.getVariantBuilder(ctx.getEntry()).forAllStates(state ->
             ConfiguredModel.builder()
-                .modelFile(prov.models().getExistingFile(ResourceLocation.fromNamespaceAndPath(
+                .modelFile(prov.models().getExistingFile(Identifier.fromNamespaceAndPath(
                     AnvilCraftPigeonPlus.MOD_ID,
                     "block/mixed_biomass_cauldron_%s".formatted(
                         state.getValue(MixedBiomassCauldronBlock.LEVEL) == 4

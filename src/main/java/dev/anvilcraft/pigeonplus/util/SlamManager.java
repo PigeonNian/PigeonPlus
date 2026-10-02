@@ -275,8 +275,8 @@ public final class SlamManager {
         int rubbleCount = 60;
         for (int i = 0; i < rubbleCount; i++) {
             // 角度在 ±半角 内均匀取，半径带随机以免看起来像同心圆
-            double angle = Math.toRadians((level.random.nextDouble() * 2.0 - 1.0) * SECTOR_HALF_ANGLE);
-            double radius = SECTOR_RADIUS * Math.sqrt(level.random.nextDouble());
+            double angle = Math.toRadians((level.getRandom().nextDouble() * 2.0 - 1.0) * SECTOR_HALF_ANGLE);
+            double radius = SECTOR_RADIUS * Math.sqrt(level.getRandom().nextDouble());
             Vec3 offset = rotateY(forward, angle).scale(radius);
 
             level.sendParticles(
@@ -291,8 +291,8 @@ public final class SlamManager {
             new Vector3f(0.55f, 0.45f, 0.32f), 1.6f
         );
         for (int i = 0; i < 40; i++) {
-            double angle = Math.toRadians((level.random.nextDouble() * 2.0 - 1.0) * SECTOR_HALF_ANGLE);
-            Vec3 offset = rotateY(forward, angle).scale(SECTOR_RADIUS * level.random.nextDouble());
+            double angle = Math.toRadians((level.getRandom().nextDouble() * 2.0 - 1.0) * SECTOR_HALF_ANGLE);
+            Vec3 offset = rotateY(forward, angle).scale(SECTOR_RADIUS * level.getRandom().nextDouble());
             level.sendParticles(
                 dust,
                 origin.x + offset.x, groundY, origin.z + offset.z,

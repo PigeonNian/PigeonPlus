@@ -2,7 +2,7 @@ package dev.anvilcraft.pigeonplus.block;
 
 import dev.anvilcraft.pigeonplus.init.AddonInteractionMap;
 import dev.dubhe.anvilcraft.api.hammer.IHammerRemovable;
-import dev.dubhe.anvilcraft.block.Layered4LevelCauldronBlock;
+import dev.dubhe.anvilcraft.block.cauldron.Layered4LevelCauldronBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.world.InteractionHand;

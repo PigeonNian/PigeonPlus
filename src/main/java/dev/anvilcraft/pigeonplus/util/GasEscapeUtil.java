@@ -3,7 +3,7 @@ package dev.anvilcraft.pigeonplus.util;
 import dev.anvilcraft.pigeonplus.fluid.GasFluid;
 import dev.anvilcraft.pigeonplus.init.AddonFluids;
 import dev.dubhe.anvilcraft.api.fluid.LargeCauldronFluidHandler;
-import dev.dubhe.anvilcraft.block.GiantAnvilBlock;
+import dev.dubhe.anvilcraft.block.workstation.GiantAnvilBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.DustParticleOptions;

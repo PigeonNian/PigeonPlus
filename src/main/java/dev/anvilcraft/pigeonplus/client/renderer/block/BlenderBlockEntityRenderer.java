@@ -16,7 +16,7 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -27,7 +27,7 @@ public class BlenderBlockEntityRenderer implements BlockEntityRenderer<BlenderBl
     private static final float ROTATION_DEGREES_PER_TICK = 45.0f;
 
     private static final ModelResourceLocation TOP_MODEL = new ModelResourceLocation(
-        ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/blender_top"),
+        Identifier.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/blender_top"),
         "standalone");
 
     public BlenderBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
@@ -77,8 +77,8 @@ public class BlenderBlockEntityRenderer implements BlockEntityRenderer<BlenderBl
 
     private static boolean isLargeCauldronCore(Level level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
-        ResourceLocation id = state.getBlock().builtInRegistryHolder().key().location();
-        if (!id.equals(ResourceLocation.fromNamespaceAndPath("anvilcraft", "large_cauldron"))) {
+        Identifier id = state.getBlock().builtInRegistryHolder().key().location();
+        if (!id.equals(Identifier.fromNamespaceAndPath("anvilcraft", "large_cauldron"))) {
             return false;
         }
         Property<?> halfProp = state.getBlock().getStateDefinition().getProperty("half");

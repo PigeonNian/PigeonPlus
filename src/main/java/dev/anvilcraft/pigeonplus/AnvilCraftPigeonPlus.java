@@ -14,7 +14,7 @@ import dev.anvilcraft.pigeonplus.init.AddonParticles;
 import dev.anvilcraft.pigeonplus.init.AddonRecipeTypes;
 import dev.anvilcraft.pigeonplus.init.AddonSounds;
 import dev.anvilcraft.lib.v2.registrum.Registrum;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -44,8 +44,8 @@ public class AnvilCraftPigeonPlus {
         ModBlockEntities.register(modEventBus);
     }
 
-    public static ResourceLocation of(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+    public static Identifier of(String path) {
+        return Identifier.fromNamespaceAndPath(MOD_ID, path);
     }
 
     /**

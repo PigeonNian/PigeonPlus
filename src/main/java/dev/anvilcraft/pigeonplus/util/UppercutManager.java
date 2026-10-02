@@ -6,7 +6,7 @@ import dev.anvilcraft.pigeonplus.init.AddonMobEffects;
 import dev.anvilcraft.pigeonplus.init.AddonSounds;
 import dev.anvilcraft.pigeonplus.network.UppercutAscentPacket;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -61,7 +61,7 @@ public final class UppercutManager {
     private static final double HOVER_GRAVITY_REDUCTION = -0.25;
 
     /** 滞空重力修饰符的固定 id，便于精确移除。 */
-    private static final ResourceLocation HOVER_GRAVITY_ID =
+    private static final Identifier HOVER_GRAVITY_ID =
         AnvilCraftPigeonPlus.of("uppercut_hover_gravity");
 
     /** 前方判定距离（格）。 */

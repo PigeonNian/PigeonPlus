@@ -66,7 +66,7 @@ public class PigeonAnvilBlock extends BetterAnvilBlock implements IHammerRemovab
     ) {
         // 保留普通铁砧的落地音效与粒子（levelEvent 1031）
         super.onLand(level, pos, state, replacedState, fallingEntity);
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return;
         }
         // 鸽子咕咕叫

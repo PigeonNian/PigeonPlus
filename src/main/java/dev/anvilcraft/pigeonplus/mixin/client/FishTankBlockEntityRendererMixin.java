@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import dev.anvilcraft.pigeonplus.client.renderer.GasTankRenderContext;
 import dev.anvilcraft.pigeonplus.fluid.GasFluid;
 import dev.dubhe.anvilcraft.block.entity.FishTankBlockEntity;
-import dev.dubhe.anvilcraft.client.renderer.blockentity.FishTankBlockEntityRenderer;
+import dev.dubhe.anvilcraft.client.renderer.blockentity.FishTankRenderer;
 import dev.dubhe.anvilcraft.client.support.FluidRenderHelper;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.neoforged.neoforge.fluids.FluidStack;

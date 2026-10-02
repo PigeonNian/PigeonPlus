@@ -215,7 +215,7 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
 
     private void syncToClient() {
         this.setChanged();
-        if (this.level != null && !this.level.isClientSide) {
+        if (this.level != null && !this.level.isClientSide()) {
             BlockState state = this.getBlockState();
             this.level.sendBlockUpdated(this.worldPosition, state, state, Block.UPDATE_CLIENTS);
         }

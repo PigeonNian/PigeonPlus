@@ -7,18 +7,18 @@ import dev.anvilcraft.pigeonplus.block.AnvilPumpBlock;
 import dev.anvilcraft.pigeonplus.block.entity.AnvilPumpBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class AnvilPumpBlockEntityRenderer implements BlockEntityRenderer<AnvilPumpBlockEntity> {
     private static final ModelResourceLocation PISTON = ModelResourceLocation.standalone(
-        ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/anvil_pump_pistion")
+        Identifier.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/anvil_pump_pistion")
     );
     private static final float MAX_PISTON_DROP = 8.0F / 16.0F;
 
@@ -52,7 +52,7 @@ public class AnvilPumpBlockEntityRenderer implements BlockEntityRenderer<AnvilPu
             .getModelRenderer()
             .renderModel(
                 poseStack.last(),
-                buffer.getBuffer(RenderType.cutout()),
+                buffer.getBuffer(RenderTypes.cutoutMovingBlock()),
                 null,
                 piston,
                 1.0F,

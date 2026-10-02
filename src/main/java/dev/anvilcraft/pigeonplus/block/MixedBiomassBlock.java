@@ -20,7 +20,7 @@ public class MixedBiomassBlock extends LiquidBlock {
 
     @Override
     protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
-        if (level.isClientSide || !(entity instanceof LivingEntity living)) {
+        if (level.isClientSide() || !(entity instanceof LivingEntity living)) {
             return;
         }
 

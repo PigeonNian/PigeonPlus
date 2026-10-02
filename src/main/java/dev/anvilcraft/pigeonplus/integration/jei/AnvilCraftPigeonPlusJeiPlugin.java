@@ -13,7 +13,7 @@ import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +25,7 @@ public class AnvilCraftPigeonPlusJeiPlugin implements IModPlugin {
         RecipeType.createRecipeHolderType(AnvilCraftPigeonPlus.of("gas_liquefaction"));
 
     @Override
-    public @NotNull ResourceLocation getPluginUid() {
+    public @NotNull Identifier getPluginUid() {
         return AnvilCraftPigeonPlus.of("jei_plugin");
     }
 

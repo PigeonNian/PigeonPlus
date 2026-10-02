@@ -7,7 +7,7 @@ import dev.anvilcraft.pigeonplus.util.RocketPunchManager;
 import dev.anvilcraft.pigeonplus.util.SkillCooldowns;
 import dev.anvilcraft.pigeonplus.util.SlamManager;
 import dev.anvilcraft.pigeonplus.util.UppercutManager;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -27,7 +27,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 @EventBusSubscriber(modid = AnvilCraftPigeonPlus.MOD_ID)
 public class RocketPunchEventListener {
     /** 蓄力减速的修饰符 id，需固定以便反复增删。 */
-    private static final ResourceLocation CHARGE_SLOW_ID =
+    private static final Identifier CHARGE_SLOW_ID =
         AnvilCraftPigeonPlus.of("rocket_punch_charge_slow");
 
     /**

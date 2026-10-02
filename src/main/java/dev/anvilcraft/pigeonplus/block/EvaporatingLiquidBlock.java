@@ -53,13 +53,13 @@ public class EvaporatingLiquidBlock extends LiquidBlock {
     }
 
     private static void scheduleEvaporation(Level level, BlockPos pos) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return;
         }
         level.scheduleTick(
             pos,
             level.getBlockState(pos).getBlock(),
-            MIN_EVAPORATION_DELAY_TICKS + level.random.nextInt(RANDOM_EVAPORATION_DELAY_TICKS)
+            MIN_EVAPORATION_DELAY_TICKS + level.getRandom().nextInt(RANDOM_EVAPORATION_DELAY_TICKS)
         );
     }
 

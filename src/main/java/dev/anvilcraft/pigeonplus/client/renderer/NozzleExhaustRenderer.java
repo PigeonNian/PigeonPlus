@@ -4,14 +4,14 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.anvilcraft.pigeonplus.util.NozzleExhaustUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public final class NozzleExhaustRenderer {
-    private static final ResourceLocation BEAM_TEXTURE =
-        ResourceLocation.withDefaultNamespace("textures/entity/beacon_beam.png");
+    private static final Identifier BEAM_TEXTURE =
+        Identifier.withDefaultNamespace("textures/entity/beacon_beam.png");
     private static final int FULL_BRIGHT = 0x00F000F0;
     private static final float CENTER_X = 0.5F;
     private static final float CENTER_Z = 0.5F;
@@ -38,7 +38,7 @@ public final class NozzleExhaustRenderer {
             return;
         }
 
-        VertexConsumer buffer = buffers.getBuffer(RenderType.beaconBeam(BEAM_TEXTURE, true));
+        VertexConsumer buffer = buffers.getBuffer(RenderTypes.beaconBeam(BEAM_TEXTURE, true));
         PoseStack.Pose pose = poseStack.last();
         RenderProfile profile = profile(propellant);
         float heightScale = flameProgress * flameProgress * (3.0F - 2.0F * flameProgress);

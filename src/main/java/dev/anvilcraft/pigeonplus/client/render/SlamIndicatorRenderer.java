@@ -9,7 +9,7 @@ import dev.anvilcraft.pigeonplus.util.SkillCooldowns;
 import dev.anvilcraft.pigeonplus.util.SlamManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -83,7 +83,7 @@ public final class SlamIndicatorRenderer {
         poseStack.translate(landing.x - cameraPos.x, landing.y + Y_OFFSET - cameraPos.y, landing.z - cameraPos.z);
         Matrix4f matrix = poseStack.last().pose();
 
-        VertexConsumer consumer = minecraft.renderBuffers().bufferSource().getBuffer(RenderType.lines());
+        VertexConsumer consumer = minecraft.renderBuffers().bufferSource().getBuffer(RenderTypes.lines());
 
         // 扇形轮廓 = 两条半径 + 一段弧，围成闭合形状。
         // 不画中心那条线：它指的方向已经由扇形张角表达，多一条反而显得杂乱。
@@ -102,7 +102,7 @@ public final class SlamIndicatorRenderer {
             prev = point;
         }
 
-        minecraft.renderBuffers().bufferSource().endBatch(RenderType.lines());
+        minecraft.renderBuffers().bufferSource().endBatch(RenderTypes.lines());
         poseStack.popPose();
     }
 

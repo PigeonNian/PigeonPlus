@@ -198,7 +198,7 @@ public class FeedSpreaderBlockEntity extends BlockEntity {
             ItemStack temporaryBoneMeal = new ItemStack(Items.BONE_MEAL);
             if (BoneMealItem.applyBonemeal(temporaryBoneMeal, this.level, targetPos, null)) {
                 this.level.levelEvent(1505, targetPos, 0);
-                if (this.level.random.nextFloat() < 0.3F) {
+                if (this.level.getRandom().nextFloat() < 0.3F) {
                     feed.shrink(1);
                     this.setChanged();
                 }
@@ -381,20 +381,20 @@ public class FeedSpreaderBlockEntity extends BlockEntity {
         double baseAngle = easedProgress * Math.PI * 4.0;
         double speed = (0.11 + this.spreadParticleRadius * 0.045) * speedMultiplier;
         for (int i = 0; i < count; i++) {
-            double angle = baseAngle + this.level.random.nextDouble() * 0.9 - 0.45;
+            double angle = baseAngle + this.level.getRandom().nextDouble() * 0.9 - 0.45;
             double directionX = Math.cos(angle);
             double directionZ = Math.sin(angle);
-            double side = (this.level.random.nextDouble() - 0.5) * 0.24 * this.spreadParticleRadius;
+            double side = (this.level.getRandom().nextDouble() - 0.5) * 0.24 * this.spreadParticleRadius;
             double x = this.worldPosition.getX() + 0.5 + directionX * 0.46 - directionZ * side;
-            double y = this.worldPosition.getY() + 0.78 + this.level.random.nextDouble() * 0.16;
+            double y = this.worldPosition.getY() + 0.78 + this.level.getRandom().nextDouble() * 0.16;
             double z = this.worldPosition.getZ() + 0.5 + directionZ * 0.46 + directionX * side;
-            double distanceScale = 0.65 + this.level.random.nextDouble() * 0.95;
-            double xSpeed = directionX * speed * distanceScale + (this.level.random.nextDouble() - 0.5) * 0.025;
-            double ySpeed = 0.045 + this.level.random.nextDouble() * 0.07;
-            double zSpeed = directionZ * speed * distanceScale + (this.level.random.nextDouble() - 0.5) * 0.025;
+            double distanceScale = 0.65 + this.level.getRandom().nextDouble() * 0.95;
+            double xSpeed = directionX * speed * distanceScale + (this.level.getRandom().nextDouble() - 0.5) * 0.025;
+            double ySpeed = 0.045 + this.level.getRandom().nextDouble() * 0.07;
+            double zSpeed = directionZ * speed * distanceScale + (this.level.getRandom().nextDouble() - 0.5) * 0.025;
 
             this.level.addParticle(this.getSpreadParticle(), x, y, z, xSpeed, ySpeed, zSpeed);
-            if (this.spreadParticleMaterial == SPREAD_MATERIAL_BONE_MEAL && this.level.random.nextFloat() < 0.35F) {
+            if (this.spreadParticleMaterial == SPREAD_MATERIAL_BONE_MEAL && this.level.getRandom().nextFloat() < 0.35F) {
                 this.level.addParticle(ParticleTypes.WHITE_ASH, x, y, z, xSpeed * 0.65, ySpeed * 0.6, zSpeed * 0.65);
                 this.level.addParticle(ParticleTypes.HAPPY_VILLAGER, x, y, z, xSpeed * 0.45, ySpeed * 0.5, zSpeed * 0.45);
             }

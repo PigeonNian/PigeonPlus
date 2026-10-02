@@ -3,7 +3,7 @@ package dev.anvilcraft.pigeonplus.mixin;
 import dev.anvilcraft.pigeonplus.init.AddonRecipeTypes;
 import dev.anvilcraft.pigeonplus.recipe.GasLiquefactionRecipe;
 import dev.anvilcraft.pigeonplus.util.GasLiquefactionTracker;
-import dev.dubhe.anvilcraft.block.LargeFluidTankBlock;
+import dev.dubhe.anvilcraft.block.container.LargeFluidTankBlock;
 import dev.dubhe.anvilcraft.block.entity.LargeFluidTankBlockEntity;
 import dev.dubhe.anvilcraft.block.state.Cube3x3PartHalf;
 import net.minecraft.core.BlockPos;

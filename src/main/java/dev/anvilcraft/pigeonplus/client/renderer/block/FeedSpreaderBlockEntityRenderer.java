@@ -15,7 +15,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -23,10 +23,10 @@ import net.neoforged.neoforge.client.model.data.ModelData;
 
 public class FeedSpreaderBlockEntityRenderer implements BlockEntityRenderer<FeedSpreaderBlockEntity> {
     private static final ModelResourceLocation BUCKET_MODEL = ModelResourceLocation.standalone(
-        ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/feed_spreader_bucket")
+        Identifier.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/feed_spreader_bucket")
     );
     private static final ModelResourceLocation PISTON_MODEL = ModelResourceLocation.standalone(
-        ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/feed_spreader_piston")
+        Identifier.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/feed_spreader_piston")
     );
     private static final float MAX_PISTON_DROP = 15.0F / 16.0F;
 

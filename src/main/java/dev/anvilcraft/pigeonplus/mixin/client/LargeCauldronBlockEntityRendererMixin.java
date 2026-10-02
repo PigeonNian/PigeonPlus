@@ -17,7 +17,7 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -38,12 +38,12 @@ import java.util.List;
     public class LargeCauldronBlockEntityRendererMixin {
     @Unique
     private static final ModelResourceLocation PIGEONPLUS_LARGE_CAULDRON_TOP = new ModelResourceLocation(
-        ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/large_cauldron_top"),
+        Identifier.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/large_cauldron_top"),
         "standalone"
     );
     @Unique
     private static final ModelResourceLocation PIGEONPLUS_LARGE_CAULDRON_BOTTOM = new ModelResourceLocation(
-        ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/large_cauldron_bottom"),
+        Identifier.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/large_cauldron_bottom"),
         "standalone"
     );
     @Unique

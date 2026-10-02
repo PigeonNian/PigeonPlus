@@ -72,7 +72,7 @@ public class StasisBeaconBlockEntity extends BlockEntity {
         if (level.getGameTime() % 80L == 0L) {
             int lastLevels = blockEntity.levels;
             blockEntity.levels = updateBase(level, x, y, z);
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 boolean shouldLit = blockEntity.levels > 0;
                 boolean isLit = state.hasProperty(StasisBeaconBlock.LIT) && state.getValue(StasisBeaconBlock.LIT);
                 if (shouldLit && !isLit) {
@@ -92,7 +92,7 @@ public class StasisBeaconBlockEntity extends BlockEntity {
             blockEntity.beamHeight = blockEntity.checkingBeamHeight;
         }
 
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             blockEntity.tickStasis((ServerLevel) level, pos);
         }
     }
@@ -263,14 +263,14 @@ public class StasisBeaconBlockEntity extends BlockEntity {
         this.frozenAccumulatedDamage = damage;
         this.frozenAccumulatedSpeed = speed;
         this.frozenTicks = ticks;
-        if (changed && this.level != null && !this.level.isClientSide) {
+        if (changed && this.level != null && !this.level.isClientSide()) {
             this.syncToClient();
         }
     }
 
     private void syncToClient() {
         this.setChanged();
-        if (this.level != null && !this.level.isClientSide) {
+        if (this.level != null && !this.level.isClientSide()) {
             BlockState state = this.getBlockState();
             this.level.sendBlockUpdated(this.worldPosition, state, state, Block.UPDATE_CLIENTS);
         }

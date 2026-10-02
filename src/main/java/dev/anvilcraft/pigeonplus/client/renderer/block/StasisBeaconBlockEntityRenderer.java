@@ -9,7 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -187,7 +187,7 @@ public class StasisBeaconBlockEntityRenderer implements BlockEntityRenderer<Stas
     private record TintedChainBufferSource(MultiBufferSource delegate, int alpha) implements MultiBufferSource {
         @Override
         public VertexConsumer getBuffer(RenderType renderType) {
-            return new TintedChainVertexConsumer(this.delegate.getBuffer(RenderType.translucent()), this.alpha);
+            return new TintedChainVertexConsumer(this.delegate.getBuffer(RenderTypes.translucentMovingBlock()), this.alpha);
         }
     }
 
