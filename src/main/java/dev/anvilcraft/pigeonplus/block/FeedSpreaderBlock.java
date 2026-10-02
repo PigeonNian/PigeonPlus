@@ -12,6 +12,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
@@ -55,7 +56,7 @@ public class FeedSpreaderBlock extends BaseEntityBlock implements IHammerRemovab
     }
 
     @Override
-    public VoxelShape getOcclusionShape(BlockState state, BlockGetter level, BlockPos pos) {
+    public VoxelShape getOcclusionShape(BlockState state) {
         return Shapes.empty();
     }
 
@@ -65,7 +66,7 @@ public class FeedSpreaderBlock extends BaseEntityBlock implements IHammerRemovab
     }
 
     @Override
-    protected boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) {
+    protected boolean propagatesSkylightDown(BlockState state) {
         return true;
     }
 
@@ -155,12 +156,18 @@ public class FeedSpreaderBlock extends BaseEntityBlock implements IHammerRemovab
         );
     }
 
+    /**
+     * 26.1 把 {@code onRemove} 换成了 {@code affectNeighborsAfterRemoval}：
+     * 只在服务端触发，且不再给出新旧状态。原先靠
+     * {@code !state.is(newState.getBlock())} 判断「真的被换成别的方块了」，
+     * 现在改为在移除前直接掉落内容物——这样无论后续换成什么方块，
+     * 内容物都不会丢。
+     */
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        if (!level.isClientSide() && !state.is(newState.getBlock())
-            && level.getBlockEntity(pos) instanceof FeedSpreaderBlockEntity feedSpreader) {
+    protected void affectNeighborsAfterRemoval(ServerLevel level, BlockPos pos, boolean movedByPiston) {
+        if (level.getBlockEntity(pos) instanceof FeedSpreaderBlockEntity feedSpreader) {
             Containers.dropContents(level, pos, feedSpreader.getDrops());
         }
-        super.onRemove(state, level, pos, newState, movedByPiston);
+        super.affectNeighborsAfterRemoval(level, pos, movedByPiston);
     }
 }

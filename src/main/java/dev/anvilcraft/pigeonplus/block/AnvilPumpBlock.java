@@ -16,7 +16,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.RenderShape;
@@ -125,13 +127,28 @@ public class AnvilPumpBlock extends BetterBaseEntityBlock
         return FACING;
     }
 
+    /**
+     * 邻居变化时同步红石供电状态。
+     *
+     * <p>26.1 把 {@code neighborChanged} 改名为 {@code handleNeighborChanged}，
+     * 且参数里不再传 {@code BlockState}、来源位置也由 {@code BlockPos}
+     * 换成了 {@link Orientation}（红石朝向）。因此这里用
+     * {@code level.getBlockState(pos)} 取当前状态。
+     */
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, net.minecraft.world.level.block.Block block, BlockPos fromPos, boolean isMoving) {
-        super.neighborChanged(state, level, pos, block, fromPos, isMoving);
+    public void handleNeighborChanged(
+        Level level, BlockPos pos, net.minecraft.world.level.block.Block block,
+        Orientation orientation, boolean isMoving
+    ) {
+        super.handleNeighborChanged(level, pos, block, orientation, isMoving);
         if (level.isClientSide()) {
             return;
         }
         FluidNetworkManager.INSTANCE.addAdjacentContainers(level, pos);
+        BlockState state = level.getBlockState(pos);
+        if (!(state.getBlock() instanceof AnvilPumpBlock)) {
+            return;
+        }
         boolean hasSignal = level.hasNeighborSignal(pos);
         if (hasSignal != state.getValue(PumpBlock.POWERED)) {
             level.setBlock(pos, state.setValue(PumpBlock.POWERED, hasSignal), 2);
@@ -147,12 +164,16 @@ public class AnvilPumpBlock extends BetterBaseEntityBlock
         }
     }
 
+    /**
+     * 26.1 把 {@code onRemove} 换成了
+     * {@code affectNeighborsAfterRemoval(ServerLevel, BlockPos, boolean)}：
+     * 只在服务端触发，且不再给出新旧状态，因此无法再比较两者是否同方块。
+     * 这里改为直接标记管网为脏——被移除本身就意味着管网结构变化。
+     */
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        super.onRemove(state, level, pos, newState, movedByPiston);
-        if (!level.isClientSide() && !state.is(newState.getBlock())) {
-            FluidNetworkManager.INSTANCE.markDirty(level);
-        }
+    protected void affectNeighborsAfterRemoval(ServerLevel level, BlockPos pos, boolean movedByPiston) {
+        super.affectNeighborsAfterRemoval(level, pos, movedByPiston);
+        FluidNetworkManager.INSTANCE.markDirty(level);
     }
 
     @Nullable

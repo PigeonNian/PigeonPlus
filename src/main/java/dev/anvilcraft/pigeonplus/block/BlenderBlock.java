@@ -68,7 +68,7 @@ public class BlenderBlock extends BaseEntityBlock implements IHammerRemovable {
     }
 
     @Override
-    public VoxelShape getOcclusionShape(BlockState state, BlockGetter level, BlockPos pos) {
+    public VoxelShape getOcclusionShape(BlockState state) {
         return Shapes.empty();
     }
 

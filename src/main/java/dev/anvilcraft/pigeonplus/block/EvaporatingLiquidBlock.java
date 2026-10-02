@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.level.material.FlowingFluid;
 import org.joml.Vector3f;
 
@@ -39,16 +40,21 @@ public class EvaporatingLiquidBlock extends LiquidBlock {
         scheduleEvaporation(level, pos);
     }
 
+    /**
+     * 26.1 把 {@code neighborChanged} 改名并改了签名：
+     * 不再传 {@code BlockState}，来源位置由 {@code BlockPos} 换成
+     * {@link Orientation}（红石朝向）。本方法只关心「有变化就重排蒸发」，
+     * 用不到这两个参数。
+     */
     @Override
-    protected void neighborChanged(
-        BlockState state,
+    protected void handleNeighborChanged(
         Level level,
         BlockPos pos,
         net.minecraft.world.level.block.Block neighborBlock,
-        BlockPos neighborPos,
+        Orientation orientation,
         boolean movedByPiston
     ) {
-        super.neighborChanged(state, level, pos, neighborBlock, neighborPos, movedByPiston);
+        super.handleNeighborChanged(level, pos, neighborBlock, orientation, movedByPiston);
         scheduleEvaporation(level, pos);
     }
 
