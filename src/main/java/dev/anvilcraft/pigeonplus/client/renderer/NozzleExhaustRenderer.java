@@ -3,6 +3,7 @@ package dev.anvilcraft.pigeonplus.client.renderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.anvilcraft.pigeonplus.util.NozzleExhaustUtil;
+import net.minecraft.client.renderer.blockentity.BeaconRenderer;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 
@@ -13,9 +14,15 @@ public final class NozzleExhaustRenderer {
      * <p>26.1 里渲染层必须由提交方（{@code submitCustomGeometry} 的调用者）指定，
      * 因此这个贴图对外公开，便于调用方构造
      * {@code RenderTypes.beaconBeam(BEAM_TEXTURE, true)}。
+     *
+     * <p><b>注意路径</b>：26.1 把光束贴图从
+     * {@code textures/entity/beacon_beam.png} 挪到了
+     * {@code textures/entity/beacon/beacon_beam.png}（多了一层 {@code beacon/}）。
+     * 沿用旧路径会拿到缺失贴图，喷焰就会渲染成<b>紫黑</b>。
+     * 这里直接引用原版 {@link BeaconRenderer#BEAM_LOCATION} 常量而不是自己拼字符串，
+     * 这样原版日后再挪动目录也能自动跟随。
      */
-    public static final Identifier BEAM_TEXTURE =
-        Identifier.withDefaultNamespace("textures/entity/beacon_beam.png");
+    public static final Identifier BEAM_TEXTURE = BeaconRenderer.BEAM_LOCATION;
     private static final int FULL_BRIGHT = 0x00F000F0;
     private static final float CENTER_X = 0.5F;
     private static final float CENTER_Z = 0.5F;
