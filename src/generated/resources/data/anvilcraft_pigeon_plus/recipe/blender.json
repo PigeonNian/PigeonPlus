@@ -2,18 +2,10 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "I": {
-      "item": "minecraft:iron_ingot"
-    },
-    "P": {
-      "item": "anvilcraft:pipe"
-    },
-    "S": {
-      "item": "minecraft:iron_shovel"
-    },
-    "T": {
-      "item": "anvilcraft:fluid_tank"
-    }
+    "I": "minecraft:iron_ingot",
+    "P": "anvilcraft:pipe",
+    "S": "minecraft:iron_shovel",
+    "T": "anvilcraft:fluid_tank"
   },
   "pattern": [
     " S ",
@@ -21,7 +13,6 @@
     "III"
   ],
   "result": {
-    "count": 1,
     "id": "anvilcraft_pigeon_plus:blender"
   }
 }

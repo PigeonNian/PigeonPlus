@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "A": {
-      "item": "minecraft:anvil"
-    },
-    "F": {
-      "item": "minecraft:feather"
-    },
-    "I": {
-      "item": "minecraft:iron_ingot"
-    }
+    "A": "minecraft:anvil",
+    "F": "minecraft:feather",
+    "I": "minecraft:iron_ingot"
   },
   "pattern": [
     "FIF",
@@ -18,7 +12,6 @@
     "FIF"
   ],
   "result": {
-    "count": 1,
     "id": "anvilcraft_pigeon_plus:pigeon_anvil"
   }
 }

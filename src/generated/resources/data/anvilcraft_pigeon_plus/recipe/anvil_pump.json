@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "A": {
-      "item": "minecraft:piston"
-    },
-    "B": {
-      "item": "minecraft:anvil"
-    },
-    "C": {
-      "item": "anvilcraft:pipe"
-    }
+    "A": "minecraft:piston",
+    "B": "minecraft:anvil",
+    "C": "anvilcraft:pipe"
   },
   "pattern": [
     "A",
@@ -18,7 +12,6 @@
     "C"
   ],
   "result": {
-    "count": 1,
     "id": "anvilcraft_pigeon_plus:anvil_pump"
   }
 }

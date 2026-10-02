@@ -10,7 +10,6 @@
       "translate": "advancements.anvilcraft_pigeon_plus.root.description"
     },
     "icon": {
-      "count": 1,
       "id": "anvilcraft_pigeon_plus:pigeon_anvil"
     },
     "show_toast": false,
