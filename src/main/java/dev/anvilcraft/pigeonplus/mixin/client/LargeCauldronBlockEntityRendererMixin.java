@@ -23,9 +23,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * 大炼药锅的两项本模组扩展：
  * 装了喷口后加装顶/底盖板，以及气体铺满锅体、点燃火焰被遮蔽。
