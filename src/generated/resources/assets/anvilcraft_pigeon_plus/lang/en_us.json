@@ -103,5 +103,10 @@
   "tooltip.anvilcraft_pigeon_plus.item.nozzle.shift": "Requires a matching large cauldron propellant reaction\nRedstone signal disables the exhaust\nThe center exhaust can heat blocks, damage entities, and apply momentum",
   "tooltip.anvilcraft_pigeon_plus.item.stasis_beacon": "Freezes one non-player entity or falling block inside its beam",
   "tooltip.anvilcraft_pigeon_plus.item.stasis_beacon.shift": "Requires a Frost Metal Block beacon base\nStores incoming damage and momentum while time is stopped\nReleases after 30 seconds or 5 hearts of accumulated damage",
-  "tooltip.anvilcraft_pigeon_plus.press_key": "Hold %s for details"
+  "tooltip.anvilcraft_pigeon_plus.press_key": "Hold %s for details",
+  "tooltip.anvilcraft_pigeon_plus.stasis_beacon.damage": "  Stored damage: %s / %s",
+  "tooltip.anvilcraft_pigeon_plus.stasis_beacon.duration": "  Duration: %s s",
+  "tooltip.anvilcraft_pigeon_plus.stasis_beacon.speed": "  Stored speed: %s b/t",
+  "tooltip.anvilcraft_pigeon_plus.stasis_beacon.status.frozen": "  Status: Time-frozen",
+  "tooltip.anvilcraft_pigeon_plus.stasis_beacon.status.idle": "  Status: Idle"
 }

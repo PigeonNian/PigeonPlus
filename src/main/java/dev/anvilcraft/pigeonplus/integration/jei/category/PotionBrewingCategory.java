@@ -20,7 +20,7 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
@@ -76,7 +76,7 @@ public class PotionBrewingCategory implements IRecipeCategory<PotionBrewingJeiRe
     }
 
     @Override
-    public RecipeType<PotionBrewingJeiRecipe> getRecipeType() {
+    public IRecipeType<PotionBrewingJeiRecipe> getRecipeType() {
         return AnvilCraftPigeonPlusJeiPlugin.POTION_BREWING;
     }
 
@@ -108,7 +108,7 @@ public class PotionBrewingCategory implements IRecipeCategory<PotionBrewingJeiRe
     ) {
 
         builder.addSlot(RecipeIngredientRole.INPUT, JeiSlotUtil.INPUT_X, JeiSlotUtil.ITEM_Y)
-            .addItemStack(recipe.reagent());
+            .add(recipe.reagent());
         IRecipeSlotBuilder inputSlot = JeiFluidUtil.addFluidSlot(
             builder,
             RecipeIngredientRole.INPUT,
@@ -153,26 +153,25 @@ public class PotionBrewingCategory implements IRecipeCategory<PotionBrewingJeiRe
         double mouseY
     ) {
         float anvilYOffset = JeiRenderHelper.getAnvilAnimationOffset(this.timer);
-        RenderSupport.renderBlock(
+        RenderSupport.renderBlockAt(
             guiGraphics,
-            Blocks.ANVIL.defaultBlockState(),
+            this.heater,
             81,
-            ANVIL_Y + anvilYOffset,
+            HEATER_Y,
             MODEL_SCALE
         );
-        RenderSupport.renderBlock(
+        RenderSupport.renderBlockAt(
             guiGraphics,
             this.cauldron,
             81,
             CAULDRON_Y,
             MODEL_SCALE
         );
-
-        RenderSupport.renderBlock(
+        RenderSupport.renderBlockAt(
             guiGraphics,
-            this.heater,
+            Blocks.ANVIL.defaultBlockState(),
             81,
-            HEATER_Y,
+            ANVIL_Y + anvilYOffset,
             MODEL_SCALE
         );
         this.arrowIn.draw(guiGraphics, ARROW_IN_X, ARROW_Y);
@@ -207,14 +206,14 @@ public class PotionBrewingCategory implements IRecipeCategory<PotionBrewingJeiRe
     public static void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
         AnvilCraftJeiPlugin.addAnvilProcessingCatalysts(
             registration, AnvilCraftPigeonPlusJeiPlugin.POTION_BREWING);
-        registration.addRecipeCatalyst(
-            new ItemStack(Items.CAULDRON), AnvilCraftPigeonPlusJeiPlugin.POTION_BREWING);
-        registration.addRecipeCatalyst(
-            new ItemStack(ModBlocks.FISH_TANK), AnvilCraftPigeonPlusJeiPlugin.POTION_BREWING);
-        registration.addRecipeCatalyst(
-            new ItemStack(ModBlocks.HEATER), AnvilCraftPigeonPlusJeiPlugin.POTION_BREWING);
-        registration.addRecipeCatalyst(
-            new ItemStack(ModBlocks.BURNING_HEATER), AnvilCraftPigeonPlusJeiPlugin.POTION_BREWING);
+        registration.addCraftingStation(
+            AnvilCraftPigeonPlusJeiPlugin.POTION_BREWING, new ItemStack(Items.CAULDRON));
+        registration.addCraftingStation(
+            AnvilCraftPigeonPlusJeiPlugin.POTION_BREWING, new ItemStack(ModBlocks.FISH_TANK));
+        registration.addCraftingStation(
+            AnvilCraftPigeonPlusJeiPlugin.POTION_BREWING, new ItemStack(ModBlocks.HEATER));
+        registration.addCraftingStation(
+            AnvilCraftPigeonPlusJeiPlugin.POTION_BREWING, new ItemStack(ModBlocks.BURNING_HEATER));
     }
 
 }

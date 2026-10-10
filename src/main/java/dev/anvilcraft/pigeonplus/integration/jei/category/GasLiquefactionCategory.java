@@ -16,7 +16,7 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
@@ -56,7 +56,7 @@ public class GasLiquefactionCategory implements IRecipeCategory<RecipeHolder<Gas
 
     @Override
     @NotNull
-    public  RecipeType<RecipeHolder<GasLiquefactionRecipe>> getRecipeType() {
+    public  IRecipeType<RecipeHolder<GasLiquefactionRecipe>> getRecipeType() {
         return AnvilCraftPigeonPlusJeiPlugin.GAS_LIQUEFACTION;
     }
 
@@ -86,12 +86,12 @@ public class GasLiquefactionCategory implements IRecipeCategory<RecipeHolder<Gas
         GasLiquefactionRecipe recipe = holder.value();
         builder.addSlot(RecipeIngredientRole.INPUT, GAS_X, FLUID_Y)
             .setFluidRenderer(recipe.input().getAmount(), false, 16, 16)
-            .addFluidStack(recipe.input().getFluid(), recipe.input().getAmount());
+            .add(recipe.input().getFluid(), recipe.input().getAmount());
         builder.addSlot(RecipeIngredientRole.OUTPUT, LIQUID_X, FLUID_Y)
             .setFluidRenderer(recipe.output().getAmount(), false, 16, 16)
-            .addFluidStack(recipe.output().getFluid(), recipe.output().getAmount());
+            .add(recipe.output().getFluid(), recipe.output().getAmount());
         builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT)
-            .addItemStack(bucketFor(recipe.output().getFluid()));
+            .add(bucketFor(recipe.output().getFluid()));
     }
 
     @Override
@@ -154,9 +154,9 @@ public class GasLiquefactionCategory implements IRecipeCategory<RecipeHolder<Gas
     }
 
     public static void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        registration.addRecipeCatalyst(new ItemStack(AddonBlocks.ANVIL_PUMP), AnvilCraftPigeonPlusJeiPlugin.GAS_LIQUEFACTION);
-        registration.addRecipeCatalyst(new ItemStack(ModBlocks.PUMP), AnvilCraftPigeonPlusJeiPlugin.GAS_LIQUEFACTION);
-        registration.addRecipeCatalyst(new ItemStack(ModBlocks.LARGE_FLUID_TANK), AnvilCraftPigeonPlusJeiPlugin.GAS_LIQUEFACTION);
+        registration.addCraftingStation(AnvilCraftPigeonPlusJeiPlugin.GAS_LIQUEFACTION, new ItemStack(AddonBlocks.ANVIL_PUMP));
+        registration.addCraftingStation(AnvilCraftPigeonPlusJeiPlugin.GAS_LIQUEFACTION, new ItemStack(ModBlocks.PUMP));
+        registration.addCraftingStation(AnvilCraftPigeonPlusJeiPlugin.GAS_LIQUEFACTION, new ItemStack(ModBlocks.LARGE_FLUID_TANK));
     }
 
     private static ItemStack bucketFor(Fluid fluid) {

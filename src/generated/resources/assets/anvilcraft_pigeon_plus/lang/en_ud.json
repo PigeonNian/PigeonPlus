@@ -103,5 +103,10 @@
   "tooltip.anvilcraft_pigeon_plus.item.nozzle.shift": "ɯnʇuǝɯoɯ ʎꞁddɐ puɐ 'sǝᴉʇᴉʇuǝ ǝᵷɐɯɐp 'sʞɔoꞁq ʇɐǝɥ uɐɔ ʇsnɐɥxǝ ɹǝʇuǝɔ ǝɥ⟘\nʇsnɐɥxǝ ǝɥʇ sǝꞁqɐsᴉp ꞁɐuᵷᴉs ǝuoʇspǝᴚ\nuoᴉʇɔɐǝɹ ʇuɐꞁꞁǝdoɹd uoɹpꞁnɐɔ ǝᵷɹɐꞁ ᵷuᴉɥɔʇɐɯ ɐ sǝɹᴉnbǝᴚ",
   "tooltip.anvilcraft_pigeon_plus.item.stasis_beacon": "ɯɐǝq sʇᴉ ǝpᴉsuᴉ ʞɔoꞁq ᵷuᴉꞁꞁɐɟ ɹo ʎʇᴉʇuǝ ɹǝʎɐꞁd-uou ǝuo sǝzǝǝɹℲ",
   "tooltip.anvilcraft_pigeon_plus.item.stasis_beacon.shift": "ǝᵷɐɯɐp pǝʇɐꞁnɯnɔɔɐ ɟo sʇɹɐǝɥ ϛ ɹo spuoɔǝs 0Ɛ ɹǝʇɟɐ sǝsɐǝꞁǝᴚ\npǝddoʇs sᴉ ǝɯᴉʇ ǝꞁᴉɥʍ ɯnʇuǝɯoɯ puɐ ǝᵷɐɯɐp ᵷuᴉɯoɔuᴉ sǝɹoʇS\nǝsɐq uoɔɐǝq ʞɔoꞁᗺ ꞁɐʇǝW ʇsoɹℲ ɐ sǝɹᴉnbǝᴚ",
-  "tooltip.anvilcraft_pigeon_plus.press_key": "sꞁᴉɐʇǝp ɹoɟ %s pꞁoH"
+  "tooltip.anvilcraft_pigeon_plus.press_key": "sꞁᴉɐʇǝp ɹoɟ %s pꞁoH",
+  "tooltip.anvilcraft_pigeon_plus.stasis_beacon.damage": "%s / %s :ǝᵷɐɯɐp pǝɹoʇS  ",
+  "tooltip.anvilcraft_pigeon_plus.stasis_beacon.duration": "s %s :uoᴉʇɐɹnᗡ  ",
+  "tooltip.anvilcraft_pigeon_plus.stasis_beacon.speed": "ʇ/q %s :pǝǝds pǝɹoʇS  ",
+  "tooltip.anvilcraft_pigeon_plus.stasis_beacon.status.frozen": "uǝzoɹɟ-ǝɯᴉ⟘ :snʇɐʇS  ",
+  "tooltip.anvilcraft_pigeon_plus.stasis_beacon.status.idle": "ǝꞁpI :snʇɐʇS  "
 }

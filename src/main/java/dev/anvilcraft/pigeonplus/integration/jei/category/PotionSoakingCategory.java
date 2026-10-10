@@ -19,7 +19,7 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
@@ -64,7 +64,7 @@ public class PotionSoakingCategory implements IRecipeCategory<PotionSoakingJeiRe
     }
 
     @Override
-    public RecipeType<PotionSoakingJeiRecipe> getRecipeType() {
+    public IRecipeType<PotionSoakingJeiRecipe> getRecipeType() {
         return AnvilCraftPigeonPlusJeiPlugin.POTION_SOAKING;
     }
 
@@ -96,7 +96,7 @@ public class PotionSoakingCategory implements IRecipeCategory<PotionSoakingJeiRe
     ) {
 
         builder.addSlot(RecipeIngredientRole.INPUT, JeiSlotUtil.INPUT_X, JeiSlotUtil.ITEM_Y)
-            .addItemStack(recipe.input());
+            .add(recipe.input());
         IRecipeSlotBuilder potionSlot = JeiFluidUtil.addFluidSlot(
             builder,
             RecipeIngredientRole.INPUT,
@@ -137,10 +137,10 @@ public class PotionSoakingCategory implements IRecipeCategory<PotionSoakingJeiRe
         double mouseY
     ) {
         float anvilYOffset = JeiRenderHelper.getAnvilAnimationOffset(this.timer);
-        RenderSupport.renderBlock(
-            guiGraphics, Blocks.ANVIL.defaultBlockState(), 81, ANVIL_Y + anvilYOffset, MODEL_SCALE);
-        RenderSupport.renderBlock(
+        RenderSupport.renderBlockAt(
             guiGraphics, this.tank, 81, TANK_Y, MODEL_SCALE);
+        RenderSupport.renderBlockAt(
+            guiGraphics, Blocks.ANVIL.defaultBlockState(), 81, ANVIL_Y + anvilYOffset, MODEL_SCALE);
         this.arrowIn.draw(guiGraphics, ARROW_IN_X, ARROW_Y);
         this.arrowOut.draw(guiGraphics, ARROW_OUT_X, ARROW_Y);
 
@@ -159,9 +159,9 @@ public class PotionSoakingCategory implements IRecipeCategory<PotionSoakingJeiRe
     public static void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
         AnvilCraftJeiPlugin.addAnvilProcessingCatalysts(
             registration, AnvilCraftPigeonPlusJeiPlugin.POTION_SOAKING);
-        registration.addRecipeCatalyst(
-            new ItemStack(Items.CAULDRON), AnvilCraftPigeonPlusJeiPlugin.POTION_SOAKING);
-        registration.addRecipeCatalyst(
-            new ItemStack(ModBlocks.FISH_TANK), AnvilCraftPigeonPlusJeiPlugin.POTION_SOAKING);
+        registration.addCraftingStation(
+            AnvilCraftPigeonPlusJeiPlugin.POTION_SOAKING, new ItemStack(Items.CAULDRON));
+        registration.addCraftingStation(
+            AnvilCraftPigeonPlusJeiPlugin.POTION_SOAKING, new ItemStack(ModBlocks.FISH_TANK));
     }
 }

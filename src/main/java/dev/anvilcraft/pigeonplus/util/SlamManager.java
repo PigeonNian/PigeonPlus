@@ -438,7 +438,7 @@ public final class SlamManager {
             }
 
             target.invulnerableTime = 0;
-            target.hurt(AddonDamageTypes.seismicSlam(level, player), damage);
+            target.hurtServer(level, AddonDamageTypes.seismicSlam(level, player), damage);
 
             // 砸地以击退为主：从玩家指向目标的方向给一个水平冲量，并略微上抬
             Vec3 push = new Vec3(toTarget.x, 0.0, toTarget.z);

@@ -99,6 +99,26 @@ public class AddonLangHandler {
         provider.add("gui.anvilcraft_pigeon_plus.gas_liquefaction.keep_pumping", "Keep Pumping");
         provider.add("gui.anvilcraft_pigeon_plus.gas_liquefaction.liquefy", "Liquefy");
         provider.add("tooltip.anvilcraft_pigeon_plus.press_key", AddonItemTooltipManager.PRESS_KEY);
+        provider.add(
+            "tooltip.anvilcraft_pigeon_plus.stasis_beacon.status.idle",
+            "  Status: Idle"
+        );
+        provider.add(
+            "tooltip.anvilcraft_pigeon_plus.stasis_beacon.status.frozen",
+            "  Status: Time-frozen"
+        );
+        provider.add(
+            "tooltip.anvilcraft_pigeon_plus.stasis_beacon.duration",
+            "  Duration: %s s"
+        );
+        provider.add(
+            "tooltip.anvilcraft_pigeon_plus.stasis_beacon.damage",
+            "  Stored damage: %s / %s"
+        );
+        provider.add(
+            "tooltip.anvilcraft_pigeon_plus.stasis_beacon.speed",
+            "  Stored speed: %s b/t"
+        );
         for (Map.Entry<Item, String> entry : AddonItemTooltipManager.getNormalMap().entrySet()) {
             provider.add(AddonItemTooltipManager.getTranslationKey(entry.getKey()), entry.getValue());
         }

@@ -14,26 +14,26 @@ import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.helpers.IJeiHelpers;
-import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.types.IRecipeHolderType;
+import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import org.jetbrains.annotations.NotNull;
 
 @JeiPlugin
 public class AnvilCraftPigeonPlusJeiPlugin implements IModPlugin {
-    public static final RecipeType<RecipeHolder<BlendingRecipe>> BLENDING =
-        RecipeType.createRecipeHolderType(AnvilCraftPigeonPlus.of("blending"));
-    public static final RecipeType<RecipeHolder<GasLiquefactionRecipe>> GAS_LIQUEFACTION =
-        RecipeType.createRecipeHolderType(AnvilCraftPigeonPlus.of("gas_liquefaction"));
-    public static final RecipeType<PotionBrewingJeiRecipe> POTION_BREWING =
-        RecipeType.create(AnvilCraftPigeonPlus.MOD_ID, "potion_brewing", PotionBrewingJeiRecipe.class);
-    public static final RecipeType<PotionBrewingJeiRecipe> POTION_BULK_BREWING =
-        RecipeType.create(AnvilCraftPigeonPlus.MOD_ID, "potion_bulk_brewing", PotionBrewingJeiRecipe.class);
-    public static final RecipeType<PotionSoakingJeiRecipe> POTION_SOAKING =
-        RecipeType.create(AnvilCraftPigeonPlus.MOD_ID, "potion_soaking", PotionSoakingJeiRecipe.class);
+    public static final IRecipeHolderType<BlendingRecipe> BLENDING =
+        IRecipeHolderType.create(AnvilCraftPigeonPlus.of("blending"));
+    public static final IRecipeHolderType<GasLiquefactionRecipe> GAS_LIQUEFACTION =
+        IRecipeHolderType.create(AnvilCraftPigeonPlus.of("gas_liquefaction"));
+    public static final IRecipeType<PotionBrewingJeiRecipe> POTION_BREWING =
+        IRecipeType.create(AnvilCraftPigeonPlus.of("potion_brewing"), PotionBrewingJeiRecipe.class);
+    public static final IRecipeType<PotionBrewingJeiRecipe> POTION_BULK_BREWING =
+        IRecipeType.create(AnvilCraftPigeonPlus.of("potion_bulk_brewing"), PotionBrewingJeiRecipe.class);
+    public static final IRecipeType<PotionSoakingJeiRecipe> POTION_SOAKING =
+        IRecipeType.create(AnvilCraftPigeonPlus.of("potion_soaking"), PotionSoakingJeiRecipe.class);
 
     @Override
     public @NotNull Identifier getPluginUid() {

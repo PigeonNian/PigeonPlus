@@ -26,7 +26,7 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
-import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -55,7 +55,7 @@ public class BlendingCategory extends AbstractProgressCategory<BlendingRecipe> {
     }
 
     @Override
-    public RecipeType<RecipeHolder<BlendingRecipe>> getRecipeType() {
+    public IRecipeType<RecipeHolder<BlendingRecipe>> getRecipeType() {
         return AnvilCraftPigeonPlusJeiPlugin.BLENDING;
     }
 
@@ -119,9 +119,9 @@ public class BlendingCategory extends AbstractProgressCategory<BlendingRecipe> {
     ) {
         BlendingRecipe recipe = recipeHolder.value();
         float anvilYOffset = JeiRenderHelper.getAnvilAnimationOffset(timer);
-        RenderSupport.renderBlock(guiGraphics, Blocks.ANVIL.defaultBlockState(), 81, 12 + anvilYOffset, 12);
-        RenderSupport.renderBlock(guiGraphics, getDisplayedInputCauldron(recipe), 81, 30, 12);
-        RenderSupport.renderBlock(guiGraphics, AddonBlocks.BLENDER.getDefaultState().setValue(BlenderBlock.WORKING, true), 81, 40, 12);
+        RenderSupport.renderBlockAt(guiGraphics, AddonBlocks.BLENDER.getDefaultState().setValue(BlenderBlock.WORKING, true), 81, 40, 12);
+        RenderSupport.renderBlockAt(guiGraphics, getDisplayedInputCauldron(recipe), 81, 30, 12);
+        RenderSupport.renderBlockAt(guiGraphics, Blocks.ANVIL.defaultBlockState(), 81, 12 + anvilYOffset, 12);
 
         arrowIn.draw(guiGraphics, 54, 20);
         arrowOut.draw(guiGraphics, 92, 19);
@@ -216,8 +216,8 @@ public class BlendingCategory extends AbstractProgressCategory<BlendingRecipe> {
 
     public static void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
         AnvilCraftJeiPlugin.addAnvilProcessingCatalysts(registration, AnvilCraftPigeonPlusJeiPlugin.BLENDING);
-        registration.addRecipeCatalyst(new ItemStack(Items.CAULDRON), AnvilCraftPigeonPlusJeiPlugin.BLENDING);
-        registration.addRecipeCatalyst(new ItemStack(ModBlocks.FISH_TANK), AnvilCraftPigeonPlusJeiPlugin.BLENDING);
-        registration.addRecipeCatalyst(new ItemStack(AddonBlocks.BLENDER), AnvilCraftPigeonPlusJeiPlugin.BLENDING);
+        registration.addCraftingStation(AnvilCraftPigeonPlusJeiPlugin.BLENDING, new ItemStack(Items.CAULDRON));
+        registration.addCraftingStation(AnvilCraftPigeonPlusJeiPlugin.BLENDING, new ItemStack(ModBlocks.FISH_TANK));
+        registration.addCraftingStation(AnvilCraftPigeonPlusJeiPlugin.BLENDING, new ItemStack(AddonBlocks.BLENDER));
     }
 }
