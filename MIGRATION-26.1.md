@@ -592,3 +592,146 @@ AnvilLib 与 AnvilCraft **都发布了 sources jar**，解压后可直接读到�
   （用 `UTF8Encoding($false, $true)` 严格解码可验证）。
 - **`Select-String` 默认不区分大小写**：查 API 名时可能误报（例如查 `FluidAction` 会命中 `fluidaction`）。
 - 构建配置改动后需 `--no-configuration-cache` 或让 Gradle 自行失效缓存。
+
+---
+
+# 第二批移植：1.21.1 新特性 → 26.1.2
+
+来源：`dev/1.21.1/1.1` 上自 merge-base `92cfd1a` 之后的 26 个提交
+（大型烟花/大型烟花火箭实体与多方块、药水流体与酿造浸泡、JEI 三个药水分类、压缩合成、
+储罐药水发射器交互）。规模：63 个新增文件（46 Java + 17 资源）+ 12 个既有文件追加。
+
+最终验证：`clean compileJava` 0 错误、`runData` 成功、mixin 静态校验 PROBLEMS=0、
+`runClient` 正常启动且无 mixin 注入错误。
+
+## 取文件的坑：git 会折叠未跟踪目录
+
+`git status --short` 对**全部文件都未跟踪**的目录只输出目录本身（如
+`?? src/.../entity/`），据此枚举会整批漏掉文件——本轮就漏了 10 个 Java 文件
+（含 950 行的 `LargeFireworksRocketEntity`）。
+**必须用 `git status --short --untracked-files=all`，或 `git ls-files --others --exclude-standard`。**
+
+## 运行时才暴露的三个真 bug
+
+### 1. Mixin `method` 重载歧义（编译期与静态校验都查不出）
+
+`ModelBlockSelectionMixin` 原写 `method = "highlight"`，而 2474 的
+`ModelBlockSelection` 有**两个** `highlight` 重载，Mixin 无法消歧，报
+`Critical injection failure ... (0/1) succeeded. Scanned 0 target(s)`，
+并直接导致 **AnvilCraft 加载失败**（不是本模组报错，日志里显示为 anvilcraft 失败）。
+
+修法：写完整描述符。
+```
+method = "highlight(Lnet/neoforged/neoforge/client/event/ExtractBlockOutlineRenderStateEvent;Lnet/minecraft/world/level/block/state/BlockState;)Z"
+```
+推论：`tools/check-mixin-targets.ps1` 只能校验「方法名是否存在」，**查不出重载歧义**；
+遇到目标类有同名重载时必须手写描述符。
+
+### 2. 数据生成期注册表组件未绑定
+
+`runData` 报 `NPE: Components not bound yet`。根因：
+NeoForge 115 的 `FluidStack` 构造器会读 `fluid.builtInRegistryHolder().components()`，
+而组件绑定只发生在 `WorldLoader:80` / `ReloadableServerResources`，
+**晚于** `loadResources` 解析配方 → 任何在 datagen 里 `new FluidStack(...)` 都炸。
+
+修法（`AddonDatagen#gatherData`）：给流体注册表补一次空组件绑定。
+```java
+BuiltInRegistries.FLUID.listElements()
+    .forEach(holder -> holder.bindComponents(DataComponentMap.EMPTY));
+```
+**只绑流体，不要走 `DATA_COMPONENT_INITIALIZERS.build(...)`**：那会连带构建所有注册表
+（含物品）的组件，而模组物品组件里有 `HolderSet` 匿名实现，会抛
+`Data components must implement equals and hashCode`。
+
+> 注意：`clientData()` 与 `serverData()` 都跑 Registrum 的配方生成器
+> （其侧别过滤被作者注释掉了，「For now, generate everything together」），
+> 所以把 run 从 `clientData` 换成 `serverData` **不能**绕开这个问题，
+> 反而会让 `clientData` 才生成的 assets（blockstates/models/sounds.json）全部消失。
+
+### 3. 静态初始化早于组件绑定
+
+两个渲染器原用 `static final ItemStack PEARL_STACK = new ItemStack(...)`，
+在资源加载期就构造 `ItemStack`（同样读组件），抛
+`ExceptionInInitializerError: Components not bound yet`。
+修法：改为使用时构造。
+
+## 新增实体必须声明 `noLootTable()`
+
+`EntityType` 默认带掉落表，`LootTableProvider` 校验时会抛
+`Missing loottable '...:entities/xxx'`。本模组两个实体都不掉落，加
+`.noLootTable()` 即可。
+
+## 物品模型注册不能重复
+
+`Registrum` 为方块生成物品模型时，若同时在 `.blockstate(...)` 里调
+`registerSimpleItemModel` **又**在 `.item(...)` 上挂 `.model(...)`，会抛
+`Duplicate item model definition for <id>`。
+楼梯/台阶/纸块统一只保留 `blockstate` 里那一处。
+
+## 1.21.1 → 26.1.2 的 API 断层（本批新增）
+
+| 1.21.1 | 26.1.2 |
+|---|---|
+| `Entity#lerpTo` / `lerpTargetX/Y/Z/XRot/YRot` | 覆写 `getInterpolation(): InterpolationHandler`（实体自持），位置包走 `moveOrInterpolateTo` |
+| `EntityRenderer<T>` | `EntityRenderer<T, S extends EntityRenderState>`：`createRenderState()` + `extractRenderState()` + `submit()` |
+| `Entity#getBoundingBoxForCulling()` | 移到 `EntityRenderer#getBoundingBoxForCulling(T)` |
+| `Entity#kill()` | `kill(ServerLevel)`；且 `Entity#hurtServer` 变为**抽象**方法，必须实现 |
+| `DimensionTransition` / `changeDimension` | `TeleportTransition` / `Entity#teleport(TeleportTransition)` |
+| `ServerLevel#getSharedSpawnPos()` | `getRespawnData().pos()` |
+| `Level#getDayTime()` | `getOverworldClockTime()` |
+| `Entity#canBeCollidedWith()` | `canBeCollidedWith(@Nullable Entity other)` |
+| `CompoundTag.getInt/getLong/contains/getList` | `ValueInput#getIntOr/getLongOr/child/childrenListOrEmpty` |
+| `saveAdditional(CompoundTag, Provider)` | `saveAdditional(ValueOutput)` / `loadAdditional(ValueInput)` |
+| `ValueInput#read(name, codec)` 返回 `Optional` | **没有** `resultOrPartial`，用 `orElse` / `ifPresent` |
+| `Potion.getName(holder, prefix)` | `PotionContents#getName(prefix)` |
+| `BuiltInRegistries.POTION.holders()` | `.listElements()` |
+| `Fabric-like` `IFluidHandler` / `IItemHandler` | `ResourceHandler<FluidResource>` / `ResourceHandler<ItemResource>`，`insert`/`extract` 带 `TransactionContext` |
+| `Capabilities.FluidHandler.BLOCK` | `Capabilities.Fluid.BLOCK` |
+| `Capabilities.FluidHandler.ITEM` + `IFluidHandlerItem` | `Capabilities.Fluid.ITEM` + `ItemAccessResourceHandler<T>` |
+| `IClientFluidTypeExtensions#getStillTexture/getFlowingTexture/getTintColor` | 全部移除，流体外观数据驱动 |
+| `FastColor.ARGB32` | `net.minecraft.util.ARGB` |
+| `DirectionProperty` | `EnumProperty<Direction>` |
+| `Player#displayClientMessage(msg, true)` | `sendOverlayMessage(Component)`（**不是** `sendSystemMessage`，后者是聊天栏） |
+| `Entity#startRiding(e, true)` | `startRiding(e)` |
+| `block.FluidStackPredicate` 等 AnvilCraft 类 | `block.power.consumer.HeaterBlock` / `block.workstation.BurningHeaterBlock` / `item.tool.AnvilHammerItem` |
+| `ModBlocks.GUNPOWDER_BLOCK` | `ModBlocks.GUNPOWER_BLOCK`（AnvilCraft 拼写修正） |
+| JEI `RecipeIngredientRole.CATALYST` | `RecipeIngredientRole.CRAFTING_STATION` |
+
+### AnvilCraft 加热器判据变更（2386 → 2474）
+
+`LargeCauldronBlockEntity#isActiveHeatingHelper` 由
+`!state.getValue(HeaterBlock.OVERLOAD)` 改为 `((HeaterBlock) state.getBlock()).isActive(state)`，
+后者是 `!POWERED && !OVERLOAD`。本模组有两处**复制**了这段逻辑
+（`LargeCauldronBlockEntityMixin`、`AmbientHeater`），升级时必须跟着改，
+否则被红石信号点亮的加热器会被误判为有效热源。
+
+### 保留未修的问题（1 个，属 AnvilCraft 上游缺陷）
+
+`fluid_mixing/mixed_biomass_to_gaseous_biogas` 仍在 `runClient` 时解析失败：
+`Fluid ... does not have components yet`。
+
+**同批的 3 个 `gas_liquefaction` 配方已修好**（`Loaded N recipes` 由 3221 升到 3224）：
+把 `GasLiquefactionRecipe` 的字段类型由 `FluidStack` 改为 `FluidStackTemplate`，
+并在访问器里运行时物化。`FluidStackTemplate.CODEC` 用的是 `FLUID_HOLDER_CODEC`
+（不带「组件必须已绑定」校验），且 JSON 结构完全一致（同样的 `id`/`amount`/`components`），
+**生成的 JSON 逐字节不变**，对既有存档/数据包向后兼容。
+
+```
+public record GasLiquefactionRecipe(FluidStackTemplate inputTemplate, FluidStackTemplate outputTemplate)
+    implements Recipe<GasLiquefactionRecipe.Input> {
+    public FluidStack input()  { return this.inputTemplate.create(); }
+    public FluidStack output() { return this.outputTemplate.create(); }
+}
+```
+注意：`FluidStackTemplate#create()` **也**要读组件，所以只能在运行时调用（访问器里可以，
+编解码/构造期间不行）。datagen 侧构造配方时也必须直接传模板。
+
+**剩下这一个改不动**：`FluidMixingRecipe` 是 AnvilCraft 的类，`fluidResults` 是
+`List<FluidStack>`、codec 是 `FluidStack.CODEC.listOf()`。要修必须改它的字段语义
+（换成模板并延迟物化），从外部只能用侵入式 mixin 改字段/`<clinit>`，不划算。
+
+> 这其实是 **AnvilCraft 上游的缺陷**：在 26.1.2 下 `FluidMixingRecipe` **根本无法从
+> 数据包加载**。它们自己没发现，是因为 AnvilCraft 不发布任何流体配方
+> （1693 个配方 JSON 中含 fluid 的为 0），只有本模组会踩。建议向上游反馈。
+
+

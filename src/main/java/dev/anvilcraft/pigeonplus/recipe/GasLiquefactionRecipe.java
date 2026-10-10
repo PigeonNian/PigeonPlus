@@ -15,27 +15,21 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStackTemplate;
 
-/**
- * 气体液化配方：把一种流体按比例转成另一种。
- *
- * <p>本配方不参与原版合成台逻辑（没有物品形态的输入输出），
- * 而是由气体液化装置直接读取数据。26.1 的 {@link Recipe} 接口新增了
- * {@code placementInfo} 与 {@code recipeBookCategory}，
- * 并移除了 {@code assemble(input, registries)} 的 registries 参数、
- * {@code canCraftInDimensions} 与 {@code getResultItem}。
- */
-public record GasLiquefactionRecipe(FluidStack input, FluidStack output) implements Recipe<GasLiquefactionRecipe.Input> {
+public record GasLiquefactionRecipe(FluidStackTemplate inputTemplate, FluidStackTemplate outputTemplate)
+    implements Recipe<GasLiquefactionRecipe.Input> {
+
     public static final MapCodec<GasLiquefactionRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        FluidStack.CODEC.fieldOf("input").forGetter(GasLiquefactionRecipe::input),
-        FluidStack.CODEC.fieldOf("output").forGetter(GasLiquefactionRecipe::output)
+        FluidStackTemplate.CODEC.fieldOf("input").forGetter(GasLiquefactionRecipe::inputTemplate),
+        FluidStackTemplate.CODEC.fieldOf("output").forGetter(GasLiquefactionRecipe::outputTemplate)
     ).apply(instance, GasLiquefactionRecipe::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, GasLiquefactionRecipe> STREAM_CODEC = StreamCodec.composite(
-        FluidStack.STREAM_CODEC,
-        GasLiquefactionRecipe::input,
-        FluidStack.STREAM_CODEC,
-        GasLiquefactionRecipe::output,
+        FluidStackTemplate.STREAM_CODEC,
+        GasLiquefactionRecipe::inputTemplate,
+        FluidStackTemplate.STREAM_CODEC,
+        GasLiquefactionRecipe::outputTemplate,
         GasLiquefactionRecipe::new
     );
 
@@ -43,8 +37,16 @@ public record GasLiquefactionRecipe(FluidStack input, FluidStack output) impleme
     public static final RecipeSerializer<GasLiquefactionRecipe> SERIALIZER =
         new RecipeSerializer<>(CODEC, STREAM_CODEC);
 
+    public FluidStack input() {
+        return this.inputTemplate.create();
+    }
+
+    public FluidStack output() {
+        return this.outputTemplate.create();
+    }
+
     public int ratio() {
-        return this.output.getAmount() > 0 ? this.input.getAmount() / this.output.getAmount() : 0;
+        return this.outputTemplate.amount() > 0 ? this.inputTemplate.amount() / this.outputTemplate.amount() : 0;
     }
 
     @Override

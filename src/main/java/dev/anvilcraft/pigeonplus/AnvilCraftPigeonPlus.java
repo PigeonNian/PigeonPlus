@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import dev.anvilcraft.pigeonplus.block.entity.ModBlockEntities;
 import dev.anvilcraft.pigeonplus.data.AddonDatagen;
 import dev.anvilcraft.pigeonplus.init.AddonBlocks;
+import dev.anvilcraft.pigeonplus.init.AddonEntities;
 import dev.anvilcraft.pigeonplus.init.AddonFluids;
 import dev.anvilcraft.pigeonplus.init.AddonInteractionMap;
 import dev.anvilcraft.pigeonplus.init.AddonItemGroups;
@@ -39,6 +40,7 @@ public class AnvilCraftPigeonPlus {
         AddonRecipeTypes.register(modEventBus);
         AddonBlocks.register();
         AddonItems.register();
+        AddonEntities.register();
         AddonDatagen.init();
         ModCriterionTriggers.register(modEventBus);
         ModBlockEntities.register(modEventBus);
@@ -60,5 +62,17 @@ public class AnvilCraftPigeonPlus {
 
     private static void loadComplete(FMLLoadCompleteEvent event) {
         event.enqueueWork(AddonInteractionMap::init);
+        event.enqueueWork(() -> {
+            net.minecraft.core.dispenser.DispenseItemBehavior previous =
+                net.minecraft.world.level.block.DispenserBlock.DISPENSER_REGISTRY.get(
+                    net.minecraft.world.item.Items.GLASS_BOTTLE);
+            net.minecraft.world.level.block.DispenserBlock.registerBehavior(
+                net.minecraft.world.item.Items.GLASS_BOTTLE,
+                new dev.anvilcraft.pigeonplus.event.PotionBottleDispenseBehavior(
+                    previous != null
+                        ? previous
+                        : new net.minecraft.core.dispenser.DefaultDispenseItemBehavior())
+            );
+        });
     }
 }

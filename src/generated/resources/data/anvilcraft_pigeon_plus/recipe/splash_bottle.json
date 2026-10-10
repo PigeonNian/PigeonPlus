@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "F": "minecraft:gunpowder",
+    "G": "minecraft:glass_bottle"
+  },
+  "pattern": [
+    "GGG",
+    "GFG",
+    "GGG"
+  ],
+  "result": {
+    "id": "anvilcraft_pigeon_plus:splash_bottle"
+  }
+}

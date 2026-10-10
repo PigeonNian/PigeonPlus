@@ -1,0 +1,151 @@
+{
+  "type": "anvilcraft:multiblock",
+  "pattern": {
+    "grid": [
+      [
+        "   ",
+        "   ",
+        "  A"
+      ],
+      [
+        "   ",
+        "   ",
+        "  A"
+      ],
+      [
+        "BBB",
+        "BCB",
+        "BBB"
+      ],
+      [
+        "BBB",
+        "BCB",
+        "BBB"
+      ],
+      [
+        "BBB",
+        "BCB",
+        "BBB"
+      ],
+      [
+        "BBB",
+        "BCB",
+        "BBB"
+      ],
+      [
+        "BBB",
+        "BCB",
+        "BBB"
+      ],
+      [
+        "DEF",
+        "GCH",
+        "IJK"
+      ],
+      [
+        "   ",
+        " B ",
+        "   "
+      ]
+    ],
+    "mapping": {
+      "A": {
+        "blocks": "minecraft:stripped_oak_log",
+        "properties": [
+          {
+            "axis": "y"
+          }
+        ]
+      },
+      "B": {
+        "blocks": "anvilcraft_pigeon_plus:paper_block"
+      },
+      "C": {
+        "blocks": "anvilcraft:gunpowder_block"
+      },
+      "D": {
+        "blocks": "anvilcraft_pigeon_plus:paper_block_stairs",
+        "properties": [
+          {
+            "facing": "south",
+            "half": "bottom",
+            "shape": "outer_left"
+          }
+        ]
+      },
+      "E": {
+        "blocks": "anvilcraft_pigeon_plus:paper_block_stairs",
+        "properties": [
+          {
+            "facing": "south",
+            "half": "bottom",
+            "shape": "straight"
+          }
+        ]
+      },
+      "F": {
+        "blocks": "anvilcraft_pigeon_plus:paper_block_stairs",
+        "properties": [
+          {
+            "facing": "south",
+            "half": "bottom",
+            "shape": "outer_right"
+          }
+        ]
+      },
+      "G": {
+        "blocks": "anvilcraft_pigeon_plus:paper_block_stairs",
+        "properties": [
+          {
+            "facing": "east",
+            "half": "bottom",
+            "shape": "straight"
+          }
+        ]
+      },
+      "H": {
+        "blocks": "anvilcraft_pigeon_plus:paper_block_stairs",
+        "properties": [
+          {
+            "facing": "west",
+            "half": "bottom",
+            "shape": "straight"
+          }
+        ]
+      },
+      "I": {
+        "blocks": "anvilcraft_pigeon_plus:paper_block_stairs",
+        "properties": [
+          {
+            "facing": "east",
+            "half": "bottom",
+            "shape": "outer_left"
+          }
+        ]
+      },
+      "J": {
+        "blocks": "anvilcraft_pigeon_plus:paper_block_stairs",
+        "properties": [
+          {
+            "facing": "north",
+            "half": "bottom",
+            "shape": "straight"
+          }
+        ]
+      },
+      "K": {
+        "blocks": "anvilcraft_pigeon_plus:paper_block_stairs",
+        "properties": [
+          {
+            "facing": "north",
+            "half": "bottom",
+            "shape": "outer_left"
+          }
+        ]
+      }
+    }
+  },
+  "result": {
+    "id": "anvilcraft_pigeon_plus:large_fireworks_rocket"
+  }
+}

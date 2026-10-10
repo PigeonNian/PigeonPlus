@@ -1,0 +1,928 @@
+{
+  "type": "anvilcraft:multiblock_conversion",
+  "inputPattern": {
+    "grid": [
+      [
+        "   ",
+        "   ",
+        "  A"
+      ],
+      [
+        "   ",
+        "   ",
+        "  A"
+      ],
+      [
+        "BBB",
+        "BCB",
+        "BBB"
+      ],
+      [
+        "BBB",
+        "BCB",
+        "BBB"
+      ],
+      [
+        "BBB",
+        "BCB",
+        "BBB"
+      ],
+      [
+        "BBB",
+        "BCB",
+        "BBB"
+      ],
+      [
+        "BBB",
+        "BCB",
+        "BBB"
+      ],
+      [
+        "DEF",
+        "GCH",
+        "IJK"
+      ],
+      [
+        "   ",
+        " B ",
+        "   "
+      ]
+    ],
+    "mapping": {
+      "A": {
+        "blocks": "minecraft:stripped_oak_log",
+        "properties": [
+          {
+            "axis": "y"
+          }
+        ]
+      },
+      "B": {
+        "blocks": "anvilcraft_pigeon_plus:paper_block"
+      },
+      "C": {
+        "blocks": "anvilcraft:gunpowder_block"
+      },
+      "D": {
+        "blocks": "anvilcraft_pigeon_plus:paper_block_stairs",
+        "properties": [
+          {
+            "facing": "south",
+            "half": "bottom",
+            "shape": "outer_left"
+          }
+        ]
+      },
+      "E": {
+        "blocks": "anvilcraft_pigeon_plus:paper_block_stairs",
+        "properties": [
+          {
+            "facing": "south",
+            "half": "bottom",
+            "shape": "straight"
+          }
+        ]
+      },
+      "F": {
+        "blocks": "anvilcraft_pigeon_plus:paper_block_stairs",
+        "properties": [
+          {
+            "facing": "south",
+            "half": "bottom",
+            "shape": "outer_right"
+          }
+        ]
+      },
+      "G": {
+        "blocks": "anvilcraft_pigeon_plus:paper_block_stairs",
+        "properties": [
+          {
+            "facing": "east",
+            "half": "bottom",
+            "shape": "straight"
+          }
+        ]
+      },
+      "H": {
+        "blocks": "anvilcraft_pigeon_plus:paper_block_stairs",
+        "properties": [
+          {
+            "facing": "west",
+            "half": "bottom",
+            "shape": "straight"
+          }
+        ]
+      },
+      "I": {
+        "blocks": "anvilcraft_pigeon_plus:paper_block_stairs",
+        "properties": [
+          {
+            "facing": "east",
+            "half": "bottom",
+            "shape": "outer_left"
+          }
+        ]
+      },
+      "J": {
+        "blocks": "anvilcraft_pigeon_plus:paper_block_stairs",
+        "properties": [
+          {
+            "facing": "north",
+            "half": "bottom",
+            "shape": "straight"
+          }
+        ]
+      },
+      "K": {
+        "blocks": "anvilcraft_pigeon_plus:paper_block_stairs",
+        "properties": [
+          {
+            "facing": "north",
+            "half": "bottom",
+            "shape": "outer_left"
+          }
+        ]
+      }
+    }
+  },
+  "outputPattern": {
+    "grid": [
+      [
+        "0AB",
+        "CDE",
+        "FGH"
+      ],
+      [
+        "IJK",
+        "LMN",
+        "OPQ"
+      ],
+      [
+        "RST",
+        "UVW",
+        "XYZ"
+      ],
+      [
+        "abc",
+        "def",
+        "ghi"
+      ],
+      [
+        "jkl",
+        "mno",
+        "pqr"
+      ],
+      [
+        "stu",
+        "vwx",
+        "yz1"
+      ],
+      [
+        "234",
+        "567",
+        "89]"
+      ],
+      [
+        "^_`",
+        "{|}",
+        "~:;"
+      ],
+      [
+        "<=>",
+        "?@#",
+        "$%&"
+      ]
+    ],
+    "mapping": {
+      "#": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y8_e"
+          }
+        ]
+      },
+      "$": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y8_ws"
+          }
+        ]
+      },
+      "%": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y8_s"
+          }
+        ]
+      },
+      "&": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y8_es"
+          }
+        ]
+      },
+      "0": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y0_wn"
+          }
+        ]
+      },
+      "1": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y5_es"
+          }
+        ]
+      },
+      "2": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y6_wn"
+          }
+        ]
+      },
+      "3": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y6_n"
+          }
+        ]
+      },
+      "4": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y6_en"
+          }
+        ]
+      },
+      "5": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y6_w"
+          }
+        ]
+      },
+      "6": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y6_c"
+          }
+        ]
+      },
+      "7": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y6_e"
+          }
+        ]
+      },
+      "8": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y6_ws"
+          }
+        ]
+      },
+      "9": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y6_s"
+          }
+        ]
+      },
+      ":": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y7_s"
+          }
+        ]
+      },
+      ";": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y7_es"
+          }
+        ]
+      },
+      "<": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y8_wn"
+          }
+        ]
+      },
+      "=": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y8_n"
+          }
+        ]
+      },
+      ">": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y8_en"
+          }
+        ]
+      },
+      "?": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y8_w"
+          }
+        ]
+      },
+      "@": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y8_c"
+          }
+        ]
+      },
+      "A": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y0_n"
+          }
+        ]
+      },
+      "B": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y0_en"
+          }
+        ]
+      },
+      "C": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y0_w"
+          }
+        ]
+      },
+      "D": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y0_c"
+          }
+        ]
+      },
+      "E": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y0_e"
+          }
+        ]
+      },
+      "F": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y0_ws"
+          }
+        ]
+      },
+      "G": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y0_s"
+          }
+        ]
+      },
+      "H": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y0_es"
+          }
+        ]
+      },
+      "I": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y1_wn"
+          }
+        ]
+      },
+      "J": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y1_n"
+          }
+        ]
+      },
+      "K": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y1_en"
+          }
+        ]
+      },
+      "L": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y1_w"
+          }
+        ]
+      },
+      "M": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y1_c"
+          }
+        ]
+      },
+      "N": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y1_e"
+          }
+        ]
+      },
+      "O": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y1_ws"
+          }
+        ]
+      },
+      "P": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y1_s"
+          }
+        ]
+      },
+      "Q": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y1_es"
+          }
+        ]
+      },
+      "R": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y2_wn"
+          }
+        ]
+      },
+      "S": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y2_n"
+          }
+        ]
+      },
+      "T": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y2_en"
+          }
+        ]
+      },
+      "U": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y2_w"
+          }
+        ]
+      },
+      "V": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y2_c"
+          }
+        ]
+      },
+      "W": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y2_e"
+          }
+        ]
+      },
+      "X": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y2_ws"
+          }
+        ]
+      },
+      "Y": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y2_s"
+          }
+        ]
+      },
+      "Z": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y2_es"
+          }
+        ]
+      },
+      "]": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y6_es"
+          }
+        ]
+      },
+      "^": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y7_wn"
+          }
+        ]
+      },
+      "_": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y7_n"
+          }
+        ]
+      },
+      "`": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y7_en"
+          }
+        ]
+      },
+      "a": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y3_wn"
+          }
+        ]
+      },
+      "b": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y3_n"
+          }
+        ]
+      },
+      "c": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y3_en"
+          }
+        ]
+      },
+      "d": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y3_w"
+          }
+        ]
+      },
+      "e": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y3_c"
+          }
+        ]
+      },
+      "f": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y3_e"
+          }
+        ]
+      },
+      "g": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y3_ws"
+          }
+        ]
+      },
+      "h": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y3_s"
+          }
+        ]
+      },
+      "i": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y3_es"
+          }
+        ]
+      },
+      "j": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y4_wn"
+          }
+        ]
+      },
+      "k": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y4_n"
+          }
+        ]
+      },
+      "l": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y4_en"
+          }
+        ]
+      },
+      "m": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y4_w"
+          }
+        ]
+      },
+      "n": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y4_c"
+          }
+        ]
+      },
+      "o": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y4_e"
+          }
+        ]
+      },
+      "p": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y4_ws"
+          }
+        ]
+      },
+      "q": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y4_s"
+          }
+        ]
+      },
+      "r": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y4_es"
+          }
+        ]
+      },
+      "s": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y5_wn"
+          }
+        ]
+      },
+      "t": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y5_n"
+          }
+        ]
+      },
+      "u": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y5_en"
+          }
+        ]
+      },
+      "v": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y5_w"
+          }
+        ]
+      },
+      "w": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y5_c"
+          }
+        ]
+      },
+      "x": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y5_e"
+          }
+        ]
+      },
+      "y": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y5_ws"
+          }
+        ]
+      },
+      "z": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y5_s"
+          }
+        ]
+      },
+      "{": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y7_w"
+          }
+        ]
+      },
+      "|": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y7_c"
+          }
+        ]
+      },
+      "}": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y7_e"
+          }
+        ]
+      },
+      "~": {
+        "blocks": "anvilcraft_pigeon_plus:large_fireworks_rocket",
+        "properties": [
+          {
+            "facing": "north",
+            "part": "y7_ws"
+          }
+        ]
+      }
+    }
+  }
+}

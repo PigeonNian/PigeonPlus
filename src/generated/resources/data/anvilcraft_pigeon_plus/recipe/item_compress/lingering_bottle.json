@@ -1,0 +1,21 @@
+{
+  "type": "anvilcraft:item_compress",
+  "ingredients": [
+    {
+      "count": 8,
+      "items": "minecraft:glass_bottle"
+    },
+    {
+      "items": "minecraft:dragon_breath"
+    }
+  ],
+  "results": [
+    {
+      "count": 8,
+      "id": "anvilcraft_pigeon_plus:lingering_bottle"
+    },
+    {
+      "id": "minecraft:glass_bottle"
+    }
+  ]
+}

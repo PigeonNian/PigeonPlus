@@ -7,6 +7,8 @@ import dev.anvilcraft.pigeonplus.data.provider.AddonSoundDefinitionsProvider;
 import dev.anvilcraft.pigeonplus.data.recipe.AddonRecipeHandler;
 import dev.anvilcraft.pigeonplus.init.AddonEnchantments;
 import dev.anvilcraft.lib.v2.registrum.providers.ProviderType;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -27,6 +29,9 @@ public class AddonDatagen {
      */
     @SubscribeEvent
     public static void gatherData(GatherDataEvent.Client event) {
+        BuiltInRegistries.FLUID.listElements()
+            .forEach(holder -> holder.bindComponents(DataComponentMap.EMPTY));
+
         event.addProvider(new AddonSoundDefinitionsProvider(event.getGenerator().getPackOutput()));
     }
 

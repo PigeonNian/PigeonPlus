@@ -1,0 +1,18 @@
+{
+  "type": "anvilcraft:item_compress",
+  "ingredients": [
+    {
+      "count": 8,
+      "items": "minecraft:glass_bottle"
+    },
+    {
+      "items": "minecraft:gunpowder"
+    }
+  ],
+  "results": [
+    {
+      "count": 8,
+      "id": "anvilcraft_pigeon_plus:splash_bottle"
+    }
+  ]
+}

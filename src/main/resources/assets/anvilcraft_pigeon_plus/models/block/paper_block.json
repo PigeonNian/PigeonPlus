@@ -1,0 +1,12 @@
+{
+	"parent": "minecraft:block/cube",
+	"textures": {
+		"particle": "anvilcraft_pigeon_plus:block/paper_block_side",
+		"down": "anvilcraft_pigeon_plus:block/paper_block",
+		"up": "anvilcraft_pigeon_plus:block/paper_block",
+		"north": "anvilcraft_pigeon_plus:block/paper_block_side",
+		"east": "anvilcraft_pigeon_plus:block/paper_block_side",
+		"south": "anvilcraft_pigeon_plus:block/paper_block_side",
+		"west": "anvilcraft_pigeon_plus:block/paper_block_side"
+	}
+}

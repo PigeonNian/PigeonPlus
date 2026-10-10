@@ -35,6 +35,10 @@ public class AddonLangHandler {
         provider.add("block.anvilcraft_pigeon_plus.mixed_biomass", "Mixed Biomass");
         provider.add("block.anvilcraft_pigeon_plus.liquid_oxygen", "Liquid Oxygen");
         provider.add("block.anvilcraft_pigeon_plus.liquid_hydrogen", "Liquid Hydrogen");
+        provider.add("block.anvilcraft_pigeon_plus.potion", "Potion");
+        provider.add("fluid.anvilcraft_pigeon_plus.potion.of", "%s%s");
+        provider.add("fluid.anvilcraft_pigeon_plus.potion.long", "Long ");
+        provider.add("fluid.anvilcraft_pigeon_plus.potion.strong", "Strong ");
         provider.add("subtitles.anvilcraft_pigeon_plus.engine_on", "Nozzle engine starts");
         provider.add("subtitles.anvilcraft_pigeon_plus.engine_fire", "Nozzle engine roars");
         provider.add("subtitles.anvilcraft_pigeon_plus.rocket_punch_cast", "Rocket Punch");
@@ -47,6 +51,10 @@ public class AddonLangHandler {
         provider.add("death.attack.rocketPunchWallSlam", "%1$s was slammed into a wall by %2$s");
         provider.add("death.attack.uppercut", "%1$s was launched skyward by %2$s");
         provider.add("death.attack.seismicSlam", "%1$s was flattened by %2$s");
+        provider.add(
+            "death.attack.escapeTowerFailure",
+            "%1$s's escape tower failed to fire"
+        );
         provider.add("subtitles.anvilcraft_pigeon_plus.seismic_slam_leap", "Seismic Slam leaps");
         provider.add("subtitles.anvilcraft_pigeon_plus.seismic_slam_impact", "Seismic Slam impacts");
         provider.add("skill.anvilcraft_pigeon_plus.seismic_slam", "Seismic Slam");
@@ -59,6 +67,33 @@ public class AddonLangHandler {
             "Turns the Anvil Hammer into a pure weapon: it can no longer rotate or break blocks, open a portable anvil, rocket jump, or act as goggles."
         );
         provider.add("gui.anvilcraft_pigeon_plus.category.blending", "Blending");
+        provider.add("gui.anvilcraft_pigeon_plus.category.potion_brewing", "Potion Brewing");
+        provider.add(
+            "gui.anvilcraft_pigeon_plus.category.potion_brewing.whole_tank",
+            "Converts all potion in the container"
+        );
+        provider.add("gui.anvilcraft_pigeon_plus.category.potion_bulk_brewing", "Bulk Potion Brewing");
+        provider.add(
+            "gui.anvilcraft_pigeon_plus.category.potion_bulk_brewing.bulk",
+            "Brews 8B at once, using only one reagent"
+        );
+        provider.add("gui.anvilcraft_pigeon_plus.category.potion_soaking", "Potion Soaking");
+        provider.add(
+            "message.anvilcraft_pigeon_plus.large_fireworks_rocket.installed",
+            "Loaded firework star %s/%s"
+        );
+        provider.add(
+            "message.anvilcraft_pigeon_plus.large_fireworks_rocket.full",
+            "This large firework is already full (%s stars)"
+        );
+        provider.add(
+            "message.anvilcraft_pigeon_plus.large_fireworks_rocket.pearl_installed",
+            "Loaded ender pearl %s/%s"
+        );
+        provider.add(
+            "message.anvilcraft_pigeon_plus.large_fireworks_rocket.pearl_full",
+            "This large firework already holds the maximum %s ender pearls"
+        );
         provider.add("gui.anvilcraft_pigeon_plus.category.gas_liquefaction", "Gas Liquefaction");
         provider.add("gui.anvilcraft_pigeon_plus.gas_liquefaction.fill_then", "After Full");
         provider.add("gui.anvilcraft_pigeon_plus.gas_liquefaction.keep_pumping", "Keep Pumping");

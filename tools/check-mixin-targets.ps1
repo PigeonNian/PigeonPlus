@@ -17,7 +17,7 @@ $projectRoot = (Get-Location).Path
 
 # 收集 classpath：MC merged jar + 各依赖 jar
 $cpParts = New-Object System.Collections.Generic.List[string]
-$mcJar = Join-Path $projectRoot "build\moddev\artifacts\minecraft-patched-26.1.2.75-merged.jar"
+$mcJar = Join-Path $projectRoot "build\moddev\artifacts\minecraft-patched-26.1.2.115-merged.jar"
 if (Test-Path $mcJar) { $cpParts.Add($mcJar) }
 
 # AnvilCraft / AnvilLib 等依赖：从 gradle 缓存里挑最新的 26.1 版本
@@ -36,7 +36,7 @@ foreach ($g in @('dev.dubhe\anvilcraft-neoforge-26.1.2', 'dev.anvilcraft.lib\anv
 }
 $cp = $cpParts -join ';'
 
-$javap = "C:\Program Files\Java\jdk-17\bin\javap.exe"
+$javap = "C:\Users\鸽の念\.jdks\jbr-25.0.3\bin\javap.exe"
 if (-not (Test-Path $javap)) {
     # 退化：用 PATH 里的 javap
     $javap = "javap"
@@ -87,14 +87,19 @@ foreach ($file in (Get-ChildItem $SourceRoot -Recurse -Filter *.java)) {
         continue
     }
 
-    # 逐个校验 method = "..."（忽略 lambda$ 与带描述符的写法）
+    # 逐个校验 method = "..."。
+    #
+    # 注意不能无条件按 ';' 切分：「a;b」是 Mixin 的「多目标」写法，
+    # 但完整描述符（如 highlight(Lnet/...;Lnet/...;)Z）里的 ';' 是类型分隔符。
+    # 早期版本无脑切分，会把描述符切成碎片并逐片误报「缺少方法」。
+    # 判据：含 '(' 即为描述符，整体只取 '(' 之前的方法名。
     foreach ($mm in [regex]::Matches($text, 'method\s*=\s*"([^"]+)"')) {
         $methodSpec = $mm.Groups[1].Value
-        # 取方法名（可能是 a;b 形式的多目标）
-        foreach ($name in ($methodSpec -split ';')) {
+        $names = if ($methodSpec.Contains('(')) { @($methodSpec) } else { $methodSpec -split ';' }
+        foreach ($name in $names) {
             $clean = ($name -split '\(')[0].Trim()
             if ($clean -match '^\$|lambda\$') { continue }
-            # javap 输出里方法名后跟 '(' 
+            # javap 输出里方法名后跟 '('
             if ($methods -notmatch ('(?m)\b' + [regex]::Escape($clean) + '\s*\(')) {
                 $report.Add("[$($file.Name)] 目标 $targetClass 缺少方法: $clean")
                 $problems++
@@ -102,25 +107,36 @@ foreach ($file in (Get-ChildItem $SourceRoot -Recurse -Filter *.java)) {
         }
     }
 
-    # 校验 @Shadow 与 @Accessor 的字段。
-    # 这是本项目踩过的坑：@Shadow **不能解析继承字段**，
-    # 若字段声明在父类，运行时才会抛
-    # 「@Shadow field xxx was not located in the target class」。
-    # 正确做法是给字段真正的声明处加 accessor mixin。
-    foreach ($fm in [regex]::Matches($text, '@(?:Shadow|Accessor)\s*(?:\(\s*(?:value\s*=\s*)?"([^"]+)"\s*\))?\s*(?:[^\r\n;=]*?)\b(\w+)\s*(?:=|;|\())')) {
-        $fieldName = $fm.Groups[2].Value
-        # @Accessor 显式给了字段名时以它为准
-        if ($fm.Groups[1].Success) { $fieldName = $fm.Groups[1].Value }
-        # 跳过 @Shadow 方法（后面跟 '('）
-        if ($fm.Value -match '\(\s*\)' -and $fm.Value -match '\(') {
-            # 形如 @Shadow private void foo(  -> 是方法，交给上面的 method 校验
-            if ($fm.Value -notmatch '=\s*\w+\s*;') { }
+    # 校验 @Shadow / @Accessor 的目标成员。
+    #
+    # 这里有两个曾让本脚本「假通过」的坑：
+    #   1. 正则括号必须配平。旧写法结尾是 '(?:=|;|\())'，多了一个右括号，
+    #      .NET 解析期抛「Too many )'s」，整段循环被静默跳过。
+    #   2. 必须按**终止符**区分方法与字段：以 '(' 结束的是方法，以 ';'/'=' 结束的才是字段。
+    #      旧写法把方法也吃进来，再想靠事后匹配 '\(\s*\)' 补救是无效的
+    #      ——匹配在 '(' 处就结束了，不含 ')'，于是每个 @Shadow 方法都被误报成「缺少字段」。
+    foreach ($fm in [regex]::Matches($text, '@(?:Shadow|Accessor)\s*(?:\(\s*(?:value\s*=\s*)?"([^"]+)"\s*\))?\s*(?:[^\r\n;=()]*?)\b(\w+)\s*(=|;|\()')) {
+        $memberName = $fm.Groups[2].Value
+        $terminator = $fm.Groups[3].Value
+        if ($fm.Groups[1].Success) {
+            # @Accessor("xxx") 显式给出的是目标字段名
+            $memberName = $fm.Groups[1].Value
+            $isMethod = $false
+        } else {
+            $isMethod = ($terminator -eq '(')
         }
-        if ($fieldName -match '^(public|private|protected|static|final)$') { continue }
-        # javap 字段形式：类型 名称;  —— 名称后跟分号
-        if ($methods -notmatch ('(?m)\b' + [regex]::Escape($fieldName) + '\s*;')) {
-            $report.Add("[$($file.Name)] 目标 $targetClass 缺少字段（@Shadow 不能解析继承字段）: $fieldName")
-            $problems++
+        if ($memberName -match '^(public|private|protected|static|final|abstract)$') { continue }
+
+        if ($isMethod) {
+            if ($methods -notmatch ('(?m)\b' + [regex]::Escape($memberName) + '\s*\(')) {
+                $report.Add("[$($file.Name)] 目标 $targetClass 缺少方法（@Shadow）: $memberName")
+                $problems++
+            }
+        } else {
+            if ($methods -notmatch ('(?m)\b' + [regex]::Escape($memberName) + '\s*;')) {
+                $report.Add("[$($file.Name)] 目标 $targetClass 缺少字段（@Shadow 不能解析继承字段）: $memberName")
+                $problems++
+            }
         }
     }
 }

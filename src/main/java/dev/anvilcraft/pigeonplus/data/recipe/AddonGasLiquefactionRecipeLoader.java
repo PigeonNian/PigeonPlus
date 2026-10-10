@@ -5,7 +5,7 @@ import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
 import dev.anvilcraft.pigeonplus.init.AddonFluids;
 import dev.anvilcraft.pigeonplus.recipe.GasLiquefactionRecipe;
 import net.minecraft.resources.Identifier;
-import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStackTemplate;
 
 /**
  * 气体液化配方。
@@ -22,18 +22,18 @@ import net.neoforged.neoforge.fluids.FluidStack;
 public class AddonGasLiquefactionRecipeLoader {
     public static void init(RegistrumRecipeProvider provider) {
         pigeonplus$accept(provider, "gas_liquefaction/compressed_air", new GasLiquefactionRecipe(
-            new FluidStack(AddonFluids.COMPRESSED_AIR.get(), 415),
-            new FluidStack(AddonFluids.LIQUID_OXYGEN.get(), 1)
+            new FluidStackTemplate(AddonFluids.COMPRESSED_AIR.get(), 415),
+            new FluidStackTemplate(AddonFluids.LIQUID_OXYGEN.get(), 1)
         ));
 
         pigeonplus$accept(provider, "gas_liquefaction/compressed_air_hydrogen", new GasLiquefactionRecipe(
-            new FluidStack(AddonFluids.COMPRESSED_AIR.get(), 830),
-            new FluidStack(AddonFluids.LIQUID_HYDROGEN.get(), 1)
+            new FluidStackTemplate(AddonFluids.COMPRESSED_AIR.get(), 830),
+            new FluidStackTemplate(AddonFluids.LIQUID_HYDROGEN.get(), 1)
         ));
 
         pigeonplus$accept(provider, "gas_liquefaction/gaseous_biogas", new GasLiquefactionRecipe(
-            new FluidStack(AddonFluids.GASEOUS_BIOGAS.get(), 512),
-            new FluidStack(AddonFluids.LIQUEFIED_BIOGAS.get(), 1)
+            new FluidStackTemplate(AddonFluids.GASEOUS_BIOGAS.get(), 512),
+            new FluidStackTemplate(AddonFluids.LIQUEFIED_BIOGAS.get(), 1)
         ));
     }
 

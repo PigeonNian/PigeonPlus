@@ -5,12 +5,16 @@ import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
 import dev.anvilcraft.pigeonplus.block.AnvilPumpBlock;
 import dev.anvilcraft.pigeonplus.block.BlenderBlock;
 import dev.anvilcraft.pigeonplus.block.FeedSpreaderBlock;
+import dev.anvilcraft.pigeonplus.block.LargeFireworksRocketBlock;
 import dev.anvilcraft.pigeonplus.block.MixedBiomassCauldronBlock;
 import dev.anvilcraft.pigeonplus.block.NozzleBlock;
 import dev.anvilcraft.pigeonplus.block.PigeonAnvilBlock;
 import dev.anvilcraft.pigeonplus.block.StasisBeaconBlock;
+import dev.anvilcraft.pigeonplus.block.state.LargeFireworksRocketPart;
 import dev.dubhe.anvilcraft.item.block.FlexibleMultiPartBlockItem;
+import dev.dubhe.anvilcraft.item.block.SimpleMultiPartBlockItem;
 import dev.dubhe.anvilcraft.block.multipart.FlexibleMultiPartBlock;
+import dev.dubhe.anvilcraft.block.multipart.SimpleMultiPartBlock;
 import dev.dubhe.anvilcraft.block.state.DirectionCube3x3PartHalf;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.MultiVariant;
@@ -23,33 +27,15 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 
 import static dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus.REGISTRUM;
 
-/**
- * 本模组的方块注册与数据生成。
- *
- * <h3>26.1 的 datagen 改写说明</h3>
- * 1.21.1 用的 NeoForge {@code BlockStateProvider} / {@code ConfiguredModel} /
- * {@code ModelFile} 这一整套 API 在 26.1 <strong>已被移除</strong>，
- * 改为原版新的 {@code BlockModelGenerators} 体系（AnvilLib 的
- * {@code RegistrumBlockModelGenerator} 直接继承它）。主要差异：
- * <ul>
- *   <li>不再有 {@code ConfiguredModel.builder().modelFile(...).rotationY(n).build()}；
- *       改为 {@code MultiVariantGenerator.dispatch(block, plainVariant(id))}
- *       再 {@code .with(旋转)}。</li>
- *   <li>常用旋转已由原版常量提供：{@code ROTATION_HORIZONTAL_FACING}（东=90°）
- *       与 {@code ROTATION_HORIZONTAL_FACING_ALT}（南=0°）。
- *       本模组原先手写的 {@code rotationY}/{@code pumpRotationY}/{@code anvilRotationY}
- *       与这两个常量完全一致，故直接替换、不再需要自定义函数。</li>
- *   <li>物品模型由 {@code withExistingParent} 改为
- *       {@code RegistrumItemModelGenerator#createWithExistingModel}。</li>
- *   <li>{@code ExistingFileHelper} 已不存在，模型直接按 id 引用，无需再查找校验。</li>
- * </ul>
- */
 public class AddonBlocks {
     static {
         REGISTRUM.defaultCreativeTab(AddonItemGroups.ADDON_ITEMS.getKey());
@@ -155,6 +141,71 @@ public class AddonBlocks {
         .onRegister(block -> Item.BY_BLOCK.put(block, Items.CAULDRON))
         .register();
 
+    public static final BlockEntry<LargeFireworksRocketBlock> LARGE_FIREWORKS_ROCKET = REGISTRUM
+        .block("large_fireworks_rocket", LargeFireworksRocketBlock::new)
+        .initialProperties(() -> Blocks.WHITE_WOOL)
+        .properties(properties -> properties
+            .sound(SoundType.WOOL)
+            .noOcclusion()
+            .isViewBlocking((state, level, pos) -> false))
+        .blockstate(() -> (ctx, gen) -> gen.blockStateOutput.accept(
+            MultiVariantGenerator.dispatch(ctx.getEntry()).with(
+                PropertyDispatch.initial(LargeFireworksRocketBlock.PART, LargeFireworksRocketBlock.FACING)
+                    .generate((part, facing) -> pigeonplus$variant(
+                            "block/large_fireworks_rocket_" + part.getModelName())
+                        .with(pigeonplus$horizontalYRot(facing))))))
+        .loot(SimpleMultiPartBlock::loot)
+        .item(SimpleMultiPartBlockItem<LargeFireworksRocketPart>::new)
+            .model(() -> (ctx, gen) -> gen.createWithExistingModel(
+                ctx.get(), pigeonplus$id("item/large_fireworks_rocket_model")))
+            .build()
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+        .register();
+
+    public static final BlockEntry<Block> PAPER_BLOCK = REGISTRUM
+        .block("paper_block", Block::new)
+        .initialProperties(() -> Blocks.WHITE_WOOL)
+        .blockstate(() -> (ctx, gen) -> gen.blockStateOutput.accept(
+            BlockModelGenerators.createSimpleBlock(ctx.getEntry(), pigeonplus$variant("block/paper_block"))))
+        .item(BlockItem::new)
+            .build()
+        .tag(BlockTags.WOOL)
+        .register();
+
+    public static final BlockEntry<StairBlock> PAPER_BLOCK_STAIRS = REGISTRUM
+        .block("paper_block_stairs", properties ->
+            new StairBlock(PAPER_BLOCK.get().defaultBlockState(), properties))
+        .initialProperties(() -> Blocks.WHITE_WOOL)
+        .blockstate(() -> (ctx, gen) -> {
+            gen.blockStateOutput.accept(BlockModelGenerators.createStairs(
+                ctx.getEntry(),
+                pigeonplus$variant("block/paper_block_stairs_inner"),
+                pigeonplus$variant("block/paper_block_stairs"),
+                pigeonplus$variant("block/paper_block_stairs_outer")));
+            gen.registerSimpleItemModel(ctx.getEntry(), pigeonplus$id("block/paper_block_stairs"));
+        })
+        .item(BlockItem::new)
+            .build()
+        .tag(BlockTags.WOOL)
+        .register();
+
+    public static final BlockEntry<SlabBlock> PAPER_BLOCK_SLAB = REGISTRUM
+        .block("paper_block_slab", SlabBlock::new)
+        .initialProperties(() -> Blocks.WHITE_WOOL)
+        .blockstate(() -> (ctx, gen) -> {
+            gen.blockStateOutput.accept(BlockModelGenerators.createSlab(
+                ctx.getEntry(),
+                pigeonplus$variant("block/paper_block_slab"),
+                pigeonplus$variant("block/paper_block_slab_top"),
+                pigeonplus$variant("block/paper_block")));
+            gen.registerSimpleItemModel(ctx.getEntry(), pigeonplus$id("block/paper_block_slab"));
+        })
+        .loot((tables, block) -> tables.add(block, tables.createSlabItemTable(block)))
+        .item(BlockItem::new)
+            .build()
+        .tag(BlockTags.WOOL)
+        .register();
+
     public static void register() {
     }
 
@@ -166,6 +217,15 @@ public class AddonBlocks {
     /** 引用一个已有模型（不再需要 ExistingFileHelper 查找）。 */
     private static MultiVariant pigeonplus$variant(String path) {
         return BlockModelGenerators.plainVariant(pigeonplus$id(path));
+    }
+
+    private static VariantMutator pigeonplus$horizontalYRot(Direction facing) {
+        return switch (facing) {
+            case EAST -> BlockModelGenerators.Y_ROT_90;
+            case SOUTH -> BlockModelGenerators.Y_ROT_180;
+            case WEST -> BlockModelGenerators.Y_ROT_270;
+            default -> BlockModelGenerators.NOP;
+        };
     }
 
     /**

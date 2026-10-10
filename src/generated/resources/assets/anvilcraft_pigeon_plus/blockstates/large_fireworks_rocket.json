@@ -1,0 +1,1219 @@
+{
+  "variants": {
+    "facing=east,part=y0_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y0_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y0_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y0_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y0_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y0_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y0_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y0_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y0_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y1_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_bottom",
+      "y": 90
+    },
+    "facing=east,part=y1_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y1_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y1_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y1_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y1_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y1_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y1_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y1_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y2_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y2_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y2_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y2_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y2_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y2_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y2_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y2_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y2_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y3_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y3_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y3_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y3_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y3_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y3_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y3_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y3_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y3_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y4_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_middle",
+      "y": 90
+    },
+    "facing=east,part=y4_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y4_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y4_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y4_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y4_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y4_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y4_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y4_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y5_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y5_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y5_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y5_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y5_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y5_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y5_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y5_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y5_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y6_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y6_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y6_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y6_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y6_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y6_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y6_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y6_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y6_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y7_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_top",
+      "y": 90
+    },
+    "facing=east,part=y7_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y7_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y7_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y7_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y7_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y7_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y7_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y7_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y8_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y8_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y8_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y8_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y8_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y8_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y8_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y8_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=east,part=y8_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 90
+    },
+    "facing=north,part=y0_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y0_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y0_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y0_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y0_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y0_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y0_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y0_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y0_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y1_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_bottom"
+    },
+    "facing=north,part=y1_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y1_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y1_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y1_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y1_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y1_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y1_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y1_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y2_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y2_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y2_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y2_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y2_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y2_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y2_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y2_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y2_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y3_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y3_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y3_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y3_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y3_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y3_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y3_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y3_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y3_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y4_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_middle"
+    },
+    "facing=north,part=y4_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y4_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y4_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y4_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y4_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y4_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y4_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y4_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y5_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y5_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y5_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y5_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y5_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y5_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y5_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y5_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y5_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y6_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y6_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y6_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y6_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y6_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y6_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y6_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y6_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y6_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y7_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_top"
+    },
+    "facing=north,part=y7_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y7_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y7_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y7_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y7_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y7_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y7_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y7_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y8_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y8_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y8_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y8_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y8_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y8_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y8_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y8_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=north,part=y8_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part"
+    },
+    "facing=south,part=y0_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y0_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y0_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y0_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y0_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y0_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y0_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y0_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y0_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y1_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_bottom",
+      "y": 180
+    },
+    "facing=south,part=y1_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y1_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y1_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y1_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y1_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y1_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y1_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y1_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y2_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y2_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y2_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y2_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y2_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y2_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y2_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y2_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y2_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y3_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y3_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y3_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y3_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y3_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y3_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y3_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y3_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y3_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y4_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_middle",
+      "y": 180
+    },
+    "facing=south,part=y4_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y4_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y4_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y4_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y4_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y4_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y4_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y4_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y5_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y5_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y5_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y5_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y5_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y5_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y5_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y5_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y5_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y6_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y6_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y6_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y6_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y6_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y6_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y6_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y6_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y6_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y7_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_top",
+      "y": 180
+    },
+    "facing=south,part=y7_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y7_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y7_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y7_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y7_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y7_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y7_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y7_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y8_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y8_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y8_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y8_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y8_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y8_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y8_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y8_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=south,part=y8_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 180
+    },
+    "facing=west,part=y0_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y0_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y0_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y0_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y0_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y0_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y0_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y0_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y0_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y1_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_bottom",
+      "y": 270
+    },
+    "facing=west,part=y1_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y1_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y1_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y1_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y1_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y1_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y1_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y1_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y2_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y2_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y2_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y2_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y2_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y2_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y2_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y2_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y2_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y3_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y3_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y3_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y3_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y3_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y3_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y3_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y3_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y3_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y4_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_middle",
+      "y": 270
+    },
+    "facing=west,part=y4_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y4_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y4_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y4_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y4_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y4_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y4_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y4_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y5_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y5_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y5_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y5_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y5_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y5_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y5_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y5_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y5_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y6_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y6_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y6_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y6_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y6_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y6_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y6_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y6_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y6_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y7_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_top",
+      "y": 270
+    },
+    "facing=west,part=y7_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y7_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y7_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y7_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y7_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y7_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y7_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y7_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y8_c": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y8_e": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y8_en": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y8_es": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y8_n": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y8_s": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y8_w": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y8_wn": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    },
+    "facing=west,part=y8_ws": {
+      "model": "anvilcraft_pigeon_plus:block/large_fireworks_rocket_part",
+      "y": 270
+    }
+  }
+}

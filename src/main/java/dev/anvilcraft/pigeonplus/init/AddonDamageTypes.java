@@ -47,6 +47,11 @@ public final class AddonDamageTypes {
         AnvilCraftPigeonPlus.of("seismic_slam")
     );
 
+    public static final ResourceKey<DamageType> ESCAPE_TOWER_FAILURE = ResourceKey.create(
+        Registries.DAMAGE_TYPE,
+        AnvilCraftPigeonPlus.of("escape_tower_failure")
+    );
+
     private AddonDamageTypes() {
     }
 
@@ -68,5 +73,9 @@ public final class AddonDamageTypes {
 
     public static DamageSource seismicSlam(Level level, @Nullable Entity attacker) {
         return level.damageSources().source(SEISMIC_SLAM, attacker);
+    }
+
+    public static DamageSource escapeTowerFailure(Level level, @Nullable Entity rocket) {
+        return level.damageSources().source(ESCAPE_TOWER_FAILURE, rocket);
     }
 }

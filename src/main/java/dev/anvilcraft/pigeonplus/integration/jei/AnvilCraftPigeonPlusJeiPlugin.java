@@ -3,6 +3,11 @@ package dev.anvilcraft.pigeonplus.integration.jei;
 import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
 import dev.anvilcraft.pigeonplus.integration.jei.category.BlendingCategory;
 import dev.anvilcraft.pigeonplus.integration.jei.category.GasLiquefactionCategory;
+import dev.anvilcraft.pigeonplus.integration.jei.category.PotionBrewingCategory;
+import dev.anvilcraft.pigeonplus.integration.jei.category.PotionBulkBrewingCategory;
+import dev.anvilcraft.pigeonplus.integration.jei.category.PotionSoakingCategory;
+import dev.anvilcraft.pigeonplus.integration.jei.recipe.PotionBrewingJeiRecipe;
+import dev.anvilcraft.pigeonplus.integration.jei.recipe.PotionSoakingJeiRecipe;
 import dev.anvilcraft.pigeonplus.recipe.GasLiquefactionRecipe;
 import dev.anvilcraft.pigeonplus.recipe.anvil.wrap.BlendingRecipe;
 import mezz.jei.api.IModPlugin;
@@ -23,6 +28,12 @@ public class AnvilCraftPigeonPlusJeiPlugin implements IModPlugin {
         RecipeType.createRecipeHolderType(AnvilCraftPigeonPlus.of("blending"));
     public static final RecipeType<RecipeHolder<GasLiquefactionRecipe>> GAS_LIQUEFACTION =
         RecipeType.createRecipeHolderType(AnvilCraftPigeonPlus.of("gas_liquefaction"));
+    public static final RecipeType<PotionBrewingJeiRecipe> POTION_BREWING =
+        RecipeType.create(AnvilCraftPigeonPlus.MOD_ID, "potion_brewing", PotionBrewingJeiRecipe.class);
+    public static final RecipeType<PotionBrewingJeiRecipe> POTION_BULK_BREWING =
+        RecipeType.create(AnvilCraftPigeonPlus.MOD_ID, "potion_bulk_brewing", PotionBrewingJeiRecipe.class);
+    public static final RecipeType<PotionSoakingJeiRecipe> POTION_SOAKING =
+        RecipeType.create(AnvilCraftPigeonPlus.MOD_ID, "potion_soaking", PotionSoakingJeiRecipe.class);
 
     @Override
     public @NotNull Identifier getPluginUid() {
@@ -35,17 +46,26 @@ public class AnvilCraftPigeonPlusJeiPlugin implements IModPlugin {
         IGuiHelper guiHelper = jeiHelpers.getGuiHelper();
         registration.addRecipeCategories(new BlendingCategory(guiHelper));
         registration.addRecipeCategories(new GasLiquefactionCategory(guiHelper));
+        registration.addRecipeCategories(new PotionBrewingCategory(guiHelper));
+        registration.addRecipeCategories(new PotionBulkBrewingCategory(guiHelper));
+        registration.addRecipeCategories(new PotionSoakingCategory(guiHelper));
     }
 
     @Override
     public void registerRecipes(@NotNull IRecipeRegistration registration) {
         BlendingCategory.registerRecipes(registration);
         GasLiquefactionCategory.registerRecipes(registration);
+        PotionBrewingCategory.registerRecipes(registration);
+        PotionBulkBrewingCategory.registerRecipes(registration);
+        PotionSoakingCategory.registerRecipes(registration);
     }
 
     @Override
     public void registerRecipeCatalysts(@NotNull IRecipeCatalystRegistration registration) {
         BlendingCategory.registerRecipeCatalysts(registration);
         GasLiquefactionCategory.registerRecipeCatalysts(registration);
+        PotionBrewingCategory.registerRecipeCatalysts(registration);
+        PotionBulkBrewingCategory.registerRecipeCatalysts(registration);
+        PotionSoakingCategory.registerRecipeCatalysts(registration);
     }
 }

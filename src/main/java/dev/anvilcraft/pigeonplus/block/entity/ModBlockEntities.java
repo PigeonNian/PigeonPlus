@@ -47,6 +47,11 @@ public class ModBlockEntities {
         BLOCK_ENTITIES.register("nozzle_exhaust", () ->
             new BlockEntityType<>(NozzleExhaustBlockEntity::new, AddonBlocks.NOZZLE.get()));
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<LargeFireworksRocketBlockEntity>>
+        LARGE_FIREWORKS_ROCKET = BLOCK_ENTITIES.register("large_fireworks_rocket", () ->
+            new BlockEntityType<>(
+                LargeFireworksRocketBlockEntity::new, AddonBlocks.LARGE_FIREWORKS_ROCKET.get()));
+
     public static void register(IEventBus bus) {
         BLOCK_ENTITIES.register(bus);
     }
@@ -61,6 +66,13 @@ public class ModBlockEntities {
             Capabilities.Item.BLOCK,
             FEED_SPREADER.get(),
             (blockEntity, side) -> blockEntity.getInventory()
+        );
+        event.registerItem(
+            Capabilities.Fluid.ITEM,
+            (stack, context) -> new dev.anvilcraft.pigeonplus.fluid.PotionBottleFluidHandler(context),
+            net.minecraft.world.item.Items.POTION,
+            net.minecraft.world.item.Items.SPLASH_POTION,
+            net.minecraft.world.item.Items.LINGERING_POTION
         );
     }
 }

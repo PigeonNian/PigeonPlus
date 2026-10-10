@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "P": "anvilcraft_pigeon_plus:paper_block"
+  },
+  "pattern": [
+    "PPP"
+  ],
+  "result": {
+    "count": 6,
+    "id": "anvilcraft_pigeon_plus:paper_block_slab"
+  }
+}

@@ -4,6 +4,8 @@ import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
 import dev.anvilcraft.pigeonplus.block.EvaporatingLiquidBlock;
 import dev.anvilcraft.pigeonplus.block.MixedBiomassBlock;
 import dev.anvilcraft.pigeonplus.fluid.GasFluid;
+import dev.anvilcraft.pigeonplus.fluid.PotionFluid;
+import dev.anvilcraft.pigeonplus.fluid.PotionFluidType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.block.Block;
@@ -200,6 +202,22 @@ public class AddonFluids {
             .liquid()
             .randomTicks(),
             new Vector3f(0.78f, 0.92f, 1.0f))
+    );
+
+    public static final DeferredHolder<FluidType, FluidType> POTION_TYPE = FLUID_TYPES.register(
+        "potion",
+        () -> new PotionFluidType(FluidType.Properties.create()
+            .descriptionId("block.%s.potion".formatted(AnvilCraftPigeonPlus.MOD_ID))
+            .density(1000)
+            .viscosity(1000)
+            .temperature(300)
+            .sound(SoundActions.BUCKET_FILL, SoundEvents.BOTTLE_FILL)
+            .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BOTTLE_EMPTY))
+    );
+
+    public static final DeferredHolder<Fluid, PotionFluid> POTION = FLUIDS.register(
+        "potion",
+        PotionFluid::new
     );
 
     private static BaseFlowingFluid.Properties mixedBiomassProperties() {

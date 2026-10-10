@@ -1,16 +1,20 @@
 package dev.anvilcraft.pigeonplus.client;
 
 import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
+import dev.anvilcraft.pigeonplus.fluid.PotionFluidUtil;
 import dev.anvilcraft.pigeonplus.init.AddonFluids;
 import net.minecraft.client.renderer.block.FluidModel;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.level.material.FluidState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RegisterFluidModelsEvent;
 import net.neoforged.neoforge.client.fluid.FluidTintSource;
 import net.neoforged.neoforge.client.fluid.FluidTintSources;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.minecraft.world.level.material.Fluid;
 
@@ -22,6 +26,8 @@ public final class AddonFluidModels {
     /** 原版水的流动贴图。 */
     private static final Material WATER_FLOW =
         new Material(Identifier.withDefaultNamespace("block/water_flow"));
+
+    private static final int PIGEONPLUS_POTION_FALLBACK = 0xFF385DC6;
 
     private AddonFluidModels() {
     }
@@ -40,6 +46,25 @@ public final class AddonFluidModels {
             AddonFluids.LIQUID_OXYGEN, AddonFluids.LIQUID_OXYGEN_FLOWING);
         pigeonplus$register(event, 0x70B8E2F4,
             AddonFluids.LIQUID_HYDROGEN, AddonFluids.LIQUID_HYDROGEN_FLOWING);
+        event.register(new FluidModel.Unbaked(
+            WATER_STILL,
+            WATER_FLOW,
+            null,
+            new FluidTintSource() {
+                @Override
+                public int color(FluidState state) {
+                    return PIGEONPLUS_POTION_FALLBACK;
+                }
+
+                @Override
+                public int colorAsStack(FluidStack stack) {
+                    PotionContents contents = PotionFluidUtil.getContents(stack);
+                    return contents == null
+                        ? PIGEONPLUS_POTION_FALLBACK
+                        : 0xFF000000 | contents.getColor();
+                }
+            }
+        ), AddonFluids.POTION);
     }
 
     /**

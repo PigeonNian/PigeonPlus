@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "anvilcraft_pigeon_plus:block/paper_block_slab"
+    },
+    "type=double": {
+      "model": "anvilcraft_pigeon_plus:block/paper_block"
+    },
+    "type=top": {
+      "model": "anvilcraft_pigeon_plus:block/paper_block_slab_top"
+    }
+  }
+}

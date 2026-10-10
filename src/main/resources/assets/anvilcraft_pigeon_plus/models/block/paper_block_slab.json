@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "anvilcraft_pigeon_plus:block/paper_block",
+    "side": "anvilcraft_pigeon_plus:block/paper_block_side",
+    "top": "anvilcraft_pigeon_plus:block/paper_block"
+  }
+}

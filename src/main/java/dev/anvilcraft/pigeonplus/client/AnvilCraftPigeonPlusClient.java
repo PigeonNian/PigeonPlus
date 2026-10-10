@@ -22,6 +22,8 @@ import dev.anvilcraft.pigeonplus.client.renderer.block.BlenderBlockEntityRendere
 import dev.anvilcraft.pigeonplus.client.renderer.block.FeedSpreaderBlockEntityRenderer;
 import dev.anvilcraft.pigeonplus.client.renderer.block.NozzleExhaustBlockEntityRenderer;
 import dev.anvilcraft.pigeonplus.client.renderer.block.StasisBeaconBlockEntityRenderer;
+import dev.anvilcraft.pigeonplus.client.renderer.block.LargeFireworksRocketBlockEntityRenderer;
+import dev.anvilcraft.pigeonplus.client.renderer.entity.LargeFireworksRocketRenderer;
 import dev.anvilcraft.pigeonplus.client.sound.NozzleSoundController;
 import dev.anvilcraft.pigeonplus.client.sound.RocketPunchChargeSoundController;
 import dev.anvilcraft.pigeonplus.client.tooltip.AddonItemTooltipManager;
@@ -189,6 +191,7 @@ public class AnvilCraftPigeonPlusClient {
             pigeonplus$id("block/large_cauldron_top"));
         StandaloneBlockModels.register(event, LargeCauldronAttachmentModels.BOTTOM,
             pigeonplus$id("block/large_cauldron_bottom"));
+        LargeFireworksRocketRenderer.registerModels(event);
     }
 
     /** 本模组的资源 id。 */
@@ -202,6 +205,14 @@ public class AnvilCraftPigeonPlusClient {
         event.registerBlockEntityRenderer(ModBlockEntities.FEED_SPREADER.get(), FeedSpreaderBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.STASIS_BEACON.get(), StasisBeaconBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.NOZZLE_EXHAUST.get(), NozzleExhaustBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(
+            ModBlockEntities.LARGE_FIREWORKS_ROCKET.get(), LargeFireworksRocketBlockEntityRenderer::new);
+        event.registerEntityRenderer(
+            dev.anvilcraft.pigeonplus.init.AddonEntities.LARGE_FIREWORKS_ROCKET.get(),
+            LargeFireworksRocketRenderer::new);
+        event.registerEntityRenderer(
+            dev.anvilcraft.pigeonplus.init.AddonEntities.LARGE_FIREWORKS_ROCKET_SEAT.get(),
+            net.minecraft.client.renderer.entity.NoopRenderer::new);
     }
 
     private void onClientSetup(FMLClientSetupEvent event) {

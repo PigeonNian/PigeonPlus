@@ -25,10 +25,10 @@ neoForge {
         }
 
         data {
-            // 用 clientData() 而不是 data()：本模组有一个 includeClient() 的声音定义
-            // 提供器（sounds.json 属于客户端资源），只跑服务端数据生成会漏掉它。
             clientData()
-            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+            programArguments.addAll '--mod', project.mod_id, '--all',
+                '--output', file('src/generated/resources/').getAbsolutePath(),
+                '--existing', file('src/main/resources/').getAbsolutePath()
         }
 
         configureEach {

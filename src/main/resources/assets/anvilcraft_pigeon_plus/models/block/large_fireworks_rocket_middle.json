@@ -1,0 +1,24 @@
+{
+	"format_version": "1.9.0",
+	"credit": "Made with Blockbench",
+	"parent": "minecraft:block/block",
+	"textures": {
+		"particle": "anvilcraft_pigeon_plus:block/large_fireworks_rocket",
+		"wool": "anvilcraft_pigeon_plus:block/large_fireworks_rocket"
+	},
+	"elements": [
+		{
+			"from": [-8, -16, -8],
+			"to": [24, 32, 24],
+			"rotation": {"angle": 0, "axis": "y", "origin": [4, 16, 4]},
+			"faces": {
+				"north": {"uv": [1, 6, 5, 12], "texture": "#wool"},
+				"east": {"uv": [1, 6, 5, 12], "texture": "#wool"},
+				"south": {"uv": [1, 6, 5, 12], "texture": "#wool"},
+				"west": {"uv": [1, 6, 5, 12], "texture": "#wool"},
+				"up": {"uv": [0, 0, 0, 0], "texture": "#wool"},
+				"down": {"uv": [0, 0, 0, 0], "texture": "#wool"}
+			}
+		}
+	]
+}
