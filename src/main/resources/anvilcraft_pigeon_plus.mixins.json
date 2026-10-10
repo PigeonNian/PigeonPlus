@@ -26,7 +26,8 @@
     "client.LargeCauldronBlockEntityRendererMixin",
     "client.MinecraftClientMixin",
     "client.ModelBlockSelectionMixin",
-    "client.ModelSelectionBakeryMixin"
+    "client.ModelSelectionBakeryMixin",
+    "client.OversizedItemScissorMixin"
   ],
   "injectors": {
     "defaultRequire": 1
