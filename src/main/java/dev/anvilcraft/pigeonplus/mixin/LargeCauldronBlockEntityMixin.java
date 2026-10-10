@@ -85,7 +85,7 @@ public class LargeCauldronBlockEntityMixin {
     @Unique
     private static boolean pigeonplus$isActiveHeatingHelper(BlockState state) {
         if (state.is(ModBlocks.HEATER)) {
-            return !state.getValue(HeaterBlock.OVERLOAD);
+            return ((HeaterBlock) state.getBlock()).isActive(state);
         }
         return state.is(ModBlocks.BURNING_HEATER) && state.getValue(BurningHeaterBlock.LEVEL) == 2;
     }

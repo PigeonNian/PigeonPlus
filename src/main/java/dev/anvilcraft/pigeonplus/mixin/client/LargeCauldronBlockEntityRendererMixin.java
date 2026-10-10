@@ -64,12 +64,6 @@ public class LargeCauldronBlockEntityRendererMixin {
     private static final float PIGEONPLUS_MAX_Y = 1.75F - 0.001F;
     /**
      * 提取阶段：有推进剂时熄火。
-     *
-     * <p>气体的「铺满」不再在这里改数据：AnvilCraft 把流体层渲染抽成了
-     * {@link FluidRenderLayers}，其中的 {@code create} 会按
-     * {@code fluidType.isLighterThanAir()} 自动把气体铺满剩余空间
-     * （见其源码：气体按「剩余高度 / 气体种数」均分，而不是按体积）。
-     * 因此本模组原先自己实现的「抬到满容量」已成为多余逻辑。
      */
     @Inject(method = "extractRenderState", at = @At("RETURN"))
     private void pigeonplus$adjustLargeCauldronState(
