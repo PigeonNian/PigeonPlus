@@ -40,8 +40,6 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import static dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus.REGISTRUM;
 
 public class AddonBlocks {
-    private static final ClientItem.Properties OVERSIZED_IN_GUI = new ClientItem.Properties(true, true, 1.0F);
-
     static {
         REGISTRUM.defaultCreativeTab(AddonItemGroups.ADDON_ITEMS.getKey());
     }
@@ -51,7 +49,7 @@ public class AddonBlocks {
         Item item,
         Identifier model
     ) {
-        output.accept(item, ItemModelUtils.plainModel(model), OVERSIZED_IN_GUI);
+        output.accept(item, ItemModelUtils.plainModel(model), new ClientItem.Properties(true, true, 1.0F));
     }
 
     public static final BlockEntry<PigeonAnvilBlock> PIGEON_ANVIL = REGISTRUM
