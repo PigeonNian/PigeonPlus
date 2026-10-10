@@ -2,6 +2,5 @@
   "model": {
     "type": "minecraft:model",
     "model": "anvilcraft_pigeon_plus:block/nozzle"
-  },
-  "oversized_in_gui": true
+  }
 }

@@ -17,13 +17,10 @@ import dev.dubhe.anvilcraft.block.multipart.FlexibleMultiPartBlock;
 import dev.dubhe.anvilcraft.block.multipart.SimpleMultiPartBlock;
 import dev.dubhe.anvilcraft.block.state.DirectionCube3x3PartHalf;
 import net.minecraft.client.data.models.BlockModelGenerators;
-import net.minecraft.client.data.models.ItemModelOutput;
 import net.minecraft.client.data.models.MultiVariant;
 import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
 import net.minecraft.client.data.models.blockstates.PropertyDispatch;
-import net.minecraft.client.data.models.model.ItemModelUtils;
 import net.minecraft.client.renderer.block.dispatch.VariantMutator;
-import net.minecraft.client.renderer.item.ClientItem;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
@@ -42,14 +39,6 @@ import static dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus.REGISTRUM;
 public class AddonBlocks {
     static {
         REGISTRUM.defaultCreativeTab(AddonItemGroups.ADDON_ITEMS.getKey());
-    }
-
-    private static void oversizedModel(
-        ItemModelOutput output,
-        Item item,
-        Identifier model
-    ) {
-        output.accept(item, ItemModelUtils.plainModel(model), new ClientItem.Properties(true, true, 1.0F));
     }
 
     public static final BlockEntry<PigeonAnvilBlock> PIGEON_ANVIL = REGISTRUM
@@ -122,7 +111,7 @@ public class AddonBlocks {
                         .with(pigeonplus$nozzleYRot(facing))))))
         .loot(FlexibleMultiPartBlock::loot)
         .item(FlexibleMultiPartBlockItem<DirectionCube3x3PartHalf, EnumProperty<Direction>, Direction>::new)
-            .model(() -> (ctx, gen) -> oversizedModel(gen.itemModelOutput, ctx.get(), pigeonplus$id("block/nozzle")))
+            .model(() -> (ctx, gen) -> gen.createWithExistingModel(ctx.get(), pigeonplus$id("block/nozzle")))
             .build()
         .tag(BlockTags.MINEABLE_WITH_PICKAXE)
         .register();
@@ -167,8 +156,8 @@ public class AddonBlocks {
                         .with(pigeonplus$horizontalYRot(facing))))))
         .loot(SimpleMultiPartBlock::loot)
         .item(SimpleMultiPartBlockItem<LargeFireworksRocketPart>::new)
-            .model(() -> (ctx, gen) -> oversizedModel(
-                gen.itemModelOutput, ctx.get(), pigeonplus$id("item/large_fireworks_rocket_model")))
+            .model(() -> (ctx, gen) -> gen.createWithExistingModel(
+                ctx.get(), pigeonplus$id("item/large_fireworks_rocket_model")))
             .build()
         .tag(BlockTags.MINEABLE_WITH_PICKAXE)
         .register();
