@@ -10,7 +10,8 @@ import net.minecraft.world.phys.Vec3;
 public final class NozzleScreenShakeManager {
     private static final NozzleScreenShakeManager INSTANCE = new NozzleScreenShakeManager();
     private static final long STARTUP_DURATION_NANOS = 800_000_000L;
-    private static final long CONTINUOUS_TIMEOUT_NANOS = 150_000_000L;
+    private static final long CONTINUOUS_HOLD_NANOS = 250_000_000L;
+    private static final long CONTINUOUS_RELEASE_NANOS = 200_000_000L;
     private static final float STARTUP_YAW_PITCH_AMPLITUDE = 3.2F;
     private static final float STARTUP_ROLL_AMPLITUDE = 4.8F;
     private static final float STARTUP_FREQUENCY = 11.5F;
@@ -116,15 +117,15 @@ public final class NozzleScreenShakeManager {
         if (falloff <= 0.01F) {
             return null;
         }
-        float seconds = (now - this.startupStartNanos) / 1_000_000_000.0F;
-        float phase = this.startupPhaseSeed + seconds * STARTUP_FREQUENCY * Mth.TWO_PI;
+        double seconds = (now - this.startupStartNanos) / 1_000_000_000.0;
+        double phase = this.startupPhaseSeed + seconds * STARTUP_FREQUENCY * Mth.TWO_PI;
         float amplitude = this.amplitudeScale();
-        float yaw = (float) (Math.sin(phase * 1.1F) + 0.55F * Math.sin(phase * 2.6F + 0.7F))
-            * STARTUP_YAW_PITCH_AMPLITUDE * falloff * amplitude;
-        float pitch = (float) (Math.sin(phase * 1.3F + 1.4F) + 0.5F * Math.sin(phase * 3.0F))
-            * STARTUP_YAW_PITCH_AMPLITUDE * falloff * amplitude;
-        float roll = (float) (Math.sin(phase * 0.9F + 0.3F) + 0.45F * Math.sin(phase * 2.2F + 2.1F))
-            * STARTUP_ROLL_AMPLITUDE * falloff * amplitude;
+        float yaw = (float) ((Math.sin(phase * 1.1) + 0.55 * Math.sin(phase * 2.6 + 0.7))
+            * STARTUP_YAW_PITCH_AMPLITUDE * falloff * amplitude);
+        float pitch = (float) ((Math.sin(phase * 1.3 + 1.4) + 0.5 * Math.sin(phase * 3.0))
+            * STARTUP_YAW_PITCH_AMPLITUDE * falloff * amplitude);
+        float roll = (float) ((Math.sin(phase * 0.9 + 0.3) + 0.45 * Math.sin(phase * 2.2 + 2.1))
+            * STARTUP_ROLL_AMPLITUDE * falloff * amplitude);
         return new float[] {yaw, pitch, roll};
     }
 
@@ -132,21 +133,29 @@ public final class NozzleScreenShakeManager {
         if (!this.isContinuousActive(now)) {
             return null;
         }
-        float timeout = (now - this.continuousUpdateNanos) / (float) CONTINUOUS_TIMEOUT_NANOS;
-        float falloff = (1.0F - Mth.clamp(timeout, 0.0F, 1.0F)) * this.continuousIntensity;
+        float falloff = this.continuousFalloff(now) * this.continuousIntensity;
         if (falloff <= 0.01F) {
             return null;
         }
-        float seconds = now / 1_000_000_000.0F;
-        float phase = this.continuousPhaseSeed + seconds * CONTINUOUS_FREQUENCY * Mth.TWO_PI;
+        double seconds = now / 1_000_000_000.0;
+        double phase = this.continuousPhaseSeed + seconds * CONTINUOUS_FREQUENCY * Mth.TWO_PI;
         float amplitude = this.amplitudeScale();
-        float yaw = (float) (Math.sin(phase * 1.8F) + 0.35F * Math.sin(phase * 4.1F))
-            * CONTINUOUS_YAW_PITCH_AMPLITUDE * falloff * amplitude;
-        float pitch = (float) (Math.sin(phase * 1.6F + 1.2F) + 0.30F * Math.sin(phase * 3.7F + 0.4F))
-            * CONTINUOUS_YAW_PITCH_AMPLITUDE * falloff * amplitude;
-        float roll = (float) (Math.sin(phase * 1.2F + 2.3F) + 0.35F * Math.sin(phase * 3.4F + 1.1F))
-            * CONTINUOUS_ROLL_AMPLITUDE * falloff * amplitude;
+        float yaw = (float) ((Math.sin(phase * 1.8) + 0.35 * Math.sin(phase * 4.1))
+            * CONTINUOUS_YAW_PITCH_AMPLITUDE * falloff * amplitude);
+        float pitch = (float) ((Math.sin(phase * 1.6 + 1.2) + 0.30 * Math.sin(phase * 3.7 + 0.4))
+            * CONTINUOUS_YAW_PITCH_AMPLITUDE * falloff * amplitude);
+        float roll = (float) ((Math.sin(phase * 1.2 + 2.3) + 0.35 * Math.sin(phase * 3.4 + 1.1))
+            * CONTINUOUS_ROLL_AMPLITUDE * falloff * amplitude);
         return new float[] {yaw, pitch, roll};
+    }
+
+    private float continuousFalloff(long now) {
+        long sinceLastSustain = now - this.continuousUpdateNanos;
+        if (sinceLastSustain <= CONTINUOUS_HOLD_NANOS) {
+            return 1.0F;
+        }
+        float release = (sinceLastSustain - CONTINUOUS_HOLD_NANOS) / (float) CONTINUOUS_RELEASE_NANOS;
+        return 1.0F - Mth.clamp(release, 0.0F, 1.0F);
     }
 
     private float amplitudeScale() {
@@ -158,6 +167,7 @@ public final class NozzleScreenShakeManager {
     }
 
     private boolean isContinuousActive(long now) {
-        return this.continuousIntensity > 0.01F && now - this.continuousUpdateNanos < CONTINUOUS_TIMEOUT_NANOS;
+        return this.continuousIntensity > 0.01F
+            && now - this.continuousUpdateNanos < CONTINUOUS_HOLD_NANOS + CONTINUOUS_RELEASE_NANOS;
     }
 }
