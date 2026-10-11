@@ -3,6 +3,7 @@ package dev.anvilcraft.pigeonplus.mixin;
 import dev.anvilcraft.pigeonplus.init.AddonFluids;
 import dev.anvilcraft.pigeonplus.util.NozzleExhaustUtil;
 import dev.anvilcraft.pigeonplus.util.GasEscapeUtil;
+import dev.anvilcraft.pigeonplus.util.PotionParticleUtil;
 import dev.dubhe.anvilcraft.block.workstation.BurningHeaterBlock;
 import dev.dubhe.anvilcraft.block.power.consumer.HeaterBlock;
 import dev.dubhe.anvilcraft.block.entity.LargeCauldronBlockEntity;
@@ -40,6 +41,19 @@ public class LargeCauldronBlockEntityMixin {
                     NozzleExhaustUtil.spawnPropellantParticles(serverLevel, pos, propellant);
                 }
             }
+        }
+    }
+
+    @Inject(method = "serverTick", at = @At("TAIL"))
+    private static void pigeonplus$emitPotionParticles(
+        Level level,
+        BlockPos pos,
+        BlockState state,
+        LargeCauldronBlockEntity entity,
+        CallbackInfo ci
+    ) {
+        if (entity.isMainPart()) {
+            PotionParticleUtil.emitLargeCauldronParticles(level, pos, entity.getFluids());
         }
     }
 

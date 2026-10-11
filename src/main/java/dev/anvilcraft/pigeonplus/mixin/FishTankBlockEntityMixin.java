@@ -1,6 +1,7 @@
 package dev.anvilcraft.pigeonplus.mixin;
 
 import dev.anvilcraft.pigeonplus.util.GasEscapeUtil;
+import dev.anvilcraft.pigeonplus.util.PotionParticleUtil;
 import dev.dubhe.anvilcraft.block.entity.FishTankBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -21,5 +22,16 @@ public class FishTankBlockEntityMixin {
         CallbackInfo ci
     ) {
         GasEscapeUtil.escapeFishTankGas(level, pos, entity.getFluidHandler());
+    }
+
+    @Inject(method = "serverTick", at = @At("HEAD"))
+    private static void pigeonplus$emitPotionParticles(
+        Level level,
+        BlockPos pos,
+        BlockState state,
+        FishTankBlockEntity entity,
+        CallbackInfo ci
+    ) {
+        PotionParticleUtil.emitFishTankParticles(level, pos, entity.getFluidHandler());
     }
 }
