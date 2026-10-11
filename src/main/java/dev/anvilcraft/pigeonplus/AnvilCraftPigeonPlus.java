@@ -15,6 +15,8 @@ import dev.anvilcraft.pigeonplus.init.AddonParticles;
 import dev.anvilcraft.pigeonplus.init.AddonRecipeTypes;
 import dev.anvilcraft.pigeonplus.init.AddonSounds;
 import dev.anvilcraft.lib.v2.registrum.Registrum;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -61,6 +63,9 @@ public class AnvilCraftPigeonPlus {
     }
 
     private static void loadComplete(FMLLoadCompleteEvent event) {
+        BuiltInRegistries.FLUID.listElements()
+            .filter(holder -> !holder.areComponentsBound())
+            .forEach(holder -> holder.bindComponents(DataComponentMap.EMPTY));
         event.enqueueWork(AddonInteractionMap::init);
         event.enqueueWork(() -> {
             net.minecraft.core.dispenser.DispenseItemBehavior previous =

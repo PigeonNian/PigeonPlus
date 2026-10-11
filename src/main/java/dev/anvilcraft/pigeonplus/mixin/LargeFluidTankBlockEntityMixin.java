@@ -185,9 +185,14 @@ public abstract class LargeFluidTankBlockEntityMixin {
         FluidResource liquidResource = FluidResource.of(liquid);
         int filled = 0;
         for (int i = 0; i < handler.size() && filled < actualAmount; i++) {
-            if (handler.getResource(i).getFluid().isSame(liquid)) {
-                filled += FluidTransactions.insert(handler, i, liquidResource, actualAmount - filled);
+            if (!handler.isValid(i, liquidResource)) {
+                continue;
             }
+            int inserted = FluidTransactions.insert(handler, i, liquidResource, actualAmount - filled);
+            if (inserted <= 0) {
+                break;
+            }
+            filled += inserted;
         }
         if (filled < actualAmount) {
             // 液体没全部装下，把多余气体退回
