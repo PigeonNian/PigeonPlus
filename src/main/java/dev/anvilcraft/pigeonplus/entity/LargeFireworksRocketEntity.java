@@ -28,6 +28,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.InterpolationHandler;
+import net.minecraft.world.entity.Leashable;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.item.ItemStack;
@@ -36,6 +37,7 @@ import net.minecraft.world.item.component.FireworkExplosion;
 import net.minecraft.world.item.component.Fireworks;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.level.storage.ValueInput;
@@ -47,6 +49,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class LargeFireworksRocketEntity extends Entity {
@@ -85,6 +88,12 @@ public class LargeFireworksRocketEntity extends Entity {
         ResourceKey.create(Registries.DIMENSION, Identifier.fromNamespaceAndPath("anvilcraft", "mun"));
 
     private static final double ESCAPE_HEIGHT = 512.0;
+
+    private static final double LEASH_CARRY_DISTANCE = 4.0;
+
+    private static final double ROPE_HALF_WIDTH = 1.0;
+
+    private static final double ROPE_HEIGHT = 2.0;
 
     private static final long MIDNIGHT = 18000L;
     private static final long MIDNIGHT_WINDOW = 1000L;
@@ -205,6 +214,21 @@ public class LargeFireworksRocketEntity extends Entity {
     }
 
     @Override
+    public boolean supportQuadLeashAsHolder() {
+        return true;
+    }
+
+    @Override
+    public Vec3[] getQuadLeashHolderOffsets() {
+        return new Vec3[]{
+            new Vec3(-ROPE_HALF_WIDTH, ROPE_HEIGHT, ROPE_HALF_WIDTH),
+            new Vec3(-ROPE_HALF_WIDTH, ROPE_HEIGHT, -ROPE_HALF_WIDTH),
+            new Vec3(ROPE_HALF_WIDTH, ROPE_HEIGHT, -ROPE_HALF_WIDTH),
+            new Vec3(ROPE_HALF_WIDTH, ROPE_HEIGHT, ROPE_HALF_WIDTH)
+        };
+    }
+
+    @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(DATA_FUSE, DEFAULT_FUSE);
         builder.define(DATA_FIREWORKS_ITEM, new ItemStack(Items.FIREWORK_ROCKET));
@@ -278,8 +302,14 @@ public class LargeFireworksRocketEntity extends Entity {
             return;
         }
 
+        this.tickLeashedMobs();
+
         if (this.isDetonating()) {
             this.tickBurst();
+            return;
+        }
+
+        if (this.tryScatterLeashedMobs()) {
             return;
         }
 
@@ -304,12 +334,20 @@ public class LargeFireworksRocketEntity extends Entity {
             return;
         }
 
+        if (this.isCarryingLeashedMobs()) {
+            return;
+        }
+
         boolean needsAltitude =
             !this.getPassengers().isEmpty() || !this.pearlOwners.isEmpty();
         int fuse = needsAltitude ? MOON_FUSE : this.getFuse();
         if (life >= fuse) {
             this.detonate();
         }
+    }
+
+    private boolean isCarryingLeashedMobs() {
+        return !Leashable.leashableLeashedTo(this).isEmpty();
     }
 
     private boolean tryMoonTravel(int life) {
@@ -399,12 +437,77 @@ public class LargeFireworksRocketEntity extends Entity {
         ));
     }
 
+    private void tickLeashedMobs() {
+        for (Leashable leashable : Leashable.leashableLeashedTo(this)) {
+            if (!(leashable instanceof Entity entity) || entity.isRemoved()) {
+                continue;
+            }
+            if (entity.distanceTo(this) <= LEASH_CARRY_DISTANCE) {
+                continue;
+            }
+            Vec3 target = this.position().add(0.0, 0.5, 0.0);
+            entity.teleportTo(target.x, target.y, target.z);
+            entity.setDeltaMovement(Vec3.ZERO);
+            entity.resetFallDistance();
+            entity.hurtMarked = true;
+        }
+    }
+
+    private boolean tryScatterLeashedMobs() {
+        if (!(this.level() instanceof ServerLevel serverLevel)) {
+            return false;
+        }
+        List<Leashable> leashed = Leashable.leashableLeashedTo(this);
+        if (leashed.isEmpty()) {
+            return false;
+        }
+        if (this.getY() < AnvilCraftPigeonPlus.CONFIG.leashedRocketScatterHeight) {
+            return false;
+        }
+        int radius = AnvilCraftPigeonPlus.CONFIG.leashedRocketScatterRadius;
+        double scatterY = this.getY();
+        WorldBorder border = serverLevel.getWorldBorder();
+        int scattered = 0;
+        for (Leashable leashable : leashed) {
+            if (!(leashable instanceof Entity entity) || entity.isRemoved()) {
+                continue;
+            }
+            double x = this.getX() + Mth.nextDouble(this.random, -radius, radius);
+            double z = this.getZ() + Mth.nextDouble(this.random, -radius, radius);
+            BlockPos clamped = border.clampToBounds(x, scatterY, z);
+            boolean teleported = entity.teleportTo(
+                serverLevel,
+                clamped.getX() + 0.5,
+                scatterY,
+                clamped.getZ() + 0.5,
+                Set.of(),
+                entity.getYRot(),
+                entity.getXRot(),
+                true
+            );
+            if (!teleported) {
+                continue;
+            }
+            leashable.removeLeash();
+            entity.setDeltaMovement(Vec3.ZERO);
+            entity.resetFallDistance();
+            entity.hurtMarked = true;
+            scattered++;
+        }
+        if (scattered == 0) {
+            this.detonate();
+        }
+        return true;
+    }
+
     private void detonate() {
         if (!(this.level() instanceof ServerLevel serverLevel)) {
             return;
         }
         this.setDetonating(true);
         this.setDeltaMovement(Vec3.ZERO);
+
+        this.dropAllLeashConnections(null);
 
         double x = this.getX();
         double y = this.blastY();

@@ -2,6 +2,7 @@ package dev.anvilcraft.pigeonplus.data.lang;
 
 import dev.anvilcraft.lib.v2.config.ConfigData;
 import dev.anvilcraft.pigeonplus.AddonClientConfig;
+import dev.anvilcraft.pigeonplus.AddonConfig;
 import dev.anvilcraft.lib.v2.registrum.providers.RegistrumLangProvider;
 import dev.anvilcraft.pigeonplus.client.tooltip.AddonItemTooltipManager;
 import net.minecraft.world.item.Item;
@@ -17,6 +18,7 @@ public class AddonLangHandler {
      */
     public static void init(RegistrumLangProvider provider) {
         ConfigData.readConfigClass(provider, AddonClientConfig.class);
+        ConfigData.readConfigClass(provider, AddonConfig.class);
         provider.add("advancements.anvilcraft_pigeon_plus.root.title", "AnvilCraft: Pigeon Plus");
         provider.add("advancements.anvilcraft_pigeon_plus.root.description", "Welcome to the Pigeon Plus addon");
         provider.add("advancements.anvilcraft_pigeon_plus.nozzle_ignition.title", "The test pad is launch pad!");

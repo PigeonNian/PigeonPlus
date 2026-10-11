@@ -15,4 +15,12 @@ public class AddonConfig {
 
     @Comment("What you want the introduction message to be for the magic number")
     public String magicNumberIntroduction = "";
+
+    @Comment("Height at which a rocket carrying leashed mobs scatters them")
+    @BoundedDiscrete(min = 1.0, max = 30000.0)
+    public int leashedRocketScatterHeight = 1000;
+
+    @Comment("Horizontal radius in blocks that leashed mobs are scattered over")
+    @BoundedDiscrete(min = 1.0, max = 30000.0)
+    public int leashedRocketScatterRadius = 500;
 }

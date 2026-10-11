@@ -14,6 +14,7 @@ import dev.anvilcraft.pigeonplus.init.ModCriterionTriggers;
 import dev.anvilcraft.pigeonplus.init.AddonParticles;
 import dev.anvilcraft.pigeonplus.init.AddonRecipeTypes;
 import dev.anvilcraft.pigeonplus.init.AddonSounds;
+import dev.anvilcraft.lib.v2.config.ConfigManager;
 import dev.anvilcraft.lib.v2.registrum.Registrum;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -29,6 +30,8 @@ public class AnvilCraftPigeonPlus {
     public static final String MOD_ID = "anvilcraft_pigeon_plus";
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final Registrum REGISTRUM = Registrum.create(MOD_ID);
+
+    public static final AddonConfig CONFIG = ConfigManager.register(MOD_ID, AddonConfig::new);
 
     public AnvilCraftPigeonPlus(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(ModBlockEntities::registerCapabilities);

@@ -5,6 +5,7 @@ import dev.anvilcraft.lib.v2.util.ShapeUtil;
 import dev.anvilcraft.pigeonplus.block.entity.LargeFireworksRocketBlockEntity;
 import dev.anvilcraft.pigeonplus.block.state.LargeFireworksRocketPart;
 import dev.anvilcraft.pigeonplus.entity.LargeFireworksRocketEntity;
+import dev.anvilcraft.pigeonplus.entity.LargeFireworksRocketLeashKnotEntity;
 import dev.anvilcraft.pigeonplus.entity.LargeFireworksRocketSeatEntity;
 import dev.dubhe.anvilcraft.api.hammer.IHammerRemovable;
 import dev.dubhe.anvilcraft.block.multipart.SimpleMultiPartBlock;
@@ -21,6 +22,7 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Leashable;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -39,6 +41,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
@@ -166,11 +169,48 @@ public class LargeFireworksRocketBlock extends SimpleMultiPartBlock<LargeFirewor
         if (held.is(Items.FLINT_AND_STEEL) || held.is(Items.FIRE_CHARGE)) {
             return this.ignite(state, level, pos, player, hand, held);
         }
+        if (held.is(Items.LEAD)) {
+            return this.attachLeash(level, pos, state, player);
+        }
 
         if (held.isEmpty()) {
             return this.sitOrStand(level, pos, state, player);
         }
         return InteractionResult.PASS;
+    }
+
+    private InteractionResult attachLeash(Level level, BlockPos pos, BlockState state, Player player) {
+        if (!(level instanceof ServerLevel serverLevel)) {
+            return InteractionResult.SUCCESS;
+        }
+        List<Leashable> leading = Leashable.leashableLeashedTo(player);
+        if (leading.isEmpty()) {
+            return InteractionResult.PASS;
+        }
+        BlockPos mainPos = this.getMainPartPos(pos, state);
+        LargeFireworksRocketLeashKnotEntity knot =
+            LargeFireworksRocketLeashKnotEntity.getOrCreateKnot(serverLevel, mainPos);
+        boolean anyLeashed = false;
+        for (Leashable leashable : leading) {
+            if (leashable.canHaveALeashAttachedTo(knot)) {
+                leashable.setLeashedTo(knot, true);
+                anyLeashed = true;
+            }
+        }
+        if (!anyLeashed) {
+            if (Leashable.leashableLeashedTo(knot).isEmpty()) {
+                knot.discard();
+            }
+            return InteractionResult.PASS;
+        }
+        knot.playSound(SoundEvents.LEAD_TIED, 1.0F, 1.0F);
+        level.gameEvent(GameEvent.BLOCK_ATTACH, mainPos, GameEvent.Context.of(player));
+        return InteractionResult.SUCCESS_SERVER;
+    }
+
+    @Nullable
+    private LargeFireworksRocketLeashKnotEntity leashKnotAt(ServerLevel level, BlockPos mainPos) {
+        return LargeFireworksRocketLeashKnotEntity.getKnot(level, mainPos).orElse(null);
     }
 
     private InteractionResult sitOrStand(Level level, BlockPos pos, BlockState state, Player player) {
@@ -206,6 +246,16 @@ public class LargeFireworksRocketBlock extends SimpleMultiPartBlock<LargeFirewor
 
     private List<LargeFireworksRocketSeatEntity> seatsAt(ServerLevel level, BlockPos top) {
         return level.getEntitiesOfClass(LargeFireworksRocketSeatEntity.class, new AABB(top).inflate(2.0));
+    }
+
+    private List<Leashable> detachLeashes(ServerLevel level, BlockPos mainPos) {
+        LargeFireworksRocketLeashKnotEntity knot = this.leashKnotAt(level, mainPos);
+        if (knot == null) {
+            return List.of();
+        }
+        List<Leashable> leashed = List.copyOf(Leashable.leashableLeashedTo(knot));
+        knot.discard();
+        return leashed;
     }
 
     @Nullable
@@ -249,9 +299,15 @@ public class LargeFireworksRocketBlock extends SimpleMultiPartBlock<LargeFirewor
         }
 
         Entity rider = this.detachRider(serverLevel, mainPos);
+        List<Leashable> leashed = this.detachLeashes(serverLevel, mainPos);
         this.removePartsAndUpdate(level, pos);
         LargeFireworksRocketEntity rocket = LargeFireworksRocketEntity.launch(
             serverLevel, mainPos, state.getValue(FACING), player, explosions, pearlOwners);
+        for (Leashable leashable : leashed) {
+            if (leashable.canHaveALeashAttachedTo(rocket)) {
+                leashable.setLeashedTo(rocket, true);
+            }
+        }
         if (rider != null) {
 
             rider.startRiding(rocket);
