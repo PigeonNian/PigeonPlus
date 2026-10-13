@@ -50,8 +50,7 @@ public class FishTankBrewingEventListener {
         FluidStack stored = fluids.getFluidInTank(0);
         IItemHandler input = tank.getInput();
         PotionContents contents = PotionBrewingHelper.resolveContents(stored);
-        // 酿造需要加热；固液反应（药片）不需要，所以加热只门控酿造这一段。
-        if (contents != null && AmbientHeater.hasActiveHeaterBelow(level, tankPos)) {
+        if (contents != null && BrewingBlender.hasBrewingBlenderBelow(level, tankPos)) {
             PotionBrewingHelper.Selection selection =
                 PotionBrewingHelper.select(level.potionBrewing(), contents, input);
             if (selection != null && brew(level, tankPos, fluids, input, stored, selection)) {

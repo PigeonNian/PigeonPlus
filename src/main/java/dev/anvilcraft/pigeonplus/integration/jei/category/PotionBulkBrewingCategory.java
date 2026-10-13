@@ -1,5 +1,6 @@
 package dev.anvilcraft.pigeonplus.integration.jei.category;
 
+import dev.anvilcraft.pigeonplus.init.AddonBlocks;
 import dev.anvilcraft.pigeonplus.integration.jei.AnvilCraftPigeonPlusJeiPlugin;
 import dev.anvilcraft.pigeonplus.integration.jei.recipe.PotionBrewingJeiRecipe;
 import dev.anvilcraft.pigeonplus.integration.jei.recipe.PotionBrewingJeiRecipes;
@@ -29,8 +30,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.List;
-
 /**
  * 大型炼药锅的「批量酿造」分类。
  *
@@ -54,8 +53,8 @@ public class PotionBulkBrewingCategory implements IRecipeCategory<PotionBrewingJ
     private static final int HEATER_X = 100;
     private static final int HEATER_Y = 41;
 
-    private static final Component HEATER_ACTIVE = Component.translatable(
-        "gui.anvilcraft.category.super_heating.need_activated"
+    private static final Component BLENDER_ACTIVE = Component.translatable(
+        "gui.anvilcraft_pigeon_plus.category.potion_bulk_brewing.need_blender"
     ).withStyle(ChatFormatting.GOLD);
     private static final Component BULK = Component.translatable(
         "gui.anvilcraft_pigeon_plus.category.potion_bulk_brewing.bulk"
@@ -133,8 +132,8 @@ public class PotionBulkBrewingCategory implements IRecipeCategory<PotionBrewingJ
             .addItemStack(recipe.reagent())
             .addRichTooltipCallback((slotView, tooltip) -> tooltip.add(BULK));
         builder.addSlot(RecipeIngredientRole.CATALYST, HEATER_X + 1, HEATER_Y + 1)
-            .addItemStacks(List.of(ModBlocks.HEATER.asStack(), ModBlocks.BURNING_HEATER.asStack()))
-            .addRichTooltipCallback((slotView, tooltip) -> tooltip.add(HEATER_ACTIVE));
+            .addItemStack(new ItemStack(AddonBlocks.ELECTRIC_BLENDER))
+            .addRichTooltipCallback((slotView, tooltip) -> tooltip.add(BLENDER_ACTIVE));
 
         SlotPosition outputPosition = fluidOutputPosition();
         IRecipeSlotBuilder fluidOutput = JeiFluidUtil.addFluidSlot(
@@ -202,9 +201,7 @@ public class PotionBulkBrewingCategory implements IRecipeCategory<PotionBrewingJ
         registration.addRecipeCatalyst(
             new ItemStack(ModBlocks.LARGE_CAULDRON), AnvilCraftPigeonPlusJeiPlugin.POTION_BULK_BREWING);
         registration.addRecipeCatalyst(
-            new ItemStack(ModBlocks.HEATER), AnvilCraftPigeonPlusJeiPlugin.POTION_BULK_BREWING);
-        registration.addRecipeCatalyst(
-            new ItemStack(ModBlocks.BURNING_HEATER), AnvilCraftPigeonPlusJeiPlugin.POTION_BULK_BREWING);
+            new ItemStack(AddonBlocks.ELECTRIC_BLENDER), AnvilCraftPigeonPlusJeiPlugin.POTION_BULK_BREWING);
     }
 
     // 以下三个定位方法与本体 AbstractLiquidReactionCategory 完全一致。

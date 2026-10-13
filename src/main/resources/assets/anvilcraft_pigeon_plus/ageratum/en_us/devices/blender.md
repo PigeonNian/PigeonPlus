@@ -17,7 +17,7 @@ The blender is used to process biomass-related fluids and serves as the starting
 
 ## Mixed Biomass
 
-Crops and other materials can be converted into mixed biomass through blending. Mixed biomass can then participate in reactions inside a large cauldron to produce biogas.
+Crops and other materials can be converted into mixed biomass through blending. Mixed biomass can then participate in reactions inside a large cauldron to produce biogas; this requires a running blender and a heat source within the 3x3 area below the cauldron, see [Biogas](../fluids/biogas).
 
 <item id="anvilcraft_pigeon_plus:mixed_biomass_bucket"/>
 

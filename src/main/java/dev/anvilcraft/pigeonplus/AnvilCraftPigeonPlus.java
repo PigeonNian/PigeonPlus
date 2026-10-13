@@ -6,6 +6,7 @@ import dev.anvilcraft.pigeonplus.data.AddonDatagen;
 import dev.anvilcraft.pigeonplus.init.AddonBlocks;
 import dev.anvilcraft.pigeonplus.init.AddonEntities;
 import dev.anvilcraft.pigeonplus.init.AddonFluids;
+import dev.anvilcraft.pigeonplus.init.AddonHeaterInfos;
 import dev.anvilcraft.pigeonplus.init.AddonInteractionMap;
 import dev.anvilcraft.pigeonplus.init.AddonItemGroups;
 import dev.anvilcraft.pigeonplus.init.AddonItems;
@@ -67,6 +68,7 @@ public class AnvilCraftPigeonPlus {
 
     private static void loadComplete(FMLLoadCompleteEvent event) {
         event.enqueueWork(AddonInteractionMap::init);
+        event.enqueueWork(AddonHeaterInfos::init);
         event.enqueueWork(() -> {
             DispenseItemBehavior previous = DispenserBlock.DISPENSER_REGISTRY.get(Items.GLASS_BOTTLE);
             DispenserBlock.registerBehavior(

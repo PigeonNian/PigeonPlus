@@ -40,12 +40,18 @@ public class BlenderBlockEntity extends BlockEntity {
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, BlenderBlockEntity blockEntity) {
-        if (blockEntity.compressedAirTank.getFluidAmount() > 0) {
+        if (blockEntity.hasHead()
+            && blockEntity.compressedAirTank.getFluidAmount() > 0) {
             blockEntity.setWorking(true);
             blockEntity.compressedAirTank.drain(AIR_CONSUME_PER_TICK, IFluidHandler.FluidAction.EXECUTE);
         } else {
             blockEntity.setWorking(false);
         }
+    }
+
+    public boolean hasHead() {
+        BlockState state = this.getBlockState();
+        return state.hasProperty(BlenderBlock.HEAD) && state.getValue(BlenderBlock.HEAD) != BlenderBlock.BlenderHead.NONE;
     }
 
     @Nullable

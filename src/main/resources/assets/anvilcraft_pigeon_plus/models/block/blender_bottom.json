@@ -5,11 +5,11 @@
 	"textures": {
 		"0": "anvilcraft:block/pipe_end",
 		"3": "anvilcraft:block/pipe",
-		"4": "anvilcraft_pigeon_plus:block/blender_side",
-		"5": "anvilcraft_pigeon_plus:block/blender_top",
-		"6": "anvilcraft_pigeon_plus:block/blender_down",
-		"7": "anvilcraft_pigeon_plus:block/blender_botom",
-		"particle": "anvilcraft_pigeon_plus:block/blender_side"
+		"4": "anvilcraft_pigeon_plus:block/blender_old_side",
+		"5": "anvilcraft_pigeon_plus:block/blender_old_top",
+		"6": "anvilcraft_pigeon_plus:block/blender_old_down",
+		"7": "anvilcraft_pigeon_plus:block/blender_old_botom",
+		"particle": "anvilcraft_pigeon_plus:block/blender_old_side"
 	},
 	"elements": [
 		{

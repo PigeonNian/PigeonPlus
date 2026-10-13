@@ -4,6 +4,7 @@ import dev.anvilcraft.lib.v2.registrum.util.entry.BlockEntry;
 import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
 import dev.anvilcraft.pigeonplus.block.AnvilPumpBlock;
 import dev.anvilcraft.pigeonplus.block.BlenderBlock;
+import dev.anvilcraft.pigeonplus.block.ElectricBlenderBlock;
 import dev.anvilcraft.pigeonplus.block.FeedSpreaderBlock;
 import dev.anvilcraft.pigeonplus.block.LargeFireworksRocketBlock;
 import dev.anvilcraft.pigeonplus.block.MixedBiomassCauldronBlock;
@@ -63,18 +64,42 @@ public class AddonBlocks {
         .tag(BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.ANVIL)
         .register();
 
+    private static final ResourceLocation BLENDER_BASE =
+        AnvilCraftPigeonPlus.of("block/blender/pneumatic_blender");
+    private static final ResourceLocation BLENDER_BASE_ACTIVE =
+        AnvilCraftPigeonPlus.of("block/blender/pneumatic_blender_active");
+    private static final ResourceLocation ELECTRIC_BLENDER_BASE =
+        AnvilCraftPigeonPlus.of("block/blender/electric_blender");
+    private static final ResourceLocation ELECTRIC_BLENDER_BASE_ACTIVE =
+        AnvilCraftPigeonPlus.of("block/blender/electric_blender_active");
+
     public static final BlockEntry<BlenderBlock> BLENDER = REGISTRUM
         .block("blender", BlenderBlock::new)
         .initialProperties(() -> Blocks.IRON_BLOCK)
         .blockstate((ctx, prov) -> prov.getVariantBuilder(ctx.getEntry()).forAllStates(state ->
             ConfiguredModel.builder()
                 .modelFile(prov.models().getExistingFile(
-                    ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/blender_bottom")))
+                    state.getValue(BlenderBlock.WORKING) ? BLENDER_BASE_ACTIVE : BLENDER_BASE))
                 .rotationY(rotationY(state.getValue(BlenderBlock.FACING)))
                 .build()))
         .item(BlockItem::new)
-        .model((ctx, prov) -> prov.withExistingParent(ctx.getName(),
-            ResourceLocation.fromNamespaceAndPath(AnvilCraftPigeonPlus.MOD_ID, "block/blender")))
+        .model((ctx, prov) -> prov.withExistingParent(ctx.getName(), BLENDER_BASE))
+        .build()
+        .register();
+
+    public static final BlockEntry<ElectricBlenderBlock> ELECTRIC_BLENDER = REGISTRUM
+        .block("electric_blender", ElectricBlenderBlock::new)
+        .initialProperties(() -> Blocks.IRON_BLOCK)
+        .blockstate((ctx, prov) -> prov.getVariantBuilder(ctx.getEntry()).forAllStates(state ->
+            ConfiguredModel.builder()
+                .modelFile(prov.models().getExistingFile(
+                    state.getValue(BlenderBlock.WORKING) || state.getValue(ElectricBlenderBlock.HEATING)
+                        ? ELECTRIC_BLENDER_BASE_ACTIVE
+                        : ELECTRIC_BLENDER_BASE))
+                .rotationY(rotationY(state.getValue(BlenderBlock.FACING)))
+                .build()))
+        .item(BlockItem::new)
+        .model((ctx, prov) -> prov.withExistingParent(ctx.getName(), ELECTRIC_BLENDER_BASE))
         .build()
         .register();
 

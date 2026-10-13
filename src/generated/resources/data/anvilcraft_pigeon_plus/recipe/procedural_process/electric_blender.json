@@ -1,0 +1,53 @@
+{
+  "type": "anvilcraft:procedural_process",
+  "displayed_models": [
+    "anvilcraft_pigeon_plus:block/wip_display/electric_blender"
+  ],
+  "icon": {
+    "count": 1,
+    "id": "anvilcraft_pigeon_plus:electric_blender"
+  },
+  "initial_block": {
+    "blocks": "anvilcraft:heater"
+  },
+  "loop": 1,
+  "result_block": {
+    "block": "anvilcraft_pigeon_plus:electric_blender"
+  },
+  "steps": [
+    {
+      "content": {
+        "type": "anvilcraft:block_compress",
+        "inputs": [
+          {
+            "blocks": "anvilcraft:magnetoelectric_core"
+          },
+          {
+            "blocks": "anvilcraft:heater"
+          }
+        ],
+        "result": {
+          "block": "anvilcraft:wip_block"
+        }
+      },
+      "index": 0
+    },
+    {
+      "content": {
+        "type": "anvilcraft:block_compress",
+        "inputs": [
+          {
+            "blocks": "minecraft:iron_bars"
+          },
+          {
+            "blocks": "anvilcraft:wip_block"
+          }
+        ],
+        "result": {
+          "block": "anvilcraft:wip_block"
+        }
+      },
+      "index": 1
+    }
+  ]
+}

@@ -34,6 +34,12 @@ public final class AddonItemTooltipManager {
         normal(AddonBlocks.FEED_SPREADER.asItem(), "Spreads feed or bone meal when pressed by an anvil");
         normal(AddonBlocks.BLENDER.asItem(), "Blends fluid ingredients under a cauldron");
         normal(
+            AddonBlocks.ELECTRIC_BLENDER.asItem(),
+            """
+                Blends fluid ingredients under a cauldron
+                Also heats the block above while powered"""
+        );
+        normal(
             AddonItems.GASEOUS_BIOGAS_BUCKET.asItem(),
             """
                 Gas, can be liquefied by continued pumping

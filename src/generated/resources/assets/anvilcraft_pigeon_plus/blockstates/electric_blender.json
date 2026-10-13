@@ -1,0 +1,364 @@
+{
+  "variants": {
+    "facing=east,head=blaze,heating=false,overload=false,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender",
+      "y": 90
+    },
+    "facing=east,head=blaze,heating=false,overload=false,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 90
+    },
+    "facing=east,head=blaze,heating=false,overload=true,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender",
+      "y": 90
+    },
+    "facing=east,head=blaze,heating=false,overload=true,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 90
+    },
+    "facing=east,head=blaze,heating=true,overload=false,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 90
+    },
+    "facing=east,head=blaze,heating=true,overload=false,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 90
+    },
+    "facing=east,head=blaze,heating=true,overload=true,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 90
+    },
+    "facing=east,head=blaze,heating=true,overload=true,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 90
+    },
+    "facing=east,head=iron,heating=false,overload=false,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender",
+      "y": 90
+    },
+    "facing=east,head=iron,heating=false,overload=false,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 90
+    },
+    "facing=east,head=iron,heating=false,overload=true,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender",
+      "y": 90
+    },
+    "facing=east,head=iron,heating=false,overload=true,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 90
+    },
+    "facing=east,head=iron,heating=true,overload=false,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 90
+    },
+    "facing=east,head=iron,heating=true,overload=false,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 90
+    },
+    "facing=east,head=iron,heating=true,overload=true,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 90
+    },
+    "facing=east,head=iron,heating=true,overload=true,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 90
+    },
+    "facing=east,head=none,heating=false,overload=false,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender",
+      "y": 90
+    },
+    "facing=east,head=none,heating=false,overload=false,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 90
+    },
+    "facing=east,head=none,heating=false,overload=true,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender",
+      "y": 90
+    },
+    "facing=east,head=none,heating=false,overload=true,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 90
+    },
+    "facing=east,head=none,heating=true,overload=false,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 90
+    },
+    "facing=east,head=none,heating=true,overload=false,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 90
+    },
+    "facing=east,head=none,heating=true,overload=true,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 90
+    },
+    "facing=east,head=none,heating=true,overload=true,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 90
+    },
+    "facing=north,head=blaze,heating=false,overload=false,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender"
+    },
+    "facing=north,head=blaze,heating=false,overload=false,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active"
+    },
+    "facing=north,head=blaze,heating=false,overload=true,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender"
+    },
+    "facing=north,head=blaze,heating=false,overload=true,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active"
+    },
+    "facing=north,head=blaze,heating=true,overload=false,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active"
+    },
+    "facing=north,head=blaze,heating=true,overload=false,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active"
+    },
+    "facing=north,head=blaze,heating=true,overload=true,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active"
+    },
+    "facing=north,head=blaze,heating=true,overload=true,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active"
+    },
+    "facing=north,head=iron,heating=false,overload=false,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender"
+    },
+    "facing=north,head=iron,heating=false,overload=false,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active"
+    },
+    "facing=north,head=iron,heating=false,overload=true,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender"
+    },
+    "facing=north,head=iron,heating=false,overload=true,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active"
+    },
+    "facing=north,head=iron,heating=true,overload=false,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active"
+    },
+    "facing=north,head=iron,heating=true,overload=false,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active"
+    },
+    "facing=north,head=iron,heating=true,overload=true,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active"
+    },
+    "facing=north,head=iron,heating=true,overload=true,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active"
+    },
+    "facing=north,head=none,heating=false,overload=false,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender"
+    },
+    "facing=north,head=none,heating=false,overload=false,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active"
+    },
+    "facing=north,head=none,heating=false,overload=true,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender"
+    },
+    "facing=north,head=none,heating=false,overload=true,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active"
+    },
+    "facing=north,head=none,heating=true,overload=false,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active"
+    },
+    "facing=north,head=none,heating=true,overload=false,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active"
+    },
+    "facing=north,head=none,heating=true,overload=true,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active"
+    },
+    "facing=north,head=none,heating=true,overload=true,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active"
+    },
+    "facing=south,head=blaze,heating=false,overload=false,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender",
+      "y": 180
+    },
+    "facing=south,head=blaze,heating=false,overload=false,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 180
+    },
+    "facing=south,head=blaze,heating=false,overload=true,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender",
+      "y": 180
+    },
+    "facing=south,head=blaze,heating=false,overload=true,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 180
+    },
+    "facing=south,head=blaze,heating=true,overload=false,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 180
+    },
+    "facing=south,head=blaze,heating=true,overload=false,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 180
+    },
+    "facing=south,head=blaze,heating=true,overload=true,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 180
+    },
+    "facing=south,head=blaze,heating=true,overload=true,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 180
+    },
+    "facing=south,head=iron,heating=false,overload=false,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender",
+      "y": 180
+    },
+    "facing=south,head=iron,heating=false,overload=false,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 180
+    },
+    "facing=south,head=iron,heating=false,overload=true,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender",
+      "y": 180
+    },
+    "facing=south,head=iron,heating=false,overload=true,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 180
+    },
+    "facing=south,head=iron,heating=true,overload=false,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 180
+    },
+    "facing=south,head=iron,heating=true,overload=false,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 180
+    },
+    "facing=south,head=iron,heating=true,overload=true,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 180
+    },
+    "facing=south,head=iron,heating=true,overload=true,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 180
+    },
+    "facing=south,head=none,heating=false,overload=false,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender",
+      "y": 180
+    },
+    "facing=south,head=none,heating=false,overload=false,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 180
+    },
+    "facing=south,head=none,heating=false,overload=true,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender",
+      "y": 180
+    },
+    "facing=south,head=none,heating=false,overload=true,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 180
+    },
+    "facing=south,head=none,heating=true,overload=false,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 180
+    },
+    "facing=south,head=none,heating=true,overload=false,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 180
+    },
+    "facing=south,head=none,heating=true,overload=true,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 180
+    },
+    "facing=south,head=none,heating=true,overload=true,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 180
+    },
+    "facing=west,head=blaze,heating=false,overload=false,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender",
+      "y": 270
+    },
+    "facing=west,head=blaze,heating=false,overload=false,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 270
+    },
+    "facing=west,head=blaze,heating=false,overload=true,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender",
+      "y": 270
+    },
+    "facing=west,head=blaze,heating=false,overload=true,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 270
+    },
+    "facing=west,head=blaze,heating=true,overload=false,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 270
+    },
+    "facing=west,head=blaze,heating=true,overload=false,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 270
+    },
+    "facing=west,head=blaze,heating=true,overload=true,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 270
+    },
+    "facing=west,head=blaze,heating=true,overload=true,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 270
+    },
+    "facing=west,head=iron,heating=false,overload=false,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender",
+      "y": 270
+    },
+    "facing=west,head=iron,heating=false,overload=false,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 270
+    },
+    "facing=west,head=iron,heating=false,overload=true,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender",
+      "y": 270
+    },
+    "facing=west,head=iron,heating=false,overload=true,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 270
+    },
+    "facing=west,head=iron,heating=true,overload=false,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 270
+    },
+    "facing=west,head=iron,heating=true,overload=false,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 270
+    },
+    "facing=west,head=iron,heating=true,overload=true,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 270
+    },
+    "facing=west,head=iron,heating=true,overload=true,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 270
+    },
+    "facing=west,head=none,heating=false,overload=false,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender",
+      "y": 270
+    },
+    "facing=west,head=none,heating=false,overload=false,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 270
+    },
+    "facing=west,head=none,heating=false,overload=true,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender",
+      "y": 270
+    },
+    "facing=west,head=none,heating=false,overload=true,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 270
+    },
+    "facing=west,head=none,heating=true,overload=false,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 270
+    },
+    "facing=west,head=none,heating=true,overload=false,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 270
+    },
+    "facing=west,head=none,heating=true,overload=true,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 270
+    },
+    "facing=west,head=none,heating=true,overload=true,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/electric_blender_active",
+      "y": 270
+    }
+  }
+}

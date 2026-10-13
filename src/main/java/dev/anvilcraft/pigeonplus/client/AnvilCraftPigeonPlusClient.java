@@ -4,6 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import dev.anvilcraft.pigeonplus.AddonClientConfig;
 import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
 import dev.anvilcraft.lib.v2.config.ConfigManager;
+import dev.anvilcraft.pigeonplus.block.entity.BlenderBlockEntity;
+import dev.anvilcraft.pigeonplus.block.entity.ElectricBlenderBlockEntity;
 import dev.anvilcraft.pigeonplus.block.entity.ModBlockEntities;
 import dev.anvilcraft.pigeonplus.client.hud.RocketPunchChargeHud;
 import dev.anvilcraft.pigeonplus.client.hud.SkillCooldownHud;
@@ -179,10 +181,10 @@ public class AnvilCraftPigeonPlusClient {
     }
 
     private void onRegisterAdditionalModels(ModelEvent.RegisterAdditional event) {
-        ResourceLocation bottom = ResourceLocation.fromNamespaceAndPath(
-            AnvilCraftPigeonPlus.MOD_ID, "block/blender_bottom");
-        ResourceLocation top = ResourceLocation.fromNamespaceAndPath(
-            AnvilCraftPigeonPlus.MOD_ID, "block/blender_top");
+        ResourceLocation blenderHead = ResourceLocation.fromNamespaceAndPath(
+            AnvilCraftPigeonPlus.MOD_ID, "block/blender/blender_head");
+        ResourceLocation blenderHeadBlaze = ResourceLocation.fromNamespaceAndPath(
+            AnvilCraftPigeonPlus.MOD_ID, "block/blender/blender_head_blaze");
         ResourceLocation anvilPumpPiston = ResourceLocation.fromNamespaceAndPath(
             AnvilCraftPigeonPlus.MOD_ID, "block/anvil_pump_pistion");
         ResourceLocation largeCauldronTop = ResourceLocation.fromNamespaceAndPath(
@@ -197,8 +199,8 @@ public class AnvilCraftPigeonPlusClient {
         // 否则实体渲染器取不到、箭体下半段会消失。
         ResourceLocation litLargeFireworksRocketBottom = ResourceLocation.fromNamespaceAndPath(
             AnvilCraftPigeonPlus.MOD_ID, "block/lit_large_fireworks_rocket_bottom");
-        event.register(new ModelResourceLocation(bottom, "standalone"));
-        event.register(new ModelResourceLocation(top, "standalone"));
+        event.register(new ModelResourceLocation(blenderHead, "standalone"));
+        event.register(new ModelResourceLocation(blenderHeadBlaze, "standalone"));
         event.register(new ModelResourceLocation(anvilPumpPiston, "standalone"));
         event.register(new ModelResourceLocation(largeCauldronTop, "standalone"));
         event.register(new ModelResourceLocation(largeCauldronBottom, "standalone"));
@@ -208,7 +210,9 @@ public class AnvilCraftPigeonPlusClient {
     }
 
     private void onRegisterBER(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerBlockEntityRenderer(ModBlockEntities.BLENDER.get(), BlenderBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.BLENDER.get(), BlenderBlockEntityRenderer<BlenderBlockEntity>::new);
+        event.registerBlockEntityRenderer(
+            ModBlockEntities.ELECTRIC_BLENDER.get(), BlenderBlockEntityRenderer<ElectricBlenderBlockEntity>::new);
         event.registerBlockEntityRenderer(ModBlockEntities.ANVIL_PUMP.get(), AnvilPumpBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.FEED_SPREADER.get(), FeedSpreaderBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.STASIS_BEACON.get(), StasisBeaconBlockEntityRenderer::new);

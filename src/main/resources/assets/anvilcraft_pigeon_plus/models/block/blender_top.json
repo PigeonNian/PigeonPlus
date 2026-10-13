@@ -3,9 +3,9 @@
 	"credit": "Made with Blockbench",
 	"parent": "block/cube",
 	"textures": {
-		"4": "anvilcraft_pigeon_plus:block/blender_side",
-		"5": "anvilcraft_pigeon_plus:block/blender_top",
-		"particle": "anvilcraft_pigeon_plus:block/blender_side"
+		"4": "anvilcraft_pigeon_plus:block/blender_old_side",
+		"5": "anvilcraft_pigeon_plus:block/blender_old_top",
+		"particle": "anvilcraft_pigeon_plus:block/blender_old_side"
 	},
 	"elements": [
 		{

@@ -67,15 +67,28 @@ public class AddonLangHandler {
             "Turns the Anvil Hammer into a pure weapon: it can no longer rotate or break blocks, open a portable anvil, rocket jump, or act as goggles."
         );
         provider.add("gui.anvilcraft_pigeon_plus.category.blending", "Blending");
+        provider.add("gui.anvilcraft_pigeon_plus.category.fermentation", "Fermentation");
+        provider.add(
+            "gui.anvilcraft_pigeon_plus.category.fermentation.requirement",
+            "Requires a running blender and a heat source\nAn electric blender can serve as both"
+        );
         provider.add("gui.anvilcraft_pigeon_plus.category.potion_brewing", "Potion Brewing");
         provider.add(
             "gui.anvilcraft_pigeon_plus.category.potion_brewing.whole_tank",
             "Converts all potion in the container"
         );
+        provider.add(
+            "gui.anvilcraft_pigeon_plus.category.potion_brewing.need_blender",
+            "Requires a running blender with a blaze head"
+        );
         provider.add("gui.anvilcraft_pigeon_plus.category.potion_bulk_brewing", "Bulk Potion Brewing");
         provider.add(
             "gui.anvilcraft_pigeon_plus.category.potion_bulk_brewing.bulk",
             "Brews 8B at once, using only one reagent"
+        );
+        provider.add(
+            "gui.anvilcraft_pigeon_plus.category.potion_bulk_brewing.need_blender",
+            "Requires a running electric blender with a blaze head"
         );
         provider.add("gui.anvilcraft_pigeon_plus.category.potion_soaking", "Potion Soaking");
         provider.add(

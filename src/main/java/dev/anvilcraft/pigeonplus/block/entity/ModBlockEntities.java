@@ -20,6 +20,10 @@ public class ModBlockEntities {
         BLOCK_ENTITIES.register("blender", () ->
             BlockEntityType.Builder.of(BlenderBlockEntity::new, AddonBlocks.BLENDER.get()).build(null));
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ElectricBlenderBlockEntity>> ELECTRIC_BLENDER =
+        BLOCK_ENTITIES.register("electric_blender", () ->
+            BlockEntityType.Builder.of(ElectricBlenderBlockEntity::new, AddonBlocks.ELECTRIC_BLENDER.get()).build(null));
+
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<AnvilPumpBlockEntity>> ANVIL_PUMP =
         BLOCK_ENTITIES.register("anvil_pump", () ->
             BlockEntityType.Builder.of(AnvilPumpBlockEntity::new, AddonBlocks.ANVIL_PUMP.get()).build(null));

@@ -1,0 +1,11 @@
+{
+  "type": "anvilcraft_pigeon_plus:fermentation",
+  "input": {
+    "amount": 1000,
+    "id": "anvilcraft_pigeon_plus:mixed_biomass"
+  },
+  "output": {
+    "amount": 2000,
+    "id": "anvilcraft_pigeon_plus:gaseous_biogas"
+  }
+}

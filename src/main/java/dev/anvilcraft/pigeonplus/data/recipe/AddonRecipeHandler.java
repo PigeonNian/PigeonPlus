@@ -8,7 +8,8 @@ public class AddonRecipeHandler {
         AddonBlendingRecipeLoader.init(provider);
         AddonItemInjectRecipeLoader.init(provider);
         AddonItemCompressRecipeLoader.init(provider);
-        AddonFluidMixingRecipeLoader.init(provider);
+        AddonProceduralProcessRecipeLoader.init(provider);
+        AddonFermentationRecipeLoader.init(provider);
         AddonGasLiquefactionRecipeLoader.init(provider);
         AddonMultiblockRecipeLoader.init(provider);
         AddonMultiblockConversionRecipeLoader.init(provider);

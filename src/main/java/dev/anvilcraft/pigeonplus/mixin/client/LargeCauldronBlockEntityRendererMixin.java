@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus;
 import dev.anvilcraft.pigeonplus.block.NozzleBlock;
+import dev.anvilcraft.pigeonplus.util.BlenderStirring;
 import dev.anvilcraft.pigeonplus.util.NozzleExhaustUtil;
 import dev.anvilcraft.pigeonplus.client.renderer.GasContainerRenderUtil;
 import dev.dubhe.anvilcraft.api.fluid.LargeCauldronFluidHandler;
@@ -19,6 +20,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.model.data.ModelData;
@@ -56,6 +58,10 @@ import java.util.List;
     private static final float PIGEONPLUS_MIN_Y = -0.5F + 0.001F;
     @Unique
     private static final float PIGEONPLUS_MAX_Y = 1.75F - 0.001F;
+    @Unique
+    private static final ThreadLocal<Float> PIGEONPLUS_PARTIAL_TICK = ThreadLocal.withInitial(() -> 0.0F);
+    @Unique
+    private static final ThreadLocal<Float> PIGEONPLUS_STIR_ANGLE = ThreadLocal.withInitial(() -> 0.0F);
 
     @Inject(method = "render", at = @At("TAIL"))
     private void pigeonplus$renderNozzleCauldronAttachment(
@@ -170,6 +176,114 @@ import java.util.List;
             source.endBatch();
         }
         ci.cancel();
+    }
+
+    @Inject(method = "drawItems", at = @At("HEAD"))
+    private void pigeonplus$beginRotateItems(
+        LargeCauldronBlockEntity cauldron,
+        PoseStack pose,
+        MultiBufferSource buffers,
+        int light,
+        int overlay,
+        float itemY,
+        float fill,
+        CallbackInfo ci
+    ) {
+        Level level = cauldron.getLevel();
+        if (level == null || !BlenderStirring.isStirringBelowLargeCauldron(level, cauldron.getBlockPos())) {
+            PIGEONPLUS_STIR_ANGLE.set(0.0F);
+            return;
+        }
+        PIGEONPLUS_STIR_ANGLE.set(BlenderStirring.angle(level, PIGEONPLUS_PARTIAL_TICK.get()));
+    }
+
+    @Redirect(
+        method = "drawItems",
+        at = @At(
+            value = "INVOKE",
+            target = "Ldev/dubhe/anvilcraft/client/renderer/blockentity/LargeCauldronBlockEntityRenderer;"
+                + "renderItem(Ldev/dubhe/anvilcraft/block/entity/LargeCauldronBlockEntity;"
+                + "Lnet/minecraft/world/item/ItemStack;Lcom/mojang/blaze3d/vertex/PoseStack;"
+                + "Lnet/minecraft/client/renderer/MultiBufferSource;IIFFFF)V"
+        )
+    )
+    private static void pigeonplus$stirItem(
+        LargeCauldronBlockEntity cauldron,
+        ItemStack stack,
+        PoseStack pose,
+        MultiBufferSource buffers,
+        int light,
+        int overlay,
+        float x,
+        float y,
+        float z,
+        float rotation
+    ) {
+        float base = PIGEONPLUS_STIR_ANGLE.get();
+        if (base == 0.0F) {
+            renderItem(cauldron, stack, pose, buffers, light, overlay, x, y, z, rotation);
+            return;
+        }
+        float dx = x - 0.5F;
+        float dz = z - 0.5F;
+        double radius = Math.sqrt(dx * dx + dz * dz);
+        double theta = Math.toRadians(BlenderStirring.angleAt(base, radius));
+        double cos = Math.cos(theta);
+        double sin = Math.sin(theta);
+        renderItem(
+            cauldron,
+            stack,
+            pose,
+            buffers,
+            light,
+            overlay,
+            (float) (0.5F + dx * cos + dz * sin),
+            y,
+            (float) (0.5F - dx * sin + dz * cos),
+            rotation + (float) Math.toDegrees(theta)
+        );
+    }
+
+    @Shadow
+    private static void renderItem(
+        LargeCauldronBlockEntity cauldron,
+        ItemStack stack,
+        PoseStack pose,
+        MultiBufferSource buffers,
+        int light,
+        int overlay,
+        float x,
+        float y,
+        float z,
+        float rotation
+    ) {
+    }
+
+    @Inject(method = "render", at = @At("HEAD"))
+    private void pigeonplus$capturePartialTick(
+        LargeCauldronBlockEntity cauldron,
+        float partialTick,
+        PoseStack pose,
+        MultiBufferSource buffers,
+        int light,
+        int overlay,
+        CallbackInfo ci
+    ) {
+        PIGEONPLUS_PARTIAL_TICK.set(partialTick);
+    }
+
+    @Inject(method = "render", at = @At("RETURN"))
+    private void pigeonplus$clearPartialTick(
+        LargeCauldronBlockEntity cauldron,
+        float partialTick,
+        PoseStack pose,
+        MultiBufferSource buffers,
+        int light,
+        int overlay,
+        CallbackInfo ci
+    ) {
+        PIGEONPLUS_PARTIAL_TICK.remove();
+        PIGEONPLUS_STIR_ANGLE.remove();
     }
 
     @Shadow

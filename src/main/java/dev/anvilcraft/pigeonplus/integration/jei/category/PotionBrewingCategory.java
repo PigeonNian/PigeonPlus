@@ -1,9 +1,10 @@
 package dev.anvilcraft.pigeonplus.integration.jei.category;
 
+import dev.anvilcraft.pigeonplus.block.BlenderBlock;
+import dev.anvilcraft.pigeonplus.init.AddonBlocks;
 import dev.anvilcraft.pigeonplus.integration.jei.AnvilCraftPigeonPlusJeiPlugin;
 import dev.anvilcraft.pigeonplus.integration.jei.recipe.PotionBrewingJeiRecipe;
 import dev.anvilcraft.pigeonplus.integration.jei.recipe.PotionBrewingJeiRecipes;
-import dev.dubhe.anvilcraft.block.HeaterBlock;
 import dev.dubhe.anvilcraft.client.support.RenderSupport;
 import dev.dubhe.anvilcraft.init.block.ModBlocks;
 import dev.dubhe.anvilcraft.integration.jei.AnvilCraftJeiPlugin;
@@ -41,16 +42,16 @@ public class PotionBrewingCategory implements IRecipeCategory<PotionBrewingJeiRe
     private static final float MODEL_SCALE = 12.0F;
 
     // 与本体 AbstractLiquidCategory 的小锅布局一致：
-    // 铁砧在上、锅在中、处理方块（这里是加热器）紧贴锅下方，箭头分列两侧。
+    // 铁砧在上、锅在中、处理方块（这里是搅拌机）紧贴锅下方，箭头分列两侧。
     private static final int ANVIL_Y = 12;
     private static final int CAULDRON_Y = 30;
-    private static final int HEATER_Y = 40;
+    private static final int BLENDER_Y = 40;
     private static final int ARROW_IN_X = 54;
     private static final int ARROW_OUT_X = 92;
     private static final int ARROW_Y = 22;
 
-    private static final Component HEATER_ACTIVE = Component.translatable(
-        "gui.anvilcraft.category.super_heating.need_activated"
+    private static final Component BLENDER_ACTIVE = Component.translatable(
+        "gui.anvilcraft_pigeon_plus.category.potion_brewing.need_blender"
     ).withStyle(ChatFormatting.GOLD);
     private static final Component WHOLE_TANK = Component.translatable(
         "gui.anvilcraft_pigeon_plus.category.potion_brewing.whole_tank"
@@ -62,7 +63,7 @@ public class PotionBrewingCategory implements IRecipeCategory<PotionBrewingJeiRe
     private final IDrawable arrowOut;
     private final ITickTimer timer;
     private final BlockState cauldron;
-    private final BlockState heater;
+    private final BlockState blender;
 
     public PotionBrewingCategory(IGuiHelper helper) {
         this.icon = new DrawableBlockStateIcon(
@@ -74,8 +75,9 @@ public class PotionBrewingCategory implements IRecipeCategory<PotionBrewingJeiRe
         this.arrowOut = JeiRenderHelper.getArrowOutput(helper);
         this.timer = helper.createTickTimer(30, 60, true);
         this.cauldron = ModBlocks.FISH_TANK.getDefaultState();
-        // 不超载才是可用的加热器，取自本体 SuperHeatingCategory。
-        this.heater = ModBlocks.HEATER.getDefaultState().setValue(HeaterBlock.OVERLOAD, false);
+        this.blender = AddonBlocks.BLENDER.getDefaultState()
+            .setValue(BlenderBlock.HEAD, BlenderBlock.BlenderHead.BLAZE)
+            .setValue(BlenderBlock.WORKING, true);
     }
 
     @Override
@@ -177,12 +179,11 @@ public class PotionBrewingCategory implements IRecipeCategory<PotionBrewingJeiRe
             MODEL_SCALE,
             RenderSupport.SINGLE_BLOCK
         );
-        // 加热器按方块渲染在锅的正下方，与本体超加热分类的做法一致。
         RenderSupport.renderBlock(
             guiGraphics,
-            this.heater,
+            this.blender,
             81,
-            HEATER_Y,
+            BLENDER_Y,
             0,
             MODEL_SCALE,
             RenderSupport.SINGLE_BLOCK
@@ -196,7 +197,6 @@ public class PotionBrewingCategory implements IRecipeCategory<PotionBrewingJeiRe
         this.slot.draw(guiGraphics, JeiSlotUtil.OUTPUT_X - 1, JeiSlotUtil.DEFAULT_Y - 1);
     }
 
-    // 悬停在加热器方块上时给出「需要加热」提示，与本体 SuperHeatingCategory 的做法一致。
     @Override
     public void getTooltip(
         ITooltipBuilder tooltip,
@@ -205,9 +205,9 @@ public class PotionBrewingCategory implements IRecipeCategory<PotionBrewingJeiRe
         double mouseX,
         double mouseY
     ) {
-        if (mouseX >= 72 && mouseX <= 90 && mouseY >= HEATER_Y - 1 && mouseY <= HEATER_Y + 18) {
-            tooltip.add(ModBlocks.HEATER.get().getName());
-            tooltip.add(HEATER_ACTIVE);
+        if (mouseX >= 72 && mouseX <= 90 && mouseY >= BLENDER_Y - 1 && mouseY <= BLENDER_Y + 18) {
+            tooltip.add(AddonBlocks.BLENDER.get().getName());
+            tooltip.add(BLENDER_ACTIVE);
         }
     }
 
@@ -226,9 +226,9 @@ public class PotionBrewingCategory implements IRecipeCategory<PotionBrewingJeiRe
         registration.addRecipeCatalyst(
             new ItemStack(ModBlocks.FISH_TANK), AnvilCraftPigeonPlusJeiPlugin.POTION_BREWING);
         registration.addRecipeCatalyst(
-            new ItemStack(ModBlocks.HEATER), AnvilCraftPigeonPlusJeiPlugin.POTION_BREWING);
+            new ItemStack(AddonBlocks.BLENDER), AnvilCraftPigeonPlusJeiPlugin.POTION_BREWING);
         registration.addRecipeCatalyst(
-            new ItemStack(ModBlocks.BURNING_HEATER), AnvilCraftPigeonPlusJeiPlugin.POTION_BREWING);
+            new ItemStack(AddonBlocks.ELECTRIC_BLENDER), AnvilCraftPigeonPlusJeiPlugin.POTION_BREWING);
     }
 
 }

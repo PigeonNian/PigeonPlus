@@ -1,33 +1,93 @@
 {
   "variants": {
-    "facing=east,working=false": {
-      "model": "anvilcraft_pigeon_plus:block/blender_bottom",
+    "facing=east,head=blaze,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/pneumatic_blender",
       "y": 90
     },
-    "facing=east,working=true": {
-      "model": "anvilcraft_pigeon_plus:block/blender_bottom",
+    "facing=east,head=blaze,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/pneumatic_blender_active",
       "y": 90
     },
-    "facing=north,working=false": {
-      "model": "anvilcraft_pigeon_plus:block/blender_bottom"
+    "facing=east,head=iron,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/pneumatic_blender",
+      "y": 90
     },
-    "facing=north,working=true": {
-      "model": "anvilcraft_pigeon_plus:block/blender_bottom"
+    "facing=east,head=iron,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/pneumatic_blender_active",
+      "y": 90
     },
-    "facing=south,working=false": {
-      "model": "anvilcraft_pigeon_plus:block/blender_bottom",
+    "facing=east,head=none,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/pneumatic_blender",
+      "y": 90
+    },
+    "facing=east,head=none,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/pneumatic_blender_active",
+      "y": 90
+    },
+    "facing=north,head=blaze,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/pneumatic_blender"
+    },
+    "facing=north,head=blaze,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/pneumatic_blender_active"
+    },
+    "facing=north,head=iron,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/pneumatic_blender"
+    },
+    "facing=north,head=iron,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/pneumatic_blender_active"
+    },
+    "facing=north,head=none,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/pneumatic_blender"
+    },
+    "facing=north,head=none,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/pneumatic_blender_active"
+    },
+    "facing=south,head=blaze,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/pneumatic_blender",
       "y": 180
     },
-    "facing=south,working=true": {
-      "model": "anvilcraft_pigeon_plus:block/blender_bottom",
+    "facing=south,head=blaze,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/pneumatic_blender_active",
       "y": 180
     },
-    "facing=west,working=false": {
-      "model": "anvilcraft_pigeon_plus:block/blender_bottom",
+    "facing=south,head=iron,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/pneumatic_blender",
+      "y": 180
+    },
+    "facing=south,head=iron,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/pneumatic_blender_active",
+      "y": 180
+    },
+    "facing=south,head=none,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/pneumatic_blender",
+      "y": 180
+    },
+    "facing=south,head=none,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/pneumatic_blender_active",
+      "y": 180
+    },
+    "facing=west,head=blaze,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/pneumatic_blender",
       "y": 270
     },
-    "facing=west,working=true": {
-      "model": "anvilcraft_pigeon_plus:block/blender_bottom",
+    "facing=west,head=blaze,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/pneumatic_blender_active",
+      "y": 270
+    },
+    "facing=west,head=iron,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/pneumatic_blender",
+      "y": 270
+    },
+    "facing=west,head=iron,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/pneumatic_blender_active",
+      "y": 270
+    },
+    "facing=west,head=none,working=false": {
+      "model": "anvilcraft_pigeon_plus:block/blender/pneumatic_blender",
+      "y": 270
+    },
+    "facing=west,head=none,working=true": {
+      "model": "anvilcraft_pigeon_plus:block/blender/pneumatic_blender_active",
       "y": 270
     }
   }
