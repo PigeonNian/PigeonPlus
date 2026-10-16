@@ -200,4 +200,47 @@ public abstract class FluidNetworkScannerMixin {
             cir.setReturnValue(pump.getCurrentHeadlift());
         }
     }
+
+    /**
+     * 修复：本体 enqueuePump 无条件读取 PumpBlock.ORIENTATION，
+     * 而 AnvilPumpBlock 只有 FACING 属性，扫描含铁砧泵的流体网络时服务端崩溃。
+     * 遇到 AnvilPumpBlock 时用 getOutputDirection 复刻深度计算与入队逻辑并取消原方法。
+     */
+    @Inject(method = "enqueuePump", at = @At("HEAD"), cancellable = true)
+    private static void pigeonplus$enqueueAnvilPump(
+        Level level,
+        BlockPos pumpPos,
+        BlockState state,
+        BlockPos fromPos,
+        Map<BlockPos, Integer> potential,
+        Deque<BlockPos> queue,
+        CallbackInfo ci
+    ) {
+        if (!(state.getBlock() instanceof AnvilPumpBlock)) return;
+
+        Direction outputDir = AnvilPumpBlock.getOutputDirection(state);
+        Integer fromDepth = potential.get(fromPos);
+        if (fromDepth == null) return;
+        int depth = fromDepth;
+        int halfLift = pumpHalfLift(level, pumpPos);
+
+        int newDepth;
+        if (fromPos.equals(pumpPos.relative(outputDir))) {
+            newDepth = depth - halfLift;
+        } else if (fromPos.equals(pumpPos.relative(outputDir.getOpposite()))) {
+            newDepth = depth + halfLift;
+        } else {
+            ci.cancel();
+            return;
+        }
+
+        Integer old = potential.get(pumpPos);
+        if (old == null) {
+            potential.put(pumpPos.immutable(), newDepth);
+            queue.add(pumpPos.immutable());
+        } else if (newDepth < old) {
+            potential.put(pumpPos.immutable(), newDepth);
+        }
+        ci.cancel();
+    }
 }
