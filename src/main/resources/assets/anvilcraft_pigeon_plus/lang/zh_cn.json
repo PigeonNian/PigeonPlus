@@ -6,7 +6,7 @@
     "advancements.anvilcraft_pigeon_plus.root.description": "欢迎来到鸽+",
     "advancements.anvilcraft_pigeon_plus.root.title": "铁砧工艺：鸽+",
     "block.anvilcraft_pigeon_plus.anvil_pump": "铁砧泵",
-    "block.anvilcraft_pigeon_plus.blender": "搅拌机",
+    "block.anvilcraft_pigeon_plus.blender": "气动搅拌机",
     "block.anvilcraft_pigeon_plus.compressed_air": "压缩空气",
     "block.anvilcraft_pigeon_plus.feed_spreader": "饲料撒布器",
     "block.anvilcraft_pigeon_plus.gaseous_biogas": "沼气",
@@ -105,5 +105,14 @@
     "tooltip.anvilcraft_pigeon_plus.item.stasis_beacon.shift": "需要浮霜金属块信标底座\n时停期间储存受到的伤害和动量\n达到 30 秒或累计 5 颗心伤害后解除",
     "tooltip.anvilcraft_pigeon_plus.press_key": "按住 %s 以查看更多信息",
     "anvilcraft_pigeon_plus.configuration.section.anvilcraft.pigeon.plus.client.toml": "Anvilcraft Pigeon Plus 客户端配置",
-    "anvilcraft_pigeon_plus.configuration.section.anvilcraft.pigeon.plus.client.toml.title": "Anvilcraft Pigeon Plus 客户端配置"
+    "anvilcraft_pigeon_plus.configuration.section.anvilcraft.pigeon.plus.client.toml.title": "Anvilcraft Pigeon Plus 客户端配置",
+    "block.anvilcraft_pigeon_plus.electric_blender": "电搅拌机",
+    "gui.anvilcraft_pigeon_plus.category.fermentation": "发酵",
+    "gui.anvilcraft_pigeon_plus.category.fermentation.requirement": "需要一台运行中的气动搅拌机和热源\n电搅拌机可以同时充当两者",
+    "gui.anvilcraft_pigeon_plus.category.potion_brewing.need_blender": "需要一台装有烈焰人头的运行中搅拌机",
+    "gui.anvilcraft_pigeon_plus.category.potion_bulk_brewing.need_blender": "需要一台装有烈焰人头的运行中电动搅拌机",
+    "tooltip.anvilcraft_pigeon_plus.item.electric_blender": "在炼药锅下搅拌流体原料\n通电时还会加热上方方块",
+    "block.anvilcraft_pigeon_plus.chocolate_cookie_pillar": "巧克力夹心饼干柱",
+    "block.anvilcraft_pigeon_plus.dark_chocolate_cookie_pillar": "黑巧克力夹心饼干柱",
+    "block.anvilcraft_pigeon_plus.white_chocolate_cookie_pillar": "白巧克力夹心饼干柱"
 }
