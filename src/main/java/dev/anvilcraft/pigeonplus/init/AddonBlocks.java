@@ -11,19 +11,17 @@ import dev.anvilcraft.pigeonplus.block.NozzleBlock;
 import dev.anvilcraft.pigeonplus.block.PigeonAnvilBlock;
 import dev.anvilcraft.pigeonplus.block.StasisBeaconBlock;
 import dev.anvilcraft.pigeonplus.block.state.LargeFireworksRocketPart;
+import dev.anvilcraft.pigeonplus.data.AddonItemModelUtil;
 import dev.dubhe.anvilcraft.item.block.FlexibleMultiPartBlockItem;
 import dev.dubhe.anvilcraft.item.block.SimpleMultiPartBlockItem;
 import dev.dubhe.anvilcraft.block.multipart.FlexibleMultiPartBlock;
 import dev.dubhe.anvilcraft.block.multipart.SimpleMultiPartBlock;
 import dev.dubhe.anvilcraft.block.state.DirectionCube3x3PartHalf;
 import net.minecraft.client.data.models.BlockModelGenerators;
-import net.minecraft.client.data.models.ItemModelOutput;
 import net.minecraft.client.data.models.MultiVariant;
 import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
 import net.minecraft.client.data.models.blockstates.PropertyDispatch;
-import net.minecraft.client.data.models.model.ItemModelUtils;
 import net.minecraft.client.renderer.block.dispatch.VariantMutator;
-import net.minecraft.client.renderer.item.ClientItem;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
@@ -40,14 +38,8 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import static dev.anvilcraft.pigeonplus.AnvilCraftPigeonPlus.REGISTRUM;
 
 public class AddonBlocks {
-    private static final ClientItem.Properties OVERSIZED_IN_GUI = new ClientItem.Properties(true, true, 1.0F);
-
     static {
         REGISTRUM.defaultCreativeTab(AddonItemGroups.ADDON_ITEMS.getKey());
-    }
-
-    private static void pigeonplus$oversizedModel(ItemModelOutput output, Item item, Identifier model) {
-        output.accept(item, ItemModelUtils.plainModel(model), OVERSIZED_IN_GUI);
     }
 
     public static final BlockEntry<PigeonAnvilBlock> PIGEON_ANVIL = REGISTRUM
@@ -71,8 +63,8 @@ public class AddonBlocks {
             MultiVariantGenerator.dispatch(ctx.getEntry(), pigeonplus$variant("block/blender_bottom"))
                 .with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING)))
         .item(BlockItem::new)
-        .model(() -> (ctx, gen) -> pigeonplus$oversizedModel(
-            gen.itemModelOutput, ctx.get(), pigeonplus$id("block/blender")))
+        .model(() -> (ctx, gen) -> AddonItemModelUtil.oversizedItem(
+            gen, ctx.get(), pigeonplus$id("block/blender")))
         .build()
         .register();
 
@@ -85,8 +77,8 @@ public class AddonBlocks {
             MultiVariantGenerator.dispatch(ctx.getEntry(), pigeonplus$variant("block/anvil_pump"))
                 .with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING_ALT)))
         .item(BlockItem::new)
-        .model(() -> (ctx, gen) -> pigeonplus$oversizedModel(
-            gen.itemModelOutput, ctx.get(), pigeonplus$id("block/anvil_pump_full")))
+        .model(() -> (ctx, gen) -> AddonItemModelUtil.oversizedItem(
+            gen, ctx.get(), pigeonplus$id("block/anvil_pump_full")))
         .build()
         .tag(BlockTags.MINEABLE_WITH_PICKAXE)
         .register();
@@ -98,8 +90,8 @@ public class AddonBlocks {
         .blockstate(() -> (ctx, gen) -> gen.blockStateOutput.accept(
             BlockModelGenerators.createSimpleBlock(ctx.getEntry(), pigeonplus$variant("block/feed_spreader_bottom"))))
         .item(BlockItem::new)
-        .model(() -> (ctx, gen) -> pigeonplus$oversizedModel(
-            gen.itemModelOutput, ctx.get(), pigeonplus$id("block/feed_spreader_full")))
+        .model(() -> (ctx, gen) -> AddonItemModelUtil.oversizedItem(
+            gen, ctx.get(), pigeonplus$id("block/feed_spreader_full")))
         .build()
         .tag(BlockTags.MINEABLE_WITH_PICKAXE)
         .register();
@@ -123,8 +115,8 @@ public class AddonBlocks {
                         .with(pigeonplus$nozzleYRot(facing))))))
         .loot(FlexibleMultiPartBlock::loot)
         .item(FlexibleMultiPartBlockItem<DirectionCube3x3PartHalf, EnumProperty<Direction>, Direction>::new)
-            .model(() -> (ctx, gen) -> pigeonplus$oversizedModel(
-                gen.itemModelOutput, ctx.get(), pigeonplus$id("block/nozzle")))
+            .model(() -> (ctx, gen) -> AddonItemModelUtil.oversizedItem(
+                gen, ctx.get(), pigeonplus$id("block/nozzle")))
             .build()
         .tag(BlockTags.MINEABLE_WITH_PICKAXE)
         .register();
@@ -169,8 +161,8 @@ public class AddonBlocks {
                         .with(pigeonplus$horizontalYRot(facing))))))
         .loot(SimpleMultiPartBlock::loot)
         .item(SimpleMultiPartBlockItem<LargeFireworksRocketPart>::new)
-            .model(() -> (ctx, gen) -> pigeonplus$oversizedModel(
-                gen.itemModelOutput, ctx.get(), pigeonplus$id("item/large_fireworks_rocket_model")))
+            .model(() -> (ctx, gen) -> AddonItemModelUtil.oversizedItem(
+                gen, ctx.get(), pigeonplus$id("item/large_fireworks_rocket_model")))
             .build()
         .tag(BlockTags.MINEABLE_WITH_PICKAXE)
         .register();
