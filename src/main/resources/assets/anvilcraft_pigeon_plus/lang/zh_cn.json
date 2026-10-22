@@ -24,8 +24,8 @@
     "block.anvilcraft_pigeon_plus.liquid_hydrogen": "液氢",
     "block.anvilcraft_pigeon_plus.mixed_biomass": "混合生物质",
     "block.anvilcraft_pigeon_plus.potion": "药水",
-    "item.anvilcraft_pigeon_plus.splash_bottle": "喷溅玻璃瓶",
-    "item.anvilcraft_pigeon_plus.lingering_bottle": "滞留玻璃瓶",
+    "item.anvilcraft_pigeon_plus.splash_bottle": "喷溅型玻璃瓶",
+    "item.anvilcraft_pigeon_plus.lingering_bottle": "滞留型玻璃瓶",
     "fluid.anvilcraft_pigeon_plus.potion.of": "%s%s",
     "fluid.anvilcraft_pigeon_plus.potion.long": "长效",
     "fluid.anvilcraft_pigeon_plus.potion.strong": "强力",
@@ -114,5 +114,6 @@
     "tooltip.anvilcraft_pigeon_plus.item.electric_blender": "在炼药锅下搅拌流体原料\n通电时还会加热上方方块",
     "block.anvilcraft_pigeon_plus.chocolate_cookie_pillar": "巧克力夹心饼干柱",
     "block.anvilcraft_pigeon_plus.dark_chocolate_cookie_pillar": "黑巧克力夹心饼干柱",
-    "block.anvilcraft_pigeon_plus.white_chocolate_cookie_pillar": "白巧克力夹心饼干柱"
+    "block.anvilcraft_pigeon_plus.white_chocolate_cookie_pillar": "白巧克力夹心饼干柱",
+    "block.anvilcraft_pigeon_plus.large_creamy_bread_roll": "大型奶油面包卷"
 }
