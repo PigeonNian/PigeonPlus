@@ -101,7 +101,7 @@
     "gui.anvilcraft_pigeon_plus.category.potion_brewing.whole_tank": "转化容器内的全部药水",
     "gui.anvilcraft_pigeon_plus.category.potion_bulk_brewing": "批量酿造",
     "gui.anvilcraft_pigeon_plus.category.potion_bulk_brewing.bulk": "一次炼制 8B，且仅消耗 1 个材料",
-    "gui.anvilcraft_pigeon_plus.category.potion_soaking": "泡药",
+    "gui.anvilcraft_pigeon_plus.category.potion_soaking": "浸渍",
     "message.anvilcraft_pigeon_plus.large_fireworks_rocket.installed": "已装填烟火之星 %s/%s",
     "message.anvilcraft_pigeon_plus.large_fireworks_rocket.full": "这支大型烟花已经装满了（%s 颗烟火之星）",
     "message.anvilcraft_pigeon_plus.large_fireworks_rocket.pearl_installed": "已装填末影珍珠 %s/%s",
