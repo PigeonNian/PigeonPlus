@@ -1,6 +1,7 @@
 package dev.anvilcraft.pigeonplus.client.selection;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.anvilcraft.lib.v2.cube.client.CubeSelection;
 import dev.anvilcraft.lib.v2.cube.client.OutlineRenderer;
 import dev.anvilcraft.lib.v2.cube.client.SelectionPart;
@@ -78,6 +79,13 @@ public final class AddonModelBlockSelection {
         PoseStack pose = event.getPoseStack();
         Vec3 camera = event.getCamera().getPosition();
         Vec3 offset = multipart ? Vec3.ZERO : state.getOffset(level, pos);
+        // 方块局部坐标系下的相机位置：下面 translate 之后，几何与相机就处在同一个坐标系里，
+        // PackedOutline#forView 需要的就是这个值。
+        Vec3 localCamera = new Vec3(
+            camera.x - pos.getX() - offset.x,
+            camera.y - pos.getY() - offset.y,
+            camera.z - pos.getZ() - offset.z
+        );
         pose.pushPose();
         pose.translate(
             pos.getX() - camera.x + offset.x,
@@ -85,10 +93,10 @@ public final class AddonModelBlockSelection {
             pos.getZ() - camera.z + offset.z
         );
         if (!drawnByLib && outline != null && !outline.isEmpty()) {
-            drawOutline(outline, pose, event);
+            drawOutline(outline, localCamera, pose, event);
         }
         if (!extra.isEmpty()) {
-            drawOutline(extra, pose, event);
+            drawOutline(extra, localCamera, pose, event);
         }
         pose.popPose();
         event.setCanceled(true);
@@ -116,10 +124,24 @@ public final class AddonModelBlockSelection {
         );
     }
 
-    private static void drawOutline(List<SelectionPart> parts, PoseStack pose, RenderHighlightEvent.Block event) {
+    private static void drawOutline(
+        List<SelectionPart> parts,
+        Vec3 localCamera,
+        PoseStack pose,
+        RenderHighlightEvent.Block event
+    ) {
+        PackedOutline[] outlines = new PackedOutline[parts.size()];
+        PackedOutline[] visible = new PackedOutline[parts.size()];
         int segments = 0;
-        for (SelectionPart part : parts) {
-            segments += CubeSelection.outlines().get(part.geometry()).segmentCount();
+        int visibleSegments = 0;
+        for (int i = 0; i < parts.size(); i++) {
+            SelectionPart part = parts.get(i);
+            outlines[i] = CubeSelection.outlines().get(part.geometry());
+            segments += outlines[i].segmentCount();
+            // anvillib 的接缝隐藏是按视角算的：相机必须换到该部件的局部坐标系，
+            // 与 CubeHighlightEvents 里的做法一致，否则这里画出来的是未优化的原框线。
+            visible[i] = outlines[i].forView(part.localPosition(localCamera));
+            visibleSegments += visible[i].segmentCount();
         }
         if (segments > SelectionGeometry.MAX_OUTLINE_SEGMENTS) {
             AABB bounds = parts.getFirst().bounds();
@@ -134,16 +156,14 @@ public final class AddonModelBlockSelection {
             );
             return;
         }
-        for (SelectionPart part : parts) {
+        if (visibleSegments > SelectionGeometry.MAX_OUTLINE_SEGMENTS) {
+            System.arraycopy(outlines, 0, visible, 0, outlines.length);
+        }
+        VertexConsumer consumer = event.getMultiBufferSource().getBuffer(RenderType.lines());
+        for (int i = 0; i < parts.size(); i++) {
             pose.pushPose();
-            part.apply(pose);
-            PackedOutline packed = CubeSelection.outlines().get(part.geometry());
-            OutlineRenderer.render(
-                pose,
-                event.getMultiBufferSource().getBuffer(RenderType.lines()),
-                packed,
-                0, 0, 0, 0.4F
-            );
+            parts.get(i).apply(pose);
+            OutlineRenderer.render(pose, consumer, visible[i], 0, 0, 0, 0.4F);
             pose.popPose();
         }
     }

@@ -1,6 +1,7 @@
 package dev.anvilcraft.pigeonplus.block;
 
 import com.mojang.serialization.MapCodec;
+import dev.anvilcraft.lib.v2.util.ShapeUtil;
 import dev.anvilcraft.pigeonplus.block.state.LargeCreamyBreadRollPart;
 import dev.anvilcraft.pigeonplus.init.ModCriterionTriggers;
 import dev.dubhe.anvilcraft.api.hammer.IHammerRemovable;
@@ -31,12 +32,18 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.common.ItemAbilities;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 public class LargeCreamyBreadRollBlock
     extends FlexibleMultiPartBlock<LargeCreamyBreadRollPart, DirectionProperty, Direction>
@@ -49,6 +56,20 @@ public class LargeCreamyBreadRollBlock
     public static final BooleanProperty CONNECTED_BACK = BooleanProperty.create("connected_back");
     private static final int FOOD_LEVEL = 15;
     private static final float SATURATION_LEVEL = 0.8F;
+
+    private static final AABB[] GLOBAL_SHAPE = {
+        // 奶油芯：贯穿整卷
+        new AABB(-0.28125, -1, 0.0625, 1.28125, 2, 0.9375),
+        new AABB(-1, -0.28125, 0.0625, 2, 1.28125, 0.9375),
+        // 四角的小方块
+        new AABB(-0.71875, 1.28125, 0.0625, -0.28125, 1.71875, 0.9375),
+        new AABB(1.28125, 1.28125, 0.0625, 1.71875, 1.71875, 0.9375),
+        new AABB(1.28125, -0.71875, 0.0625, 1.71875, -0.28125, 0.9375),
+        new AABB(-0.71875, -0.71875, 0.0625, -0.28125, -0.28125, 0.9375),
+    };
+
+    private static final Map<Direction, Map<LargeCreamyBreadRollPart, VoxelShape>> SHAPES_BY_FACING =
+        createShapesByFacing();
 
     public LargeCreamyBreadRollBlock(Properties properties) {
         super(properties);
@@ -263,6 +284,16 @@ public class LargeCreamyBreadRollBlock
     }
 
     @Override
+    public VoxelShape getPartShape(BlockState state) {
+        if (!state.hasProperty(PART) || !state.hasProperty(FACING)) {
+            return Shapes.block();
+        }
+        return SHAPES_BY_FACING
+            .getOrDefault(state.getValue(FACING), Map.of())
+            .getOrDefault(state.getValue(PART), Shapes.block());
+    }
+
+    @Override
     protected boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) {
         return true;
     }
@@ -277,5 +308,64 @@ public class LargeCreamyBreadRollBlock
     protected BlockState mirror(BlockState state, Mirror mirror) {
         return state.setValue(PART, state.getValue(PART).mirror(mirror))
             .setValue(FACING, mirror.mirror(state.getValue(FACING)));
+    }
+
+    private static Map<Direction, Map<LargeCreamyBreadRollPart, VoxelShape>> createShapesByFacing() {
+        Map<Direction, Map<LargeCreamyBreadRollPart, VoxelShape>> byFacing = new EnumMap<>(Direction.class);
+        for (Direction facing : Direction.values()) {
+            Map<LargeCreamyBreadRollPart, VoxelShape> shapes = new EnumMap<>(LargeCreamyBreadRollPart.class);
+            for (LargeCreamyBreadRollPart part : LargeCreamyBreadRollPart.values()) {
+                shapes.put(part, slicePartShape(part, facing));
+            }
+            byFacing.put(facing, shapes);
+        }
+        return byFacing;
+    }
+
+    private static VoxelShape slicePartShape(LargeCreamyBreadRollPart part, Direction facing) {
+        double minX = part.getOffsetX(facing);
+        double minY = part.getOffsetY(facing);
+        double minZ = part.getOffsetZ(facing);
+        double maxX = minX + 1.0;
+        double maxY = minY + 1.0;
+        double maxZ = minZ + 1.0;
+        List<AABB> localParts = new ArrayList<>();
+        for (AABB source : GLOBAL_SHAPE) {
+            AABB globalPart = rotateShape(source, facing);
+            double clippedMinX = Math.max(globalPart.minX, minX);
+            double clippedMinY = Math.max(globalPart.minY, minY);
+            double clippedMinZ = Math.max(globalPart.minZ, minZ);
+            double clippedMaxX = Math.min(globalPart.maxX, maxX);
+            double clippedMaxY = Math.min(globalPart.maxY, maxY);
+            double clippedMaxZ = Math.min(globalPart.maxZ, maxZ);
+            if (clippedMinX >= clippedMaxX || clippedMinY >= clippedMaxY || clippedMinZ >= clippedMaxZ) {
+                continue;
+            }
+            // 方块空间 -> 该部件的局部坐标 -> 像素（ShapeUtil 的 16 格制）。
+            localParts.add(new AABB(
+                (clippedMinX - minX) * 16.0, (clippedMinY - minY) * 16.0, (clippedMinZ - minZ) * 16.0,
+                (clippedMaxX - minX) * 16.0, (clippedMaxY - minY) * 16.0, (clippedMaxZ - minZ) * 16.0
+            ));
+        }
+        return localParts.isEmpty() ? Shapes.empty() : ShapeUtil.merge(localParts.toArray(AABB[]::new));
+    }
+
+    private static AABB rotateShape(AABB box, Direction facing) {
+        AABB rotated = switch (facing) {
+            // 与 LargeFireworksRocketBlock#rotateShape 同一套约定（模型 y=90 把局部 -Z 转到 +X）。
+            case EAST -> new AABB(1.0 - box.maxZ, box.minY, box.minX, 1.0 - box.minZ, box.maxY, box.maxX);
+            case SOUTH -> new AABB(1.0 - box.maxX, box.minY, 1.0 - box.maxZ, 1.0 - box.minX, box.maxY, 1.0 - box.minZ);
+            case WEST -> new AABB(box.minZ, box.minY, 1.0 - box.maxX, box.maxZ, box.maxY, 1.0 - box.minX);
+            default -> box;
+        };
+        return switch (facing) {
+            // up: 模型 x=+90，把局部 +Z 转到 -Y；绕 X 轴转 90° 即 (y,z) -> (1-z, y)。
+            case UP -> new AABB(rotated.minX, 1.0 - rotated.maxZ, rotated.minY,
+                                rotated.maxX, 1.0 - rotated.minZ, rotated.maxY);
+            // down: 模型 x=270，等价于绕 X 轴 -90°：(y,z) -> (z, 1-y)。
+            case DOWN -> new AABB(rotated.minX, rotated.minZ, 1.0 - rotated.maxY,
+                                  rotated.maxX, rotated.maxZ, 1.0 - rotated.minY);
+            default -> rotated;
+        };
     }
 }

@@ -80,8 +80,8 @@ final class AddonModelSelectionBakery {
                     if (rendered
                         && !(block instanceof AbstractMultiPartBlock<?>)
                         && !AddonModelSelectionDenylist.usesOriginalOutline(block)) {
-                        List<SelectionPart> own =
-                            AddonModelSelectionBakery.collect(selection, state.getSeed(BlockPos.ZERO));
+                        List<SelectionPart> own = this.outlineParts(
+                            AddonModelSelectionBakery.collect(selection, state.getSeed(BlockPos.ZERO)));
                         if (!own.isEmpty()) {
                             outlines.put(state, own);
                         }
@@ -315,15 +315,12 @@ final class AddonModelSelectionBakery {
                         }
                     }
                     clipped.put(state, this.fixed(pieces));
-                    complete.put(
-                        state,
-                        List.of(new SelectionPart(
-                            whole,
-                            new Matrix4f()
-                                .translation(-offset.getX(), -offset.getY(), -offset.getZ())
-                                .scale(1 / AddonModelCubeGeometry.SCALE)
-                        ))
-                    );
+                    complete.put(state, this.outlineParts(List.of(new SelectionPart(
+                        whole,
+                        new Matrix4f()
+                            .translation(-offset.getX(), -offset.getY(), -offset.getZ())
+                            .scale(1 / AddonModelCubeGeometry.SCALE)
+                    ))));
                 }
                 states.putAll(clipped);
                 outlines.putAll(complete);
@@ -341,6 +338,22 @@ final class AddonModelSelectionBakery {
         return shapes.isEmpty() ? EMPTY : new ModelSelection.Fixed(
             new SelectionPart(this.geometry(shapes), new Matrix4f().scaling(1 / AddonModelCubeGeometry.SCALE))
         );
+    }
+
+    private List<SelectionPart> outlineParts(List<SelectionPart> parts) {
+        if (parts.isEmpty()) {
+            return List.of();
+        }
+        List<SelectionPart> result = new ArrayList<>(parts.size());
+        for (SelectionPart part : parts) {
+            try {
+                result.add(new SelectionPart(this.geometry(part.blockSpaceShapes())));
+            } catch (IllegalArgumentException exception) {
+                // 预算不足或形状过多时退回放大空间的部件，描边保持原样而不是整块丢失。
+                return parts;
+            }
+        }
+        return List.copyOf(result);
     }
 
     private SelectionGeometry geometry(List<ConvexShape> shapes) {
