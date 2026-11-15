@@ -30,4 +30,4 @@ The electric blender is made from a heater and a magnetoelectric core through mu
 
 ## Recipe
 
-<recipe id="anvilcraft_pigeon_plus:electric_blender"/>
+<recipe id="anvilcraft_pigeon_plus:procedural_process/electric_blender"/>

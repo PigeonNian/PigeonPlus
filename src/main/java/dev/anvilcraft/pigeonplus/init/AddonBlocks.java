@@ -98,6 +98,7 @@ public class AddonBlocks {
         .item(BlockItem::new)
         .model((ctx, prov) -> prov.withExistingParent(ctx.getName(), BLENDER_BASE))
         .build()
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
         .register();
 
     public static final BlockEntry<ElectricBlenderBlock> ELECTRIC_BLENDER = REGISTRUM
@@ -114,6 +115,7 @@ public class AddonBlocks {
         .item(BlockItem::new)
         .model((ctx, prov) -> prov.withExistingParent(ctx.getName(), ELECTRIC_BLENDER_BASE))
         .build()
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
         .register();
 
     public static final BlockEntry<AnvilPumpBlock> ANVIL_PUMP = REGISTRUM

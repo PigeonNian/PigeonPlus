@@ -30,4 +30,4 @@ items:
 
 ## 配方
 
-<recipe id="anvilcraft_pigeon_plus:electric_blender"/>
+<recipe id="anvilcraft_pigeon_plus:procedural_process/electric_blender"/>
