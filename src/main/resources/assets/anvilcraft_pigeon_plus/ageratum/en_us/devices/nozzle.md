@@ -20,6 +20,7 @@ The nozzle does not directly consume ordinary fuel. Instead, it checks whether t
 
 - Oil and liquid oxygen form kerosene exhaust when both are present and ignited.
 - Liquefied biogas and liquid oxygen form methane exhaust when both are present and ignited.
+- Liquid hydrogen and liquid oxygen form hydrogen-oxygen exhaust when both are present and ignited.
 - The exhaust shuts down when the nozzle or any sub-block receives a redstone signal.
 
 ## Center Jet
@@ -28,6 +29,7 @@ The center exhaust continuously provides momentum to entities. When used with a 
 
 - Kerosene exhaust can accelerate up to about 320 b/t over 30 seconds.
 - Methane exhaust can accelerate up to about 192 b/t over 30 seconds.
+- Hydrogen-oxygen exhaust can accelerate up to about 160 b/t over 30 seconds.
 - The center tail flame can ignite wooden blocks and heat heatable blocks to incandescent.
 
 ## Power and Heating

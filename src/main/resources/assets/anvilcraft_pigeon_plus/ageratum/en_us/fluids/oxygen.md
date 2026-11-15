@@ -17,7 +17,7 @@ items:
 
 Liquid oxygen is the oxidizer source for nozzle exhaust.
 
-Liquid hydrogen is the fuel for hydrogen-oxygen nozzle exhaust and can be obtained by liquefying compressed air.
+Liquid hydrogen is the fuel for hydrogen-oxygen nozzle exhaust.
 
 ## Compressed Air
 
@@ -25,6 +25,6 @@ The anvil pump can extract compressed air from the air when the six faces of a d
 
 ## Liquefaction
 
-When compressed air is continuously pumped into a large tank already full of compressed air, both liquid oxygen and liquid hydrogen are separated out according to the configured ratios.
+When compressed air is continuously pumped into a large tank already full of compressed air, liquid oxygen is separated out according to the configured ratio.
 
 Liquid oxygen can combust with oil or liquefied biogas to trigger nozzle exhaust; together with liquid hydrogen it triggers hydrogen-oxygen exhaust.

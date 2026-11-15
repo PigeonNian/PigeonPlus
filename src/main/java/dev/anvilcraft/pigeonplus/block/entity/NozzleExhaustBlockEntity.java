@@ -98,7 +98,7 @@ public class NozzleExhaustBlockEntity extends BlockEntity {
         this.activePropellant = propellant;
 
         if (level.getGameTime() % NozzleExhaustUtil.PLASMA_CONSUME_INTERVAL == 0
-            && !NozzleExhaustUtil.consumeTopFuelOnce(cauldron, propellant)) {
+            && !NozzleExhaustUtil.consumePropellantOnce(cauldron, propellant)) {
             this.stopExhaust();
             return;
         }

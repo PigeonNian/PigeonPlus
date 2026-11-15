@@ -19,6 +19,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumMap;
@@ -478,30 +479,104 @@ public final class NozzleExhaustUtil {
         }
     }
 
-    public static boolean consumeTopFuelOnce(
+    /**
+     * 每 1 mB 燃料完全燃烧所需的液氧量（mB）。
+     *
+     * <p>取完全燃烧的化学计量比（煤油约 2.56、甲烷 4、氢 8 质量份氧）再按体积折算，
+     * 取整到常用档位。三个值刻意拉开档次：推力越高的燃气，单位燃料耗氧越多，
+     * 于是「煤油最强但最费氧、氢氧最省氧但推力最低」这条取舍才成立。
+     */
+    private static final double OXYGEN_PER_FUEL_KEROSENE = 2.0;
+    private static final double OXYGEN_PER_FUEL_METHANE = 1.5;
+    private static final double OXYGEN_PER_FUEL_HYDROGEN = 0.5;
+
+    /**
+     * 该燃气的最佳混合比：每消耗 1 mB 燃料需要多少 mB 液氧。
+     */
+    public static double oxygenPerFuel(JetPropellant propellant) {
+        return switch (propellant) {
+            case KEROSENE -> OXYGEN_PER_FUEL_KEROSENE;
+            case METHANE -> OXYGEN_PER_FUEL_METHANE;
+            case HYDROGEN -> OXYGEN_PER_FUEL_HYDROGEN;
+        };
+    }
+
+    /**
+     * 消耗一轮推进剂：燃料，以及按最佳混合比同步折算的液氧。
+     *
+     * <p>燃料与液氧必须同时够用：先按氧的存量反推这一轮最多能烧多少燃料，再按这个
+     * 实际量等比扣氧。这样燃料只剩小半桶时不会按整桶扣氧，氧先见底时也不会白烧燃料。
+     */
+    public static boolean consumePropellantOnce(
         LargeCauldronBlockEntity cauldron,
         JetPropellant propellant
     ) {
         LargeCauldronFluidHandler handler = cauldron.getFluids();
-        java.util.List<FluidStack> fluids = handler.copyFluids();
-        for (int i = fluids.size() - 1; i >= 0; i--) {
-            FluidStack stack = fluids.get(i);
-            if (stack.isEmpty()) {
-                continue;
-            }
-            if (!matchesFuel(stack, propellant)) {
-                continue;
-            }
-            int consumeAmount = Math.min(stack.getAmount(), PLASMA_CONSUME_AMOUNT);
-            int remaining = stack.getAmount() - consumeAmount;
-            fluids.set(i, remaining > 0 ? stack.copyWithAmount(remaining) : FluidStack.EMPTY);
-            handler.setFluids(fluids);
-            if (!hasPropellant(cauldron, propellant)) {
-                cauldron.setIgnited(false);
-            }
-            return true;
+        Predicate<FluidStack> fuelFilter = stack -> matchesFuel(stack, propellant);
+        Predicate<FluidStack> oxygenFilter =
+            stack -> stack.getFluid().isSame(AddonFluids.LIQUID_OXYGEN.get());
+
+        int fuelAvailable = totalStored(handler, fuelFilter);
+        int oxygenAvailable = totalStored(handler, oxygenFilter);
+        if (fuelAvailable <= 0 || oxygenAvailable <= 0) return false;
+
+        double ratio = oxygenPerFuel(propellant);
+        // 向下取整：这一轮烧掉的燃料不会超过氧能支撑的量
+        int fuelToConsume = Math.min(
+            Math.min(fuelAvailable, PLASMA_CONSUME_AMOUNT),
+            (int) Math.floor(oxygenAvailable / ratio)
+        );
+        if (fuelToConsume <= 0) return false;
+        int oxygenToConsume = Math.min(oxygenAvailable, (int) Math.ceil(fuelToConsume * ratio));
+
+        if (drainStored(handler, fuelFilter, fuelToConsume) != fuelToConsume) return false;
+        if (drainStored(handler, oxygenFilter, oxygenToConsume) != oxygenToConsume) return false;
+
+        if (!hasPropellant(cauldron, propellant)) {
+            cauldron.setIgnited(false);
         }
-        return false;
+        return true;
+    }
+
+    private static int totalStored(LargeCauldronFluidHandler handler, Predicate<FluidStack> filter) {
+        int total = 0;
+        for (int tank = 0; tank < handler.getTanks(); tank++) {
+            FluidStack stack = handler.getFluidInTank(tank);
+            if (!stack.isEmpty() && filter.test(stack)) {
+                total += stack.getAmount();
+            }
+        }
+        return total;
+    }
+
+    /**
+     * 跨储罐抽取指定流体，返回实际抽到的量。
+     *
+     * <p>同一流体通常只占一层，但存档加载或外部写入可能把它拆成多层；每轮重新找
+     * 第一层可抽的储罐，就不会被「第一层不够、后面还有」卡住。
+     */
+    private static int drainStored(
+        LargeCauldronFluidHandler handler,
+        Predicate<FluidStack> filter,
+        int amount
+    ) {
+        int remaining = amount;
+        while (remaining > 0) {
+            FluidStack target = null;
+            for (int tank = 0; tank < handler.getTanks(); tank++) {
+                FluidStack stack = handler.getFluidInTank(tank);
+                if (!stack.isEmpty() && filter.test(stack)) {
+                    target = stack;
+                    break;
+                }
+            }
+            if (target == null) break;
+            FluidStack request = target.copyWithAmount(Math.min(remaining, target.getAmount()));
+            int drained = handler.drainStoredFluid(request, IFluidHandler.FluidAction.EXECUTE).getAmount();
+            if (drained <= 0) break;
+            remaining -= drained;
+        }
+        return amount - remaining;
     }
 
     private static boolean matchesFuel(FluidStack stack, JetPropellant propellant) {
