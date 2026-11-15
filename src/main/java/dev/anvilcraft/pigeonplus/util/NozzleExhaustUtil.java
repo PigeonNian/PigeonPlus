@@ -22,13 +22,11 @@ import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.function.Predicate;
 import java.util.Set;
 
 public final class NozzleExhaustUtil {
-    public static final int JET_TUBE_HEIGHT = 4;
     public static final int JET_RANGE_RADIUS = 1;
     public static final int JET_RANGE_HEIGHT = 12;
     public static final int JET_VISUAL_HEIGHT = 16;
