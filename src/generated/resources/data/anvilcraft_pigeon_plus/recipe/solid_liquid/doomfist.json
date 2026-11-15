@@ -1,0 +1,29 @@
+{
+  "type": "anvilcraft:solid_liquid",
+  "consume": 1,
+  "fluid": {
+    "components": {
+      "patch": {
+        "!anvilcraft:liquid_enchantment": {}
+      }
+    },
+    "fluids": "anvilcraft:liquid_enchantment"
+  },
+  "ingredients": [
+    {
+      "items": "minecraft:anvil"
+    },
+    {
+      "count": 4,
+      "items": "minecraft:iron_block"
+    }
+  ],
+  "results": [],
+  "transform": {
+    "amount": 1,
+    "components": {
+      "anvilcraft:liquid_enchantment": "anvilcraft_pigeon_plus:doomfist"
+    },
+    "id": "anvilcraft:liquid_enchantment"
+  }
+}

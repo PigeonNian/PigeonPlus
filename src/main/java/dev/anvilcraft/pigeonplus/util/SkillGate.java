@@ -48,6 +48,6 @@ public final class SkillGate {
      * 是否正在蓄力（手持带铁拳附魔的铁砧锤长按右键）。
      */
     public static boolean isCharging(Player player) {
-        return player.isUsingItem() && DoomfistEnchantmentUtil.hasDoomfist(player.getUseItem());
+        return player.isUsingItem() && DoomfistEnchantmentUtil.isDoomfistHammer(player.getUseItem());
     }
 }

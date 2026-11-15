@@ -419,7 +419,7 @@ public class AnvilCraftPigeonPlusClient {
                     Minecraft minecraft = Minecraft.getInstance();
                     if (minecraft.player != null
                         && minecraft.player.isUsingItem()
-                        && DoomfistEnchantmentUtil.hasDoomfist(minecraft.player.getUseItem())) {
+                        && DoomfistEnchantmentUtil.isDoomfistHammer(minecraft.player.getUseItem())) {
                         return;
                     }
                     original.render(graphics, deltaTracker);

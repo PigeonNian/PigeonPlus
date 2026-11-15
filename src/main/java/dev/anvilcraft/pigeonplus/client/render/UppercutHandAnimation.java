@@ -108,7 +108,7 @@ public final class UppercutHandAnimation {
         LocalPlayer player = minecraft.player;
         if (player == null) return;
         // 只有手持带铁拳附魔的铁砧锤才加动画
-        if (!DoomfistEnchantmentUtil.hasDoomfist(player.getMainHandItem())) return;
+        if (!DoomfistEnchantmentUtil.isDoomfistHammer(player.getMainHandItem())) return;
 
         float swing = UppercutClientState.swingProgress(partialTick);
         if (swing <= 0.0f) return;

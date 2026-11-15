@@ -300,12 +300,7 @@ public final class SlamManager {
             );
         }
 
-        // 3) 中心爆开一下
-        level.sendParticles(
-            ParticleTypes.EXPLOSION_EMITTER, origin.x, groundY, origin.z, 1, 0.0, 0.0, 0.0, 0.0
-        );
-
-        // 4) 登记向外扩散的冲击波
+        // 3) 登记向外扩散的冲击波
         WAVES.add(new Shockwave(level, origin, forward, groundY));
     }
 

@@ -14,5 +14,6 @@ public class AddonRecipeHandler {
         AddonGasLiquefactionRecipeLoader.init(provider);
         AddonMultiblockRecipeLoader.init(provider);
         AddonMultiblockConversionRecipeLoader.init(provider);
+        AddonEnchantmentRecipeLoader.init(provider);
     }
 }

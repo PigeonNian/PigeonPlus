@@ -63,7 +63,7 @@ public final class RocketPunchChargeHud {
         if (minecraft.options.hideGui || minecraft.screen != null) return;
         LocalPlayer player = minecraft.player;
         if (player == null || !player.isUsingItem()) return;
-        if (!DoomfistEnchantmentUtil.hasDoomfist(player.getUseItem())) return;
+        if (!DoomfistEnchantmentUtil.isDoomfistHammer(player.getUseItem())) return;
 
         float partialTick = deltaTracker.getGameTimeDeltaPartialTick(minecraft.isPaused());
         // 蓄力量 = 已用时长；满蓄力后维持期内钳到 1.0 不再增长

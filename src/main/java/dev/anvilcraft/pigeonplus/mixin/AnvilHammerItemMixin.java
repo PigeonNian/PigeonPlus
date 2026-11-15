@@ -159,7 +159,7 @@ public class AnvilHammerItemMixin {
      */
     @Inject(method = "isWearing", at = @At("HEAD"), cancellable = true)
     private static void pigeonplus$stripGoggles(Player player, CallbackInfoReturnable<Boolean> cir) {
-        if (DoomfistEnchantmentUtil.hasDoomfist(player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD))) {
+        if (DoomfistEnchantmentUtil.isDoomfistHammer(player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD))) {
             cir.setReturnValue(false);
         }
     }

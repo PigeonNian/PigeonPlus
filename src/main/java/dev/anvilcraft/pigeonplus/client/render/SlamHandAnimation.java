@@ -72,7 +72,7 @@ public final class SlamHandAnimation {
         LocalPlayer player = minecraft.player;
         if (player == null) return;
         // 只有手持带铁拳附魔的铁砧锤才加动画
-        if (!DoomfistEnchantmentUtil.hasDoomfist(player.getMainHandItem())) return;
+        if (!DoomfistEnchantmentUtil.isDoomfistHammer(player.getMainHandItem())) return;
 
         float raise = SeismicSlamClientState.raiseProgress(partialTick);
         float slam = SeismicSlamClientState.slamSwingProgress(partialTick);

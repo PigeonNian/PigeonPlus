@@ -87,7 +87,7 @@ public final class RocketPunchHandAnimation {
         Minecraft minecraft = Minecraft.getInstance();
         LocalPlayer player = minecraft.player;
         if (player == null) return;
-        if (!DoomfistEnchantmentUtil.hasDoomfist(player.getMainHandItem())) return;
+        if (!DoomfistEnchantmentUtil.isDoomfistHammer(player.getMainHandItem())) return;
 
         float rotationX = 0.0f;
         float rotationY = 0.0f;
@@ -123,7 +123,7 @@ public final class RocketPunchHandAnimation {
             rotationX = DASH_ROTATION_X;
             translateY = DASH_TRANSLATE_Y;
             translateZ = DASH_TRANSLATE_Z;
-        } else if (player.isUsingItem() && DoomfistEnchantmentUtil.hasDoomfist(player.getUseItem())) {
+        } else if (player.isUsingItem() && DoomfistEnchantmentUtil.isDoomfistHammer(player.getUseItem())) {
             // 蓄力进度：与 RocketPunchChargeHud 用同一套算法，保证手部动作与进度条同步
             float elapsed = RocketPunchManager.TOTAL_CHARGE_TICKS - player.getUseItemRemainingTicks() + partialTick;
             float progress = Mth.clamp(elapsed / RocketPunchManager.FULL_CHARGE_TICKS, 0.0f, 1.0f);

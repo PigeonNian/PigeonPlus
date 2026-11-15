@@ -60,7 +60,7 @@ public final class RocketPunchChargeSoundController {
         }
         // 不再蓄力（松开、蓄满自动释放、中途被中断）→ 立刻掐断
         boolean stillCharging = minecraft.player.isUsingItem()
-            && DoomfistEnchantmentUtil.hasDoomfist(minecraft.player.getUseItem());
+            && DoomfistEnchantmentUtil.isDoomfistHammer(minecraft.player.getUseItem());
         if (!stillCharging) {
             stop();
         }

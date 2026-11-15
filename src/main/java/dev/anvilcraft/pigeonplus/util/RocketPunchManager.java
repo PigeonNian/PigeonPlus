@@ -152,8 +152,9 @@ public final class RocketPunchManager {
         int totalTicks = Math.max(1, (int) Math.round(distance / DASH_SPEED));
         ACTIVE_DASHES.put(
             player.getUUID(),
-            new DashState(level, totalTicks, hitDamage, wallDamage)
+            new DashState(level, totalTicks, hitDamage, wallDamage, horizontal)
         );
+        spawnDashStartBurst(level, player, horizontal);
         // 位移与视角锁定都交给客户端：玩家位置由客户端权威决定，
         // 服务端位移会被下一个位置包覆盖，且 45m/s 会被 "moved too quickly" 拉回。
         PacketDistributor.sendToPlayer(
@@ -205,6 +206,7 @@ public final class RocketPunchManager {
 
             if (dash.remainingTicks-- <= 0) {
                 // 冲刺自然结束：此刻才开始计冷却（“冷却在冲刺结束后计算”）
+                spawnDashEndPuff(serverLevel, player);
                 dashes.remove();
                 startCooldown(player);
                 continue;
@@ -215,11 +217,7 @@ public final class RocketPunchManager {
             // 服务端不再 setDeltaMovement/move，否则会与客户端上报的位置互相打架。
             player.fallDistance = 0.0f;
 
-            serverLevel.sendParticles(
-                ParticleTypes.CLOUD,
-                player.getX(), player.getY() + 0.2, player.getZ(),
-                4, 0.2, 0.1, 0.2, 0.01
-            );
+            spawnDashTrail(serverLevel, player, dash);
 
             // 命中检测
             AABB box = player.getBoundingBox().inflate(HIT_RADIUS);
@@ -238,6 +236,89 @@ public final class RocketPunchManager {
         }
 
         tickLaunched(serverLevel);
+    }
+
+    /**
+     * 冲刺起步的爆开：脚下的尘土、身后的蒸汽与一圈压缩波。
+     *
+     * <p>冲刺本身只有 9 tick 左右，只靠逐 tick 尾迹会显得「凭空出现」。
+     * 起步这一炸既交代了动力来源，也给尾迹定下起点。
+     */
+    private static void spawnDashStartBurst(ServerLevel level, ServerPlayer player, Vec3 direction) {
+        double x = player.getX() - direction.x * 0.6;
+        double y = player.getY();
+        double z = player.getZ() - direction.z * 0.6;
+        level.sendParticles(ParticleTypes.GUST_EMITTER_SMALL, x, y + 0.8, z, 1, 0.0, 0.0, 0.0, 0.0);
+        level.sendParticles(ParticleTypes.CLOUD, x, y + 0.35, z, 18, 0.55, 0.35, 0.55, 0.12);
+        level.sendParticles(ParticleTypes.POOF, x, y + 0.8, z, 10, 0.45, 0.45, 0.45, 0.09);
+    }
+
+    /**
+     * 逐 tick 的尾迹：把云团铺在「上一 tick 位置 → 当前位置」这条线段上。
+     *
+     * <p>不能只落在脚下一个点：冲刺速度 45 m/s，单 tick 位移 2.25 格，
+     * 按点发射会变成一串断开的圆斑，看起来像瞬移而不是高速运动。
+     * 这里把散布范围沿冲刺方向拉长，让相邻 tick 的云带首尾相接成一条隧道。
+     *
+     * <p>云团中心压在身后——粒子一旦落到拳锋前面，第一人称下会糊住视野。
+     */
+    private static void spawnDashTrail(ServerLevel level, ServerPlayer player, DashState dash) {
+        Vec3 current = player.position();
+        Vec3 from = dash.lastPos == null ? current : dash.lastPos;
+        dash.lastPos = current;
+
+        // 冲刺允许在初始方向 ±45° 内微调视角，所以优先用本 tick 的真实位移方向
+        Vec3 direction = dash.direction;
+        Vec3 horizontalDelta = new Vec3(current.x - from.x, 0.0, current.z - from.z);
+        if (horizontalDelta.lengthSqr() > 1.0E-4) {
+            direction = horizontalDelta.normalize();
+        }
+
+        Vec3 center = from.lerp(current, 0.5).subtract(direction.scale(0.55));
+        // 上限压在 1.6：服务端位置偶尔会隔几 tick 才追上客户端，不封顶会让某一 tick 的
+        // 散布范围突然覆盖十几格，看起来像凭空炸了一团而不是尾迹
+        double along = Math.min(from.distanceTo(current) * 0.5 + 0.25, 1.6);
+        double spreadX = Math.abs(direction.x) * along + 0.22;
+        double spreadZ = Math.abs(direction.z) * along + 0.22;
+
+        // 1) 主体白汽：沿位移段拉长，构成连续云带
+        level.sendParticles(
+            ParticleTypes.CLOUD,
+            center.x, center.y + 0.95, center.z,
+            6, spreadX, 0.38, spreadZ, 0.02
+        );
+        // 2) 核心浓烟：范围小、密度高，给云带一根实心轴
+        level.sendParticles(
+            ParticleTypes.POOF,
+            center.x, center.y + 0.7, center.z,
+            3, 0.2, 0.3, 0.2, 0.03
+        );
+        // 3) 细白雾：更轻更散，负责把云带边缘化开
+        level.sendParticles(
+            ParticleTypes.WHITE_SMOKE,
+            center.x, center.y + 0.85, center.z,
+            2, spreadX * 0.8, 0.4, spreadZ * 0.8, 0.01
+        );
+        // 4) 每 3 tick 留一团压缩波，形成「一路炸过去」的节奏
+        if (dash.tick % 3 == 0) {
+            level.sendParticles(
+                ParticleTypes.GUST,
+                center.x, center.y + 0.9, center.z,
+                1, 0.0, 0.0, 0.0, 0.0
+            );
+        }
+        dash.tick++;
+    }
+
+    /**
+     * 冲刺自然结束：补一小团余烟，避免尾迹在最密的时候被硬切断。
+     */
+    private static void spawnDashEndPuff(ServerLevel level, ServerPlayer player) {
+        level.sendParticles(
+            ParticleTypes.CLOUD,
+            player.getX(), player.getY() + 0.9, player.getZ(),
+            10, 0.35, 0.35, 0.35, 0.06
+        );
     }
 
     /**
@@ -267,6 +348,17 @@ public final class RocketPunchManager {
         );
         level.sendParticles(
             ParticleTypes.EXPLOSION,
+            target.getX(), target.getY() + 0.5, target.getZ(),
+            1, 0.0, 0.0, 0.0, 0.0
+        );
+        // 命中处的白色爆云：与尾迹同色系，读起来像「整条云带撞上了目标」
+        level.sendParticles(
+            ParticleTypes.CLOUD,
+            target.getX(), target.getY() + 0.6, target.getZ(),
+            14, 0.4, 0.4, 0.4, 0.14
+        );
+        level.sendParticles(
+            ParticleTypes.GUST_EMITTER_SMALL,
             target.getX(), target.getY() + 0.5, target.getZ(),
             1, 0.0, 0.0, 0.0, 0.0
         );
@@ -347,13 +439,22 @@ public final class RocketPunchManager {
         private final ServerLevel level;
         private final float hitDamage;
         private final float wallDamage;
+        /** 起步时的水平冲刺方向；尾迹在拿不到真实位移时用它兜底。 */
+        private final Vec3 direction;
+        /** 上一 tick 的位置，用于把尾迹铺满整个位移段。 */
+        private Vec3 lastPos;
+        /** 已经推进的 tick 数，用于给压缩波打节奏。 */
+        private int tick;
         private int remainingTicks;
 
-        private DashState(ServerLevel level, int remainingTicks, float hitDamage, float wallDamage) {
+        private DashState(
+            ServerLevel level, int remainingTicks, float hitDamage, float wallDamage, Vec3 direction
+        ) {
             this.level = level;
             this.remainingTicks = remainingTicks;
             this.hitDamage = hitDamage;
             this.wallDamage = wallDamage;
+            this.direction = direction;
         }
     }
 

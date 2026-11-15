@@ -78,7 +78,7 @@ public class RocketPunchEventListener {
     public static void onUseItemStart(LivingEntityUseItemEvent.Start event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
         ItemStack stack = event.getItem();
-        if (!DoomfistEnchantmentUtil.hasDoomfist(stack)) return;
+        if (!DoomfistEnchantmentUtil.isDoomfistHammer(stack)) return;
         // 只让蓄力的玩家自己播：这是「我自己的武器在充能」，
         // 且停止时机完全由该玩家的客户端掌控，不需要跨端同步停止包
         PacketDistributor.sendToPlayer(player, new RocketPunchChargeSoundPacket(true));
@@ -95,7 +95,7 @@ public class RocketPunchEventListener {
     public static void onUseItemStop(LivingEntityUseItemEvent.Stop event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
         ItemStack stack = event.getItem();
-        if (!DoomfistEnchantmentUtil.hasDoomfist(stack)) return;
+        if (!DoomfistEnchantmentUtil.isDoomfistHammer(stack)) return;
         int chargeTicks = RocketPunchManager.TOTAL_CHARGE_TICKS - event.getDuration();
         RocketPunchManager.performRocketPunch(player, chargeTicks);
     }
@@ -123,7 +123,7 @@ public class RocketPunchEventListener {
         AttributeInstance speed = player.getAttribute(Attributes.MOVEMENT_SPEED);
         if (speed == null) return;
         boolean charging = player.isUsingItem()
-            && DoomfistEnchantmentUtil.hasDoomfist(player.getUseItem());
+            && DoomfistEnchantmentUtil.isDoomfistHammer(player.getUseItem());
         boolean hasModifier = speed.getModifier(CHARGE_SLOW_ID) != null;
         if (charging && !hasModifier) {
             speed.addTransientModifier(new AttributeModifier(
