@@ -84,22 +84,13 @@ public class StorageServerStubMixin {
             return original;
         }
         ItemStack carried = player.containerMenu.getCarried();
-        if (PotionBottleTypes.isEmptyBottle(carried) && !carried.is(Items.GLASS_BOTTLE)) {
+        if (PotionBottleTypes.isEmptyBottle(carried)) {
             return carried.copyWithCount(1);
         }
         if (pigeonplus$hasGlassBottle(player)) {
             return original;
         }
-        ItemStack inInventory = pigeonplus$potionBottleIn(player.getInventory());
-        if (inInventory != null) {
-            return inInventory;
-        }
-        ItemStack inStorage = PotionBottleTypes.emptyPotionBottleIn(
-            StorageServerStubMixin.PIGEONPLUS_STORAGE.get());
-        if (inStorage != null) {
-            return inStorage;
-        }
-        return original;
+        return pigeonplus$potionBottleIn(player.getInventory());
     }
 
     @Unique
