@@ -34,18 +34,26 @@ import java.util.List;
 
 public class FermentationCategory implements IRecipeCategory<RecipeHolder<FermentationRecipe>> {
     private static final int WIDTH = 162;
-    private static final int HEIGHT = 64;
+    /** 比常规大锅布局高 18 像素，给单独一格的「热源」留位置。 */
+    private static final int HEIGHT = 82;
     private static final float MODEL_SCALE = 7.5F;
 
     private static final int INPUT_X = 15;
     private static final int INPUT_Y = 23;
     private static final int OUTPUT_X = 129;
     private static final int OUTPUT_Y = 24;
+    /** 搅拌机格。 */
     private static final int HINT_X = 100;
     private static final int HINT_Y = 41;
+    /** 热源格：和搅拌机分开放，两者缺一不可。 */
+    private static final int HEAT_X = 100;
+    private static final int HEAT_Y = 59;
 
-    private static final Component REQUIREMENT = Component.translatable(
-        "gui.anvilcraft_pigeon_plus.category.fermentation.requirement"
+    private static final Component BLENDER_REQUIREMENT = Component.translatable(
+        "gui.anvilcraft_pigeon_plus.category.fermentation.need_blender"
+    ).withStyle(ChatFormatting.GOLD);
+    private static final Component HEAT_REQUIREMENT = Component.translatable(
+        "gui.anvilcraft_pigeon_plus.category.fermentation.need_heat"
     ).withStyle(ChatFormatting.GOLD);
 
     private final IDrawable icon;
@@ -127,7 +135,14 @@ public class FermentationCategory implements IRecipeCategory<RecipeHolder<Fermen
                 new ItemStack(AddonBlocks.BLENDER),
                 new ItemStack(AddonBlocks.ELECTRIC_BLENDER)
             ))
-            .addRichTooltipCallback((slotView, tooltip) -> tooltip.add(REQUIREMENT));
+            .addRichTooltipCallback((slotView, tooltip) -> tooltip.add(BLENDER_REQUIREMENT));
+        // 热源单独一格：和搅拌机缺一不可，混在一格里轮播会看成二选一。
+        builder.addSlot(RecipeIngredientRole.CATALYST, HEAT_X + 1, HEAT_Y + 1)
+            .addItemStacks(List.of(
+                new ItemStack(ModBlocks.HEATER),
+                new ItemStack(ModBlocks.BURNING_HEATER)
+            ))
+            .addRichTooltipCallback((slotView, tooltip) -> tooltip.add(HEAT_REQUIREMENT));
     }
 
     @Override
@@ -141,6 +156,7 @@ public class FermentationCategory implements IRecipeCategory<RecipeHolder<Fermen
         this.slot.draw(guiGraphics, INPUT_X, INPUT_Y);
         this.slot.draw(guiGraphics, OUTPUT_X, OUTPUT_Y);
         this.slot.draw(guiGraphics, HINT_X, HINT_Y);
+        this.slot.draw(guiGraphics, HEAT_X, HEAT_Y);
         this.arrowIn.draw(guiGraphics, 47, 30);
         this.arrowOut.draw(guiGraphics, 99, 29);
 
@@ -167,5 +183,9 @@ public class FermentationCategory implements IRecipeCategory<RecipeHolder<Fermen
             new ItemStack(AddonBlocks.BLENDER), AnvilCraftPigeonPlusJeiPlugin.FERMENTATION);
         registration.addRecipeCatalyst(
             new ItemStack(AddonBlocks.ELECTRIC_BLENDER), AnvilCraftPigeonPlusJeiPlugin.FERMENTATION);
+        registration.addRecipeCatalyst(
+            new ItemStack(ModBlocks.HEATER), AnvilCraftPigeonPlusJeiPlugin.FERMENTATION);
+        registration.addRecipeCatalyst(
+            new ItemStack(ModBlocks.BURNING_HEATER), AnvilCraftPigeonPlusJeiPlugin.FERMENTATION);
     }
 }

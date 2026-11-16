@@ -29,19 +29,25 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.List;
+
 /**
  * 大型炼药锅的「批量酿造」分类。
  *
  * <p>与小锅版是同一套配方，区别只在容量：大锅一次炼制 8B（8 个储罐各 1 桶），
  * 所以这里展示 8000mB，且一次只消耗 1 个材料。
  *
- * <p>排版严格照搬本体固液反应的大锅布局（{@code AbstractLiquidReactionCategory}）：
- * 输入按 2x2 网格摆放（有加热器时网格固定为 4 格），加热器是右下角的<b>催化剂槽位</b>，
- * 绘制顺序为「槽位 → 箭头 → 巨型铁砧 → 大锅」，比例 7.5。
+ * <p>排版照搬本体固液反应的大锅布局（{@code AbstractLiquidReactionCategory}）：
+ * 输入按 2x2 网格摆放（有加热器时网格固定为 4 格），绘制顺序为「槽位 → 箭头 → 巨型铁砧 → 大锅」，比例 7.5。
+ *
+ * <p>与本体布局的一处差别：催化剂分成<b>两格</b>——搅拌机和热源各占一格。
+ * 两者缺一不可，塞进同一格会变成 JEI 的轮播，看起来像二选一。第二格放在第一格下方，
+ * 分类高度因此比本体高 18 像素。
  */
 public class PotionBulkBrewingCategory implements IRecipeCategory<PotionBrewingJeiRecipe> {
     private static final int WIDTH = 162;
-    private static final int HEIGHT = 64;
+    /** 比本体大锅布局高 18 像素，给单独一格的「热源」留位置。 */
+    private static final int HEIGHT = 82;
 
     // 大锅一次 8B。
     private static final int DISPLAY_AMOUNT = 8000;
@@ -49,11 +55,18 @@ public class PotionBulkBrewingCategory implements IRecipeCategory<PotionBrewingJ
     // 与本体 AbstractLiquidReactionCategory 一致。
     private static final float MODEL_SCALE = 7.5F;
     private static final int HEATER_INPUT_GRID_SIZE = 4;
+    /** 搅拌机格：本体大锅布局里的催化剂位。 */
     private static final int HEATER_X = 100;
     private static final int HEATER_Y = 41;
+    /** 热源格：单独放在搅拌机下面，两者缺一不可，不能塞进同一格轮播。 */
+    private static final int HEAT_X = 100;
+    private static final int HEAT_Y = 59;
 
     private static final Component BLENDER_ACTIVE = Component.translatable(
         "gui.anvilcraft_pigeon_plus.category.potion_bulk_brewing.need_blender"
+    ).withStyle(ChatFormatting.GOLD);
+    private static final Component HEAT_ACTIVE = Component.translatable(
+        "gui.anvilcraft_pigeon_plus.category.potion_bulk_brewing.need_heat"
     ).withStyle(ChatFormatting.GOLD);
     private static final Component BULK = Component.translatable(
         "gui.anvilcraft_pigeon_plus.category.potion_bulk_brewing.bulk"
@@ -131,8 +144,17 @@ public class PotionBulkBrewingCategory implements IRecipeCategory<PotionBrewingJ
             .addItemStack(recipe.reagent())
             .addRichTooltipCallback((slotView, tooltip) -> tooltip.add(BULK));
         builder.addSlot(RecipeIngredientRole.CATALYST, HEATER_X + 1, HEATER_Y + 1)
-            .addItemStack(new ItemStack(AddonBlocks.ELECTRIC_BLENDER))
+            .addItemStacks(List.of(
+                new ItemStack(AddonBlocks.ELECTRIC_BLENDER),
+                new ItemStack(AddonBlocks.BLENDER)
+            ))
             .addRichTooltipCallback((slotView, tooltip) -> tooltip.add(BLENDER_ACTIVE));
+        builder.addSlot(RecipeIngredientRole.CATALYST, HEAT_X + 1, HEAT_Y + 1)
+            .addItemStacks(List.of(
+                new ItemStack(ModBlocks.HEATER),
+                new ItemStack(ModBlocks.BURNING_HEATER)
+            ))
+            .addRichTooltipCallback((slotView, tooltip) -> tooltip.add(HEAT_ACTIVE));
 
         SlotPosition outputPosition = fluidOutputPosition();
         IRecipeSlotBuilder fluidOutput = JeiFluidUtil.addFluidSlot(
@@ -174,6 +196,7 @@ public class PotionBulkBrewingCategory implements IRecipeCategory<PotionBrewingJ
         SlotPosition itemPosition = inputPosition(1);
         this.slot.draw(guiGraphics, itemPosition.x(), itemPosition.y());
         this.slot.draw(guiGraphics, HEATER_X, HEATER_Y);
+        this.slot.draw(guiGraphics, HEAT_X, HEAT_Y);
         SlotPosition outputPosition = fluidOutputPosition();
         this.slot.draw(guiGraphics, outputPosition.x(), outputPosition.y());
 

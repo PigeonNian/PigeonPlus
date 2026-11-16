@@ -55,8 +55,11 @@ public class ReformingCategory implements IRecipeCategory<RecipeHolder<Reforming
     private static final int MAGNET_X = 100;
     private static final int MAGNET_Y = 59;
 
-    private static final Component REQUIREMENT = Component.translatable(
-        "gui.anvilcraft_pigeon_plus.category.reforming.requirement"
+    private static final Component BLENDER_REQUIREMENT = Component.translatable(
+        "gui.anvilcraft_pigeon_plus.category.reforming.need_blender"
+    ).withStyle(ChatFormatting.GOLD);
+    private static final Component MAGNET_REQUIREMENT = Component.translatable(
+        "gui.anvilcraft_pigeon_plus.category.reforming.need_magnet"
     ).withStyle(ChatFormatting.GOLD);
 
     private final IDrawable icon;
@@ -131,11 +134,11 @@ public class ReformingCategory implements IRecipeCategory<RecipeHolder<Reforming
                 new ItemStack(AddonBlocks.BLENDER),
                 new ItemStack(AddonBlocks.ELECTRIC_BLENDER)
             ))
-            .addRichTooltipCallback((slotView, tooltip) -> tooltip.add(REQUIREMENT));
+            .addRichTooltipCallback((slotView, tooltip) -> tooltip.add(BLENDER_REQUIREMENT));
         // 磁铁块单独一格：两者缺一不可，轮播会让人误以为「有其一即可」。
         builder.addSlot(RecipeIngredientRole.CATALYST, MAGNET_X + 1, MAGNET_Y + 1)
             .addItemStack(new ItemStack(ModBlocks.MAGNET_BLOCK))
-            .addRichTooltipCallback((slotView, tooltip) -> tooltip.add(REQUIREMENT));
+            .addRichTooltipCallback((slotView, tooltip) -> tooltip.add(MAGNET_REQUIREMENT));
 
         SlotPosition outputPosition = fluidOutputPosition();
         JeiFluidUtil.addFluidSlot(

@@ -183,13 +183,21 @@ public class AddonLangHandler {
         );
         provider.add("gui.anvilcraft_pigeon_plus.category.fermentation", "Fermentation");
         provider.add(
-            "gui.anvilcraft_pigeon_plus.category.fermentation.requirement",
-            "Requires an air blender and a heat source\nAn electric blender can serve as both"
+            "gui.anvilcraft_pigeon_plus.category.fermentation.need_blender",
+            "Requires a running blender, air or electric"
+        );
+        provider.add(
+            "gui.anvilcraft_pigeon_plus.category.fermentation.need_heat",
+            "Also needs a heat source: electric heater, burning heater or a heating electric blender"
         );
         provider.add("gui.anvilcraft_pigeon_plus.category.reforming", "Steam Reforming");
         provider.add(
-            "gui.anvilcraft_pigeon_plus.category.reforming.requirement",
-            "Requires a giant anvil to strike the cauldron\nAlso needs a working blender, a heat source and a magnet block\nAn electric blender can serve as both blender and heat"
+            "gui.anvilcraft_pigeon_plus.category.reforming.need_blender",
+            "Triggered by a giant anvil striking the cauldron\nRequires a running blender and a heat source\nAn electric blender can serve as both blender and heat"
+        );
+        provider.add(
+            "gui.anvilcraft_pigeon_plus.category.reforming.need_magnet",
+            "Place a magnet block in the 3x3 below the cauldron as the catalyst\nThe catalyst is not consumed"
         );
         provider.add("gui.anvilcraft_pigeon_plus.category.potion_brewing", "Potion Brewing");
         provider.add(
@@ -207,7 +215,11 @@ public class AddonLangHandler {
         );
         provider.add(
             "gui.anvilcraft_pigeon_plus.category.potion_bulk_brewing.need_blender",
-            "Requires a running blender with a blaze head plus a heat source: electric heater, burning heater or a heating electric blender"
+            "Requires a running blender with a blaze head"
+        );
+        provider.add(
+            "gui.anvilcraft_pigeon_plus.category.potion_bulk_brewing.need_heat",
+            "Also needs a heat source: electric heater, burning heater or a heating electric blender"
         );
         provider.add("gui.anvilcraft_pigeon_plus.category.potion_soaking", "Potion Soaking");
         provider.add(
