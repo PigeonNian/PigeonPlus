@@ -12,6 +12,7 @@ import dev.dubhe.anvilcraft.block.BurningHeaterBlock;
 import dev.dubhe.anvilcraft.block.HeaterBlock;
 import dev.dubhe.anvilcraft.block.entity.BurningHeaterBlockEntity;
 import dev.dubhe.anvilcraft.block.entity.LargeCauldronBlockEntity;
+import dev.dubhe.anvilcraft.entity.FallingGiantAnvilEntity;
 import dev.dubhe.anvilcraft.init.block.ModBlocks;
 import dev.dubhe.anvilcraft.recipe.anvil.wrap.SuperHeatingRecipe;
 import net.minecraft.core.BlockPos;
@@ -42,11 +43,18 @@ public class ReformingEventListener {
     private static long lastTick = Long.MIN_VALUE;
 
     /**
-     * 只订阅巨型铁砧落地：大型炼药锅的重整必须由巨型铁砧砸下才成立，
-     * 普通铁砧（以及皇家/余烬/浮霜等变体）不参与。JEI 的催化剂列表与此保持一致。
+     * 只认巨型铁砧，但必须挂 {@link AnvilEvent.OnLand}。
+     *
+     * <p>巨型铁砧落地时会先发一次 {@code GiantOnLand}，再对脚下 3×3 逐格补发 9 次 {@code OnLand}。
+     * {@code GiantOnLand} 的坐标是铁砧自身落点，从那里找不到炼药锅；{@code OnLand} 的坐标才是
+     * 「贴着锅的那一层」，发酵用的也是这条路径。所以这里订阅 {@code OnLand}，再用实体类型
+     * 过滤掉普通铁砧及其变体。
      */
     @SubscribeEvent
-    public static void onGiantAnvilLand(AnvilEvent.GiantOnLand event) {
+    public static void onAnvilLand(AnvilEvent.OnLand event) {
+        if (!(event.getEntity() instanceof FallingGiantAnvilEntity)) {
+            return;
+        }
         tryReform(event.getLevel(), event.getPos());
     }
 
