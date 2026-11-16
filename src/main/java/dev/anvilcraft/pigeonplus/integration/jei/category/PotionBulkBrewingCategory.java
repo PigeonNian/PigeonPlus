@@ -8,7 +8,6 @@ import dev.dubhe.anvilcraft.block.LargeCauldronBlock;
 import dev.dubhe.anvilcraft.block.state.Cube3x3PartHalf;
 import dev.dubhe.anvilcraft.client.support.RenderSupport;
 import dev.dubhe.anvilcraft.init.block.ModBlocks;
-import dev.dubhe.anvilcraft.integration.jei.AnvilCraftJeiPlugin;
 import dev.dubhe.anvilcraft.integration.jei.util.JeiBlockIngredientUtil;
 import dev.dubhe.anvilcraft.integration.jei.util.JeiFluidUtil;
 import dev.dubhe.anvilcraft.integration.jei.util.JeiRenderHelper;
@@ -196,8 +195,10 @@ public class PotionBulkBrewingCategory implements IRecipeCategory<PotionBrewingJ
     }
 
     public static void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        AnvilCraftJeiPlugin.addAnvilProcessingCatalysts(
-            registration, AnvilCraftPigeonPlusJeiPlugin.POTION_BULK_BREWING);
+        // 大锅配方只能由巨型铁砧执行：普通铁砧那套通用催化剂在这里是错的，
+        // 会让玩家以为把普通铁砧砸在锅上也能触发。
+        registration.addRecipeCatalyst(
+            new ItemStack(ModBlocks.GIANT_ANVIL), AnvilCraftPigeonPlusJeiPlugin.POTION_BULK_BREWING);
         registration.addRecipeCatalyst(
             new ItemStack(ModBlocks.LARGE_CAULDRON), AnvilCraftPigeonPlusJeiPlugin.POTION_BULK_BREWING);
         registration.addRecipeCatalyst(

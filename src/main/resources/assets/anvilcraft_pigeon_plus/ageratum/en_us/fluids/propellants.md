@@ -29,7 +29,7 @@ Liquid oxygen sits at about 90 K. Poured into the world, it evaporates within 1-
 
 ## Fuel: Liquid Hydrogen
 
-Liquid hydrogen is the fuel used by hydrogen-oxygen exhaust.
+Liquid hydrogen is the fuel used by hydrogen-oxygen exhaust; it is made by steam-reforming biogas (see [Hydrogen and Liquid Hydrogen](hydrogen)).
 
 At about 20 K it is colder than liquid oxygen and evaporates faster, so it cannot be stored in the open either.
 

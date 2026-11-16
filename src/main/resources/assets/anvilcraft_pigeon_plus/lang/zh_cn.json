@@ -150,6 +150,8 @@
     "block.anvilcraft_pigeon_plus.electric_blender": "电搅拌机",
     "gui.anvilcraft_pigeon_plus.category.fermentation": "发酵",
     "gui.anvilcraft_pigeon_plus.category.fermentation.requirement": "需要一台运行中的气动搅拌机和热源\n电搅拌机可以同时充当两者",
+    "gui.anvilcraft_pigeon_plus.category.reforming": "蒸汽重整",
+    "gui.anvilcraft_pigeon_plus.category.reforming.requirement": "用巨型铁砧砸锅触发\n需要一台运行中的搅拌机和热源\n并在锅下 3×3 内放一块磁铁块作为催化剂\n电搅拌机可以同时充当搅拌机与热源",
     "gui.anvilcraft_pigeon_plus.category.potion_brewing.need_blender": "需要一台装有烈焰人头的运行中搅拌机",
     "gui.anvilcraft_pigeon_plus.category.potion_bulk_brewing.need_blender": "需要一台装有烈焰人头的运行中电动搅拌机",
     "tooltip.anvilcraft_pigeon_plus.item.electric_blender": "在炼药锅下搅拌流体原料\n通电时还会加热上方方块",

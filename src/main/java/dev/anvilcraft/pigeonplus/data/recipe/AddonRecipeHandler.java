@@ -11,6 +11,7 @@ public class AddonRecipeHandler {
         AddonItemCompressRecipeLoader.init(provider);
         AddonProceduralProcessRecipeLoader.init(provider);
         AddonFermentationRecipeLoader.init(provider);
+        AddonReformingRecipeLoader.init(provider);
         AddonGasLiquefactionRecipeLoader.init(provider);
         AddonMultiblockRecipeLoader.init(provider);
         AddonMultiblockConversionRecipeLoader.init(provider);

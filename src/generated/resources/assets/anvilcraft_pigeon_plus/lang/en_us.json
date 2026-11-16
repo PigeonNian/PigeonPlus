@@ -109,6 +109,8 @@
   "gui.anvilcraft_pigeon_plus.category.potion_bulk_brewing.bulk": "Brews 8B at once, using only one reagent",
   "gui.anvilcraft_pigeon_plus.category.potion_bulk_brewing.need_blender": "Requires a running electric blender with a blaze head",
   "gui.anvilcraft_pigeon_plus.category.potion_soaking": "Potion Soaking",
+  "gui.anvilcraft_pigeon_plus.category.reforming": "Steam Reforming",
+  "gui.anvilcraft_pigeon_plus.category.reforming.requirement": "Requires a giant anvil to strike the cauldron\nAlso needs a working blender, a heat source and a magnet block\nAn electric blender can serve as both blender and heat",
   "gui.anvilcraft_pigeon_plus.gas_liquefaction.fill_then": "After Full",
   "gui.anvilcraft_pigeon_plus.gas_liquefaction.keep_pumping": "Keep Pumping",
   "gui.anvilcraft_pigeon_plus.gas_liquefaction.liquefy": "Liquefy",

@@ -1,0 +1,17 @@
+{
+  "type": "anvilcraft_pigeon_plus:reforming",
+  "inputs": [
+    {
+      "amount": 1,
+      "id": "anvilcraft_pigeon_plus:liquefied_biogas"
+    },
+    {
+      "amount": 2,
+      "id": "minecraft:water"
+    }
+  ],
+  "output": {
+    "amount": 2048,
+    "id": "anvilcraft:hydrogen"
+  }
+}

@@ -35,5 +35,15 @@ public class AddonGasLiquefactionRecipeLoader {
             ),
             null
         );
+
+        // 氢气来自蒸汽重整，液化比与本体甲烷的 512:1 同一套体积口径（氢气更轻，取 400:1）。
+        provider.accept(
+            AnvilCraftPigeonPlus.of("gas_liquefaction/hydrogen"),
+            new GasLiquefactionRecipe(
+                new FluidStack(ModFluids.HYDROGEN.get(), 400),
+                new FluidStack(AddonFluids.LIQUID_HYDROGEN.get(), 1)
+            ),
+            null
+        );
     }
 }

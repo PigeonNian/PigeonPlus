@@ -17,7 +17,7 @@ items:
 
 Liquid oxygen is the oxidizer source for nozzle exhaust.
 
-Liquid hydrogen is the fuel for hydrogen-oxygen nozzle exhaust.
+Liquid hydrogen is the fuel for hydrogen-oxygen nozzle exhaust; see [Hydrogen and Liquid Hydrogen](hydrogen) for how it is made.
 
 ## Compressed Air
 

@@ -30,6 +30,7 @@ This guide records the machines, fluids, and large structure behavior added by t
 
 - [Mixed Biomass and Biogas](fluids/biogas)
 - [Liquid Oxygen and Compressed Air](fluids/oxygen)
+- [Hydrogen and Liquid Hydrogen](fluids/hydrogen)
 - [Exhaust and Fuel](fluids/propellants)
 - [Liquid Chocolate](fluids/chocolate)
 - [Gases in Pipes](fluids/gas_diffusion)

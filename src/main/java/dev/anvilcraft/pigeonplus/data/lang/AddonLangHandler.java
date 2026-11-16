@@ -186,6 +186,11 @@ public class AddonLangHandler {
             "gui.anvilcraft_pigeon_plus.category.fermentation.requirement",
             "Requires an air blender and a heat source\nAn electric blender can serve as both"
         );
+        provider.add("gui.anvilcraft_pigeon_plus.category.reforming", "Steam Reforming");
+        provider.add(
+            "gui.anvilcraft_pigeon_plus.category.reforming.requirement",
+            "Requires a giant anvil to strike the cauldron\nAlso needs a working blender, a heat source and a magnet block\nAn electric blender can serve as both blender and heat"
+        );
         provider.add("gui.anvilcraft_pigeon_plus.category.potion_brewing", "Potion Brewing");
         provider.add(
             "gui.anvilcraft_pigeon_plus.category.potion_brewing.whole_tank",

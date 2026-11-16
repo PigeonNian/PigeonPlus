@@ -2,7 +2,6 @@ package dev.anvilcraft.pigeonplus.mixin;
 
 import dev.anvilcraft.pigeonplus.util.HeaterCompat;
 import dev.anvilcraft.pigeonplus.util.NozzleExhaustUtil;
-import dev.anvilcraft.pigeonplus.util.GasEscapeUtil;
 import dev.anvilcraft.pigeonplus.util.PotionParticleUtil;
 import dev.dubhe.anvilcraft.block.entity.LargeCauldronBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -18,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(LargeCauldronBlockEntity.class)
 public class LargeCauldronBlockEntityMixin {
     @Inject(method = "serverTick", at = @At("TAIL"))
-    private static void pigeonplus$escapeGas(
+    private static void pigeonplus$emitPropellantParticles(
         Level level,
         BlockPos pos,
         BlockState state,
@@ -26,7 +25,6 @@ public class LargeCauldronBlockEntityMixin {
         CallbackInfo ci
     ) {
         if (level instanceof ServerLevel serverLevel && entity.isMainPart()) {
-            GasEscapeUtil.escapeLargeCauldronGas(level, pos, entity.getFluids());
             if (entity.isIgnited()) {
                 NozzleExhaustUtil.JetPropellant propellant = NozzleExhaustUtil.getAvailableJetPropellant(entity);
                 if (propellant != null) {
