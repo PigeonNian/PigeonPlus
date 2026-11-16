@@ -203,6 +203,14 @@ public class PotionBulkBrewingCategory implements IRecipeCategory<PotionBrewingJ
             new ItemStack(ModBlocks.LARGE_CAULDRON), AnvilCraftPigeonPlusJeiPlugin.POTION_BULK_BREWING);
         registration.addRecipeCatalyst(
             new ItemStack(AddonBlocks.ELECTRIC_BLENDER), AnvilCraftPigeonPlusJeiPlugin.POTION_BULK_BREWING);
+        // 气动搅拌机装上烈焰搅拌头一样能酿，两种搅拌机并列列出。
+        registration.addRecipeCatalyst(
+            new ItemStack(AddonBlocks.BLENDER), AnvilCraftPigeonPlusJeiPlugin.POTION_BULK_BREWING);
+        // 搅拌之外还要热源。
+        registration.addRecipeCatalyst(
+            new ItemStack(ModBlocks.HEATER), AnvilCraftPigeonPlusJeiPlugin.POTION_BULK_BREWING);
+        registration.addRecipeCatalyst(
+            new ItemStack(ModBlocks.BURNING_HEATER), AnvilCraftPigeonPlusJeiPlugin.POTION_BULK_BREWING);
     }
 
     // 以下三个定位方法与本体 AbstractLiquidReactionCategory 完全一致。

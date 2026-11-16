@@ -32,6 +32,7 @@ items:
 - [液氧与压缩空气](fluids/oxygen)
 - [氢气与液氢](fluids/hydrogen)
 - [燃气与燃料](fluids/propellants)
+- [药水与酿造](fluids/potion)
 - [熔融巧克力](fluids/chocolate)
 - [气体与管道](fluids/gas_diffusion)
 

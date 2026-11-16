@@ -59,6 +59,9 @@ public class LargeCauldronBrewingEventListener {
         if (BrewingBlender.hasBulkBrewingBlenderArrayBelow(
             level, main.getBlockPos(), level.getBlockState(main.getBlockPos()))) {
             if (brewAny(level, main, fluids, input)) {
+                // 热量来自燃烧加热器时扣一份燃烧时间；电加热不烧燃料。
+                BrewingBlender.consumeBulkBrewingFuel(
+                    level, main.getBlockPos(), level.getBlockState(main.getBlockPos()));
                 return;
             }
         }

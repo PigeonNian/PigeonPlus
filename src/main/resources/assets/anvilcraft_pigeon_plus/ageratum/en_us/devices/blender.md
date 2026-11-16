@@ -27,6 +27,20 @@ The air blender only runs while it is being fed **compressed air** from its inpu
 
 <item id="anvilcraft_pigeon_plus:compressed_air_bucket"/>
 
+## Blender Heads
+
+The blender only runs with a head installed; without one it will not turn even when fed compressed air.
+
+| Head | How to install | What it does |
+|---|---|---|
+| Iron head | Right-click with an **iron shovel** | Only makes the machine run, no heat; enough for recipes that do not need heat, such as blending crops into mixed biomass |
+| Blaze head | Right-click with a **blaze rod** | Heats the block above while running; recipes that need heat (liquid chocolate, brewing, and so on) require it |
+
+- Remove: **sneak and right-click with an empty hand**; the head goes back to your inventory, or drops at your feet if the inventory is full.
+- Swap: remove the old head first, then install the new one; the machine switches over on its own.
+
+An electric blender heats itself while powered, so it can run heat recipes even with an iron head; see [Electric Blender](electric_blender).
+
 ## Recipe
 
 <recipe id="anvilcraft_pigeon_plus:blender"/>

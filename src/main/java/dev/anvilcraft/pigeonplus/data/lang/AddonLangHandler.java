@@ -198,7 +198,7 @@ public class AddonLangHandler {
         );
         provider.add(
             "gui.anvilcraft_pigeon_plus.category.potion_brewing.need_blender",
-            "Requires an air blender with a blaze head"
+            "Requires a running blender with a blaze head"
         );
         provider.add("gui.anvilcraft_pigeon_plus.category.potion_bulk_brewing", "Bulk Potion Brewing");
         provider.add(
@@ -207,7 +207,7 @@ public class AddonLangHandler {
         );
         provider.add(
             "gui.anvilcraft_pigeon_plus.category.potion_bulk_brewing.need_blender",
-            "Requires a running electric blender with a blaze head"
+            "Requires a running blender with a blaze head plus a heat source: electric heater, burning heater or a heating electric blender"
         );
         provider.add("gui.anvilcraft_pigeon_plus.category.potion_soaking", "Potion Soaking");
         provider.add(

@@ -22,7 +22,7 @@ The electric blender is the powered version of the air blender. It needs no comp
 
 The electric blender supplies heat upward while powered, so for recipes that need both blending and heating — such as biogas conversion — a single electric blender satisfies every condition on its own. See [Biogas](../fluids/biogas).
 
-For the same reason it **places no restriction on the blender head** for heat-requiring blending recipes such as [liquid chocolate](../fluids/chocolate); an air blender, by contrast, must be fitted with a blaze head.
+For the same reason it **places no restriction on the blender head** for heat-requiring blending recipes such as [liquid chocolate](../fluids/chocolate); an air blender, by contrast, must be fitted with a blaze head. See [Air Blender](blender) for how to install and remove heads.
 
 ## Crafting
 
