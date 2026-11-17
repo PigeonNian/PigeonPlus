@@ -53,6 +53,8 @@
     "block.anvilcraft_pigeon_plus.feed_spreader": "饲料撒布器",
     "block.anvilcraft_pigeon_plus.gaseous_biogas": "沼气",
     "block.anvilcraft_pigeon_plus.large_fireworks_rocket": "大型烟花火箭",
+    "block.anvilcraft_pigeon_plus.large_tnt": "大型TNT",
+    "entity.anvilcraft_pigeon_plus.large_tnt": "大型TNT",
     "entity.anvilcraft_pigeon_plus.large_fireworks_rocket": "大型烟花火箭",
     "entity.anvilcraft_pigeon_plus.large_fireworks_rocket_seat": "大型烟花座椅",
     "block.anvilcraft_pigeon_plus.liquefied_biogas": "液化沼气",

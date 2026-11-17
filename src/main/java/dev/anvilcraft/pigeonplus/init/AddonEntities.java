@@ -2,8 +2,10 @@ package dev.anvilcraft.pigeonplus.init;
 
 import dev.anvilcraft.lib.v2.registrum.util.entry.EntityEntry;
 import dev.anvilcraft.pigeonplus.client.renderer.entity.LargeFireworksRocketRenderer;
+import dev.anvilcraft.pigeonplus.client.renderer.entity.LargeTntRenderer;
 import dev.anvilcraft.pigeonplus.entity.LargeFireworksRocketEntity;
 import dev.anvilcraft.pigeonplus.entity.LargeFireworksRocketSeatEntity;
+import dev.anvilcraft.pigeonplus.entity.LargeTntEntity;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.world.entity.MobCategory;
 
@@ -40,6 +42,19 @@ public class AddonEntities {
             .noSummon()
             .fireImmune())
         .renderer(() -> NoopRenderer::new)
+        .register();
+
+    /** 大型TNT点燃后的实体：比方块结构小 0.1 格（2.9×2.9），避免刚生成时卡在 3×3×3 坑口的边缘方块上。 */
+    public static final EntityEntry<LargeTntEntity> LARGE_TNT = REGISTRUM
+        .<LargeTntEntity>entity("large_tnt", LargeTntEntity::new, MobCategory.MISC)
+        .lang("Large TNT")
+        .properties(builder -> builder
+            .sized(LargeTntEntity.SIZE, LargeTntEntity.SIZE)
+            .clientTrackingRange(16)
+            // 大碰撞箱下落时一 tick 位移明显，10 tick 同步一次会让客户端看到"一跳一跳"的位移。
+            .updateInterval(2)
+            .fireImmune())
+        .renderer(() -> LargeTntRenderer::new)
         .register();
 
     public static void register() {

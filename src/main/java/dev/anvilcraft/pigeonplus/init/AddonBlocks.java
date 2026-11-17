@@ -10,6 +10,7 @@ import dev.anvilcraft.pigeonplus.block.FeedSpreaderBlock;
 import dev.anvilcraft.pigeonplus.block.FilledCookiePillarBlock;
 import dev.anvilcraft.pigeonplus.block.LargeCreamyBreadRollBlock;
 import dev.anvilcraft.pigeonplus.block.LargeFireworksRocketBlock;
+import dev.anvilcraft.pigeonplus.block.LargeTntBlock;
 import dev.anvilcraft.pigeonplus.block.MixedBiomassCauldronBlock;
 import dev.anvilcraft.pigeonplus.block.NozzleBlock;
 import dev.anvilcraft.pigeonplus.block.PigeonAnvilBlock;
@@ -20,6 +21,7 @@ import dev.dubhe.anvilcraft.block.item.FlexibleMultiPartBlockItem;
 import dev.dubhe.anvilcraft.block.item.SimpleMultiPartBlockItem;
 import dev.dubhe.anvilcraft.block.multipart.FlexibleMultiPartBlock;
 import dev.dubhe.anvilcraft.block.multipart.SimpleMultiPartBlock;
+import dev.dubhe.anvilcraft.block.state.Cube3x3PartHalf;
 import dev.dubhe.anvilcraft.block.state.DirectionCube3x3PartHalf;
 import dev.dubhe.anvilcraft.init.block.ModBlocks;
 import dev.dubhe.anvilcraft.init.block.ModBlockTags;
@@ -320,6 +322,26 @@ public class AddonBlocks {
         .item(SimpleMultiPartBlockItem<LargeFireworksRocketPart>::new)
         .model((ctx, prov) -> prov.withExistingParent(
             ctx.getName(), AnvilCraftPigeonPlus.of("item/large_fireworks_rocket_model")))
+        .build()
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+        .register();
+
+    public static final BlockEntry<LargeTntBlock> LARGE_TNT = REGISTRUM
+        .block("large_tnt", LargeTntBlock::new)
+        .lang("Large TNT")
+        .initialProperties(() -> Blocks.TNT)
+        .properties(properties -> properties
+            .noOcclusion()
+            .isViewBlocking((state, level, pos) -> false))
+        .blockstate((ctx, provider) -> provider.getVariantBuilder(ctx.getEntry()).forAllStates(state ->
+            ConfiguredModel.builder()
+                .modelFile(provider.models().getExistingFile(AnvilCraftPigeonPlus.of(
+                    "block/" + LargeTntBlock.getModelName(state))))
+                .build()))
+        .loot(SimpleMultiPartBlock::loot)
+        .item(SimpleMultiPartBlockItem<Cube3x3PartHalf>::new)
+        .model((ctx, prov) -> prov.withExistingParent(
+            ctx.getName(), AnvilCraftPigeonPlus.of("block/large_tnt")))
         .build()
         .tag(BlockTags.MINEABLE_WITH_PICKAXE)
         .register();

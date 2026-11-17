@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "block": "anvilcraft_pigeon_plus:large_tnt",
+              "condition": "minecraft:block_state_property",
+              "properties": {
+                "part": "bottom_center"
+              }
+            }
+          ],
+          "name": "anvilcraft_pigeon_plus:large_tnt"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "anvilcraft_pigeon_plus:blocks/large_tnt"
+}
